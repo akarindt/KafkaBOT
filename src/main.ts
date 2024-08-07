@@ -6,4 +6,5 @@ const database = new Database(DatabaseConfig.DEFAULT_DB);
 const client = new BotClient();
 
 database.InitializeDB();
-client.StartBot().then((error) => console.log(error));
+client.RegisterCommands();
+client.StartBot().catch((error) => console.log(error));

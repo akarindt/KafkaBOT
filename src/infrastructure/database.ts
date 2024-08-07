@@ -1,28 +1,29 @@
-import { DataSource, DataSourceOptions } from "typeorm";
+import { DatabaseConfig } from '@/helper/constant';
+import { DataSource, DataSourceOptions } from 'typeorm';
 
 export class Database {
-  private _options: DataSourceOptions;
-  private _Source: DataSource;
+    private _options: DataSourceOptions;
+    private _Source: DataSource;
 
-  constructor(options: DataSourceOptions) {
-    this._options = options;
-    this._Source = new DataSource(this._options);
-  }
+    constructor(options: DataSourceOptions) {
+        this._options = options;
+        this._Source = new DataSource(this._options);
+    }
 
-  public get options() {
-    return this._options;
-  }
-  
-  public get Source() {
-    return this._Source;
-  }
+    public get options() {
+        return this._options;
+    }
 
-  public InitializeDB() {
-    this._Source
-      .initialize()
-      .then(() => {
-        console.log("DATABASE CONNECTED");
-      })
-      .catch((error) => console.log(error));
-  }
+    public get Source() {
+        return this._Source;
+    }
+
+    public InitializeDB() {
+        this._Source
+            .initialize()
+            .then(() => {
+                console.log(`[INFO] Database connected - current driver: ${DatabaseConfig.DEFAULT_DB.type}`);
+            })
+            .catch((error) => console.log(error));
+    }
 }

@@ -1,8 +1,11 @@
-import { DataSourceOptions } from 'typeorm';
 import dotenv from 'dotenv';
+import { DataSourceOptions } from 'typeorm';
+
+
 dotenv.config({ path: '.env' });
 
 export class Misc {
+    public static readonly PRIMARY_EMBED_COLOR = 0xeb86c6;
     public static readonly USER_AGENTS = [
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 YaBrowser/20.9.0.933 Yowser/2.5 Safari/537.36',
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.192 Safari/537.36 OPR/74.0.3911.218',
@@ -12,6 +15,7 @@ export class Misc {
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36',
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:100.0) Gecko/20100101 Firefox/100.0',
     ];
+
 }
 
 export class Hoyolab {
