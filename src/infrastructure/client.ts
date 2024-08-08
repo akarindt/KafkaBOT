@@ -1,10 +1,11 @@
-import { Client, Collection, GatewayIntentBits, REST, Routes } from 'discord.js';
+import { Client, Collection, EmbedBuilder, GatewayIntentBits, REST, Routes } from 'discord.js';
 import { CommandInteraction, Message } from 'discord.js';
 import { glob } from 'glob';
 import path from 'path';
 import url from 'url';
 import { Player } from 'discord-player';
 import { YoutubeiExtractor } from 'discord-player-youtubei';
+import { Misc } from '@/helper/constant';
 
 export interface Command {
     data: any;
@@ -161,8 +162,36 @@ export class BotClient extends Client {
     }
 
     public async RegisterPlayer() {
-        const player = new Player(this, { skipFFmpeg: true });
+        const player = new Player(this);
         await player.extractors.register(YoutubeiExtractor, {});
+
+        const embed = (message: string) => {
+            return new EmbedBuilder()
+                .setColor(Misc.PRIMARY_EMBED_COLOR)
+                .setAuthor({
+                    name: `${this.user?.displayName} - ${this.user?.tag}`,
+                    iconURL: this.user?.avatarURL() || "",
+                })
+                .setTitle(message)
+                .setTimestamp()
+                .setFooter({ text: 'SauceNAO', iconURL: this.user?.tag });
+        }
+
+        player.events.on("playerStart", (queue, track) => {
+            queue.metadata.channel.send(`🎶 Started playing: **[${track.title}](${track.url})** in **${queue.channel?.name}**!`)
+        })
+
+        player.events.on("disconnect", (queue) => {
+            queue.metadata.channel.send(`❌ I was manually disconnected from the voice channel, clearing queue!`)
+        })
+
+        player.events.on("emptyChannel", (queue) => {
+            queue.metadata.channel.send("❌ Nobody is in the voice channel, leaving...");
+        });
+
+        player.events.on("emptyQueue", (queue) => {
+            queue.metadata.channel.send("✅ Queue finished!");
+        });
     }
 
     private async importFile(filePath: string) {

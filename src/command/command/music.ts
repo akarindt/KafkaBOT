@@ -48,24 +48,81 @@ export default [
                         metadata: interaction,
                     },
                 });
-                await interaction.followUp(`**${track.cleanTitle}** enqueued!`);
+                await interaction.followUp(`✅ **${track.cleanTitle}** enqueued!`);
                 return;
             } catch (e) {
-                await interaction.followUp(`Something went wrong: ${e}`);
+                await interaction.followUp(`❌ Something went wrong: ${e}`);
                 return;
             }
         },
     },
     {
         data: new SlashCommandBuilder().setName('skip').setDescription('Skip to the current song'),
-        async execute(interaction: CommandInteraction) {},
+        async execute(interaction: CommandInteraction) {
+            const player = useMainPlayer();
+            await interaction.deferReply();
+
+            if (!interaction.guildId) {
+                await interaction.reply('❌ Guild ID not found!');
+                return;
+            }
+
+            const queue = player.queues.cache.get(interaction.guildId);
+
+            if (!queue) {
+                await interaction.followUp('❌ Queue not found!');
+                return;
+            }
+
+            const currentTrack = queue.currentTrack;
+
+            if (!currentTrack) {
+                await interaction.followUp('❌ No music is being played!');
+                return;
+            }
+
+            const success = queue.node.skip();
+            await interaction.followUp({
+                content: success ? `✅ Skipped **[${currentTrack?.cleanTitle}](${currentTrack?.url})**!` : '❌ Something went wrong!',
+            });
+            return;
+        },
     },
     {
         data: new SlashCommandBuilder().setName('queue').setDescription('See the queue'),
-        async execute(interaction: CommandInteraction) {},
+        async execute(interaction: CommandInteraction) {
+            const player = useMainPlayer();
+            const queue = player.queues.cache.get(interaction.guildId || '');
+            await interaction.deferReply();
+            if (!queue) {
+                await interaction.followUp('❌ Queue not found!');
+                return;
+            }
+
+            const tracks = queue.tracks;
+        },
     },
     {
         data: new SlashCommandBuilder().setName('stop').setDescription('Stop the player'),
-        async execute(interaction: CommandInteraction) {},
+        async execute(interaction: CommandInteraction) {
+            const player = useMainPlayer();
+            await interaction.deferReply();
+
+            if (!interaction.guildId) {
+                await interaction.followUp('❌ Guild ID not found!');
+                return;
+            }
+
+            const queue = player.queues.cache.get(interaction.guildId);
+
+            if (!queue) {
+                await interaction.followUp('❌ Queue not found!');
+                return;
+            }
+
+            queue.delete();
+            await interaction.followUp({ content: '🛑 Stopped the player!' });
+            return;
+        },
     },
 ];
