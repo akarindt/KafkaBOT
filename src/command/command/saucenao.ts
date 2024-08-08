@@ -1,22 +1,29 @@
 import { Misc } from '@/helper/constant';
 import { Utils } from '@/helper/util';
-import { ContextMenuCommandBuilder, ApplicationCommandType, CommandInteraction, EmbedBuilder } from 'discord.js';
+import { CommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import sagiri from 'sagiri';
 
 export default {
-    data: new ContextMenuCommandBuilder().setName('SauceNAO').setType(ApplicationCommandType.Message),
+    data: new SlashCommandBuilder()
+    .setName("saucenao")
+    .setDescription("Find sauce")
+    .addAttachmentOption(options => 
+        options.setName("attachment").setDescription("Attachment for searching").setRequired(true)
+    ),
     async execute(interaction: CommandInteraction) {
-        const data = interaction.options.data;
-        if (!data.length) return;
+        const data = interaction.options.get("attachment");
 
-        const attachment = data[0].message?.attachments.first();
-
-        if (!attachment) {
+        if (!data) {
             await interaction.reply('❌ Image required.');
             return;
         }
 
-        if (!attachment.contentType?.startsWith('image')) {
+        if(!data.attachment) {
+            await interaction.reply('❌ Image required.');
+            return;
+        }
+
+        if(!data.attachment.contentType?.startsWith("image")) {
             await interaction.reply('❌ The attachment is in wrong format.');
             return;
         }
@@ -28,7 +35,7 @@ export default {
         }
 
         const client = sagiri(saucenaoApiKey);
-        const result = await client(attachment.url);
+        const result = await client(data.attachment.url);
         const filter = result.filter((x) => x.similarity >= Misc.DEFAULT_SIMILARITY_POINT);
 
         if (!filter.length) {
@@ -62,5 +69,5 @@ export default {
 
         await interaction.reply({ embeds: [embed] });
         return;
-    },
-};
+    }
+}

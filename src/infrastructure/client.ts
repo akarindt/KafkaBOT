@@ -3,6 +3,8 @@ import { CommandInteraction, Message } from 'discord.js';
 import { glob } from 'glob';
 import path from 'path';
 import url from 'url';
+import { Player } from 'discord-player';
+import { YoutubeiExtractor } from 'discord-player-youtubei';
 
 export interface Command {
     data: any;
@@ -29,6 +31,7 @@ export class BotClient extends Client {
                 GatewayIntentBits.GuildMessages,
                 GatewayIntentBits.GuildMessageReactions,
                 GatewayIntentBits.MessageContent,
+                GatewayIntentBits.GuildVoiceStates,
             ],
         });
     }
@@ -122,15 +125,28 @@ export class BotClient extends Client {
         await Promise.all(
             files.map(async (filePath) => {
                 const imported = await this.importFile(url.pathToFileURL(filePath).href);
-                let command = (process.env.NODE_ENV == 'development' && imported) || imported.default;
+                let command: any = (process.env.NODE_ENV == 'development' && imported) || imported.default;
 
-                if ('data' in command && 'execute' in command) {
-                    this.commands.set(command.data.name, command);
-                    body.push(command.default ? command.default.data.toJSON() : command.data.toJSON())
-                } else if ('name' in command && 'execute' in command) {
-                    this.customs.set(command.name, command);
+                if (Array.isArray(command)) {
+                    for (let item of command) {
+                        if ('data' in item && 'execute' in item) {
+                            this.commands.set(item.data.name, item);
+                            body.push(item.default ? item.default.data.toJSON() : item.data.toJSON());
+                        } else if ('name' in item && 'execute' in item) {
+                            this.customs.set(item.name, item);
+                        } else {
+                            console.log(`[WARNING] The command at ${filePath} is missing required properties.`);
+                        }
+                    }
                 } else {
-                    console.log(`[WARNING] The command at ${filePath} is missing required properties.`);
+                    if ('data' in command && 'execute' in command) {
+                        this.commands.set(command.data.name, command);
+                        body.push(command.default ? command.default.data.toJSON() : command.data.toJSON());
+                    } else if ('name' in command && 'execute' in command) {
+                        this.customs.set(command.name, command);
+                    } else {
+                        console.log(`[WARNING] The command at ${filePath} is missing required properties.`);
+                    }
                 }
             })
         );
@@ -142,6 +158,11 @@ export class BotClient extends Client {
 
         console.log(`[INFO] Started refreshing ${this.commands.size} (/) commands.`);
         console.log(`[INFO] Started refreshing ${this.customs.size} custom (/) commands.`);
+    }
+
+    public async RegisterPlayer() {
+        const player = new Player(this, { skipFFmpeg: true });
+        await player.extractors.register(YoutubeiExtractor, {});
     }
 
     private async importFile(filePath: string) {
