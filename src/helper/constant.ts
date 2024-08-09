@@ -7,6 +7,7 @@ dotenv.config({ path: '.env' });
 export class Misc {
     public static readonly PRIMARY_EMBED_COLOR = 0xeb86c6;
     public static readonly DEFAULT_SIMILARITY_POINT = 60;
+    public static readonly ITEM_PER_PAGES = 12;
     public static readonly USER_AGENTS = [
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 YaBrowser/20.9.0.933 Yowser/2.5 Safari/537.36',
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.192 Safari/537.36 OPR/74.0.3911.218',

@@ -1,5 +1,51 @@
-import { Playlist, useMainPlayer } from 'discord-player';
-import { CommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { Misc } from '@/helper/constant';
+import { Utils } from '@/helper/util';
+import { Track, useMainPlayer } from 'discord-player';
+import { CommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
+
+const listTrackEmbed = (interaction: CommandInteraction, listTracks: Track[]) => {
+    if (listTracks.length <= 0) return [];
+    if (listTracks.length <= 10) {
+        return [
+            new EmbedBuilder()
+                .setColor(Misc.PRIMARY_EMBED_COLOR)
+                .setAuthor({
+                    name: `${interaction.user.displayName} - ${interaction.user.tag}`,
+                    iconURL: interaction.user.avatarURL() || '',
+                })
+                .setTitle('List tracks')
+                .setDescription(
+                    listTracks
+                        .map((track) => {
+                            return `- **[${track.cleanTitle}](${track.url})** - By: **${track.author}** - Duration: **${track.duration}**`;
+                        })
+                        .join('\n')
+                )
+                .setTimestamp()
+                .setFooter({ text: 'Music', iconURL: interaction.client.user.avatarURL() || '' }),
+        ];
+    }
+
+    const embeds = Utils.ChunkArray(listTracks, Misc.ITEM_PER_PAGES);
+    return embeds.map(() => {
+        return new EmbedBuilder()
+            .setColor(Misc.PRIMARY_EMBED_COLOR)
+            .setAuthor({
+                name: `${interaction.user.displayName} - ${interaction.user.tag}`,
+                iconURL: interaction.user.avatarURL() || '',
+            })
+            .setTitle('List tracks')
+            .setDescription(
+                listTracks
+                    .map((track) => {
+                        return `- **[${track.cleanTitle}](${track.url})** - Duration: ${track.author}`;
+                    })
+                    .join('\n')
+            )
+            .setTimestamp()
+            .setFooter({ text: 'Music', iconURL: interaction.client.user.avatarURL() || '' });
+    });
+};
 
 export default [
     {
@@ -93,13 +139,13 @@ export default [
         async execute(interaction: CommandInteraction) {
             const player = useMainPlayer();
             const queue = player.queues.cache.get(interaction.guildId || '');
-            await interaction.deferReply();
             if (!queue) {
                 await interaction.followUp('❌ Queue not found!');
                 return;
             }
 
             const tracks = queue.tracks;
+            await Utils.ButtonPagination(interaction, listTrackEmbed(interaction, tracks.data));
         },
     },
     {

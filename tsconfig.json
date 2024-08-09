@@ -8,7 +8,9 @@
         "moduleResolution": "node16",
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
+        "target": "es5",
         "skipLibCheck": true,
+        "allowJs": true,
         "baseUrl": ".",
         "paths": {
             "@/*": ["src/*"]
