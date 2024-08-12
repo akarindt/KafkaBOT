@@ -5,7 +5,7 @@ import { CommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.j
 
 const listTrackEmbed = (interaction: CommandInteraction, listTracks: Track[]) => {
     if (listTracks.length <= 0) return [];
-    if (listTracks.length <= 10) {
+    if (listTracks.length <= Misc.ITEM_PER_PAGES) {
         return [
             new EmbedBuilder()
                 .setColor(Misc.PRIMARY_EMBED_COLOR)
@@ -50,7 +50,7 @@ const listTrackEmbed = (interaction: CommandInteraction, listTracks: Track[]) =>
 export default [
     {
         data: new SlashCommandBuilder()
-            .setName('play')
+            .setName('kfplay')
             .setDescription('Play a song')
             .addStringOption((options) => options.setName('query').setDescription('The song you want to play').setRequired(true)),
         async execute(interaction: CommandInteraction) {
@@ -103,7 +103,7 @@ export default [
         },
     },
     {
-        data: new SlashCommandBuilder().setName('skip').setDescription('Skip to the current song'),
+        data: new SlashCommandBuilder().setName('kfskip').setDescription('Skip to the current song'),
         async execute(interaction: CommandInteraction) {
             const player = useMainPlayer();
             await interaction.deferReply();
@@ -135,7 +135,7 @@ export default [
         },
     },
     {
-        data: new SlashCommandBuilder().setName('queue').setDescription('See the queue'),
+        data: new SlashCommandBuilder().setName('kfqueue').setDescription('See the queue'),
         async execute(interaction: CommandInteraction) {
             const player = useMainPlayer();
             const queue = player.queues.cache.get(interaction.guildId || '');
@@ -149,7 +149,7 @@ export default [
         },
     },
     {
-        data: new SlashCommandBuilder().setName('stop').setDescription('Stop the player'),
+        data: new SlashCommandBuilder().setName('kfstop').setDescription('Stop the player'),
         async execute(interaction: CommandInteraction) {
             const player = useMainPlayer();
             await interaction.deferReply();

@@ -1,4 +1,3 @@
-import { DatabaseConfig } from '@/helper/constant';
 import { DataSource, DataSourceOptions } from 'typeorm';
 
 export class Database {
@@ -22,7 +21,7 @@ export class Database {
         this._Source
             .initialize()
             .then(() => {
-                console.log(`[INFO] Database connected - current driver: ${DatabaseConfig.DEFAULT_DB.type}`);
+                console.log(`[INFO] Database connected - current driver: ${this.Source.options.type}`);
             })
             .catch((error) => console.log(error));
     }

@@ -5,7 +5,7 @@ import { Hercai } from 'hercai';
 export default [
     {
         data: new SlashCommandBuilder()
-            .setName('chat')
+            .setName('kfchat')
             .setDescription('Chat with AI')
             .addStringOption((options) => options.setName('question').setDescription('Ask me anything...').setRequired(true)),
         async execute(interaction: CommandInteraction) {
@@ -30,7 +30,7 @@ export default [
     },
     {
         data: new SlashCommandBuilder()
-            .setName('draw')
+            .setName('kfdraw')
             .setDescription('Ask AI to draw a image')
             .addStringOption((options) => options.setName('idea').setDescription('Give me an idea...').setRequired(true)),
         async execute(interaction: CommandInteraction) {
@@ -43,7 +43,7 @@ export default [
             }
 
             const response = await herc.drawImage({
-                model: 'animefy',
+                model: 'shonin',
                 prompt: idea.value as string,
                 negative_prompt: Misc.NEGATIVE_PROMPTS.join(','),
             });

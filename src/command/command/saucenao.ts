@@ -5,7 +5,7 @@ import sagiri from 'sagiri';
 
 export default {
     data: new SlashCommandBuilder()
-    .setName("saucenao")
+    .setName("kfsaucenao")
     .setDescription("Find sauce")
     .addAttachmentOption(options => 
         options.setName("attachment").setDescription("Attachment for searching").setRequired(true)

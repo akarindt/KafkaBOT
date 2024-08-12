@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
     "db:up": "docker-compose up -d",
     "start:dev": "nodemon src/main.ts",
     "start:prod": "node build/main.js",
@@ -17,6 +18,7 @@
     "@types/fluent-ffmpeg": "^2.1.25",
     "@types/node": "^22.1.0",
     "nodemon": "^3.1.4",
+    "ts-node": "^10.9.2",
     "tsc-alias": "^1.8.10",
     "tsx": "^4.16.5",
     "typescript": "^5.5.4"

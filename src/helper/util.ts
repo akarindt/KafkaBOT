@@ -1,12 +1,16 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CommandInteraction, ComponentType } from 'discord.js';
-
+import { AppDataSource } from './datasource';
+import NsfwKeyword from '@/entity/nsfwKeyword';
+import Command from '@/entity/command';
+import { glob } from 'glob';
+import path from 'path';
+import fs from 'fs';
 export class Utils {
     public static GetUrlPath = (url: string): string => {
         return url.replace(/^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/?\n]+)/, '');
     };
 
     public static ButtonPagination = async (interaction: CommandInteraction, pages: any[], time = 30 * 1000) => {
-
         if (!interaction || !pages || !pages.length) throw new Error('Invalid arguments');
         await interaction.deferReply();
 
@@ -93,4 +97,8 @@ export class Utils {
         }
         return chunkedArray;
     };
+
+    public static importFile = async (filePath: string) => {
+        return (await import(filePath))?.default;
+    }
 }

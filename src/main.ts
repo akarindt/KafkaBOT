@@ -1,10 +1,8 @@
-import { DatabaseConfig } from './helper/constant';
+import 'reflect-metadata';
 import { BotClient } from './infrastructure/client';
-import { Database } from './infrastructure/database';
+import { database } from './helper/datasource';
 
-const database = new Database(DatabaseConfig.DEFAULT_DB);
 const client = new BotClient();
-
 database.InitializeDB();
 client.RegisterCommands();
 client.RegisterPlayer();
