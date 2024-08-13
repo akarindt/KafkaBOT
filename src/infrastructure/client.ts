@@ -35,6 +35,7 @@ export class BotClient extends Client {
                 GatewayIntentBits.GuildMessageReactions,
                 GatewayIntentBits.MessageContent,
                 GatewayIntentBits.GuildVoiceStates,
+                GatewayIntentBits.GuildMessagePolls
             ],
         });
     }

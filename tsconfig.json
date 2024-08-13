@@ -10,7 +10,7 @@
         "experimentalDecorators": true,
         "useDefineForClassFields": false,
         "target": "es5",
-        "lib": ["ES6"],
+        "lib": ["ES6", "DOM"],
         "strictPropertyInitialization": false,
         "skipLibCheck": true,
         "allowJs": true,

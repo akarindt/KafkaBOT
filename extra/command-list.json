@@ -38,5 +38,10 @@
         "commandName": "/kfsaucenao",
         "description": "Find sauce",
         "parameters": ["attachment"]
+    },
+    {
+        "commandName": "/kfpoll",
+        "description": "Create a poll",
+        "parameters": ["question", "multi", "duration", "polls"]
     }
 ]

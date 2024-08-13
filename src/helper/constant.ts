@@ -1,4 +1,3 @@
-import Command from '@/entity/command';
 import dotenv from 'dotenv';
 import { join } from 'path';
 import { DataSourceOptions } from 'typeorm';

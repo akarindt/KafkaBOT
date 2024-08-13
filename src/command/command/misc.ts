@@ -1,5 +1,4 @@
-import { CommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { AppDataSource } from '@/helper/datasource';
+import { CommandInteraction, EmbedBuilder, PollData, PollLayoutType, SlashCommandBuilder } from 'discord.js';
 import { Utils } from '@/helper/util';
 import { Misc } from '@/helper/constant';
 import path from 'path';
@@ -77,7 +76,45 @@ export default [
             const pathFile = path.resolve(__dirname, '../../../extra/command-list.json');
             const stringify = await fs.promises.readFile(pathFile, 'utf-8');
             const data: CommandItem[] = JSON.parse(stringify);
-            await Utils.ButtonPagination(interaction, listCommands(interaction, data))
+            await Utils.ButtonPagination(interaction, listCommands(interaction, data));
+        },
+    },
+    {
+        data: new SlashCommandBuilder()
+            .setName('kfpoll')
+            .setDescription('Create a poll')
+            .addStringOption((options) => options.setName('question').setDescription("Poll's question").setRequired(true))
+            .addBooleanOption((options) => options.setName('multi').setDescription('Allow multiple selection').setRequired(true))
+            .addNumberOption((options) => options.setName('duration').setDescription("Poll's duration (hours)").setRequired(true))
+            .addStringOption((options) => options.setName('polls').setDescription("Polls, seperated by '|||'").setRequired(true)),
+        async execute(interaction: CommandInteraction) {
+            const question = interaction.options.get('question', true);
+            const multi = interaction.options.get('multi', true);
+            const duration = interaction.options.get('duration', true);
+            const polls = interaction.options.get('polls', true);
+
+            if (!interaction.channel) {
+                await interaction.reply('❌ Channel not found');
+                return;
+            }
+
+            if (!question.value || !polls.value || typeof multi.value == 'undefined' || !duration.value) {
+                await interaction.channel.send('❌ Invalid parameters');
+                return;
+            }
+
+            const poll: PollData = {
+                question: { text: question.value as string },
+                answers: (polls.value as string).split('|||').map((p) => {
+                    return { text: p };
+                }),
+                allowMultiselect: multi.value as boolean,
+                duration: duration.value as unknown as number,
+                layoutType: PollLayoutType.Default,
+            };
+
+            await interaction.channel.send({ poll: poll });
+            return;
         },
     },
 ];
