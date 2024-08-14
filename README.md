@@ -7,7 +7,7 @@
 | :-----------------|:-------------------------------------:|:---------------------------------------------:|
 | `/kfping`         | `Reply with Pong!`                    | `None`                                        |
 | `/kfcommands`     | `Get all KafkaBOT's commands`         | `None`                                        |
-| `/kfpoll`         | `Create a Poll`                       | `question` - `multi` - `duratio` - `p1|||p2`  |
+| `/kfpoll`         | `Create a Poll`                       | `question` - `multi` - `duratio` - `polls`    |
 | `/kftft`          | `Get TFT current meta`                | `None`                                        |
 | `/kfud`           | `Search a word on Urban Dictionary`   | `term`                                        |
 | `/kfmeme`         | `Summon a random meme at will`        | `None`                                        |
