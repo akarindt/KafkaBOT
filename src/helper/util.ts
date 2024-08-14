@@ -1,7 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CommandInteraction, ComponentType } from 'discord.js';
 import { AppDataSource } from './datasource';
 import NsfwKeyword from '@/entity/nsfwKeyword';
-import Command from '@/entity/command';
 import { glob } from 'glob';
 import path from 'path';
 import fs from 'fs';
@@ -12,8 +11,6 @@ export class Utils {
 
     public static ButtonPagination = async (interaction: CommandInteraction, pages: any[], time = 30 * 1000) => {
         if (!interaction || !pages || !pages.length) throw new Error('Invalid arguments');
-        await interaction.deferReply();
-
         if (pages.length === 1) {
             await interaction.editReply({
                 embeds: pages,
@@ -90,7 +87,7 @@ export class Utils {
         return msg;
     };
 
-    public static ChunkArray = (array: any[], n: number) => {
+    public static ChunkArray = <T>(array: T[], n: number) => {
         const chunkedArray = [];
         for (let i = 0; i < array.length; i += n) {
             chunkedArray.push(array.slice(i, i + n));

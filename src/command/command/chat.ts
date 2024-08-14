@@ -5,9 +5,7 @@ import path from 'path';
 import fs from 'fs';
 import { AppDataSource } from '@/helper/datasource';
 import NSFWKeyword from '@/entity/nsfwKeyword';
-import puppeteer from 'puppeteer';
 
-type TfTMetaItem = {};
 
 export default [
     {
@@ -98,12 +96,6 @@ export default [
 
             await interaction.followUp({ embeds: [embed] });
             return;
-        },
-    },
-    {
-        data: new SlashCommandBuilder().setName('kftft').setDescription('Get current tft meta'),
-        async execute(interaction: CommandInteraction) {
-            const url = "https://tft.op.gg/meta-trends/comps"
         },
     },
 ];

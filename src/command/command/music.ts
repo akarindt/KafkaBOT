@@ -27,7 +27,7 @@ const listTrackEmbed = (interaction: CommandInteraction, listTracks: Track[]) =>
     }
 
     const embeds = Utils.ChunkArray(listTracks, Misc.ITEM_PER_PAGES);
-    return embeds.map(() => {
+    return embeds.map((tracks) => {
         return new EmbedBuilder()
             .setColor(Misc.PRIMARY_EMBED_COLOR)
             .setAuthor({
@@ -36,7 +36,7 @@ const listTrackEmbed = (interaction: CommandInteraction, listTracks: Track[]) =>
             })
             .setTitle('List tracks')
             .setDescription(
-                listTracks
+                tracks
                     .map((track) => {
                         return `- **[${track.cleanTitle}](${track.url})** - Duration: ${track.author}`;
                     })
@@ -137,6 +137,7 @@ export default [
     {
         data: new SlashCommandBuilder().setName('kfqueue').setDescription('See the queue'),
         async execute(interaction: CommandInteraction) {
+            await interaction.deferReply();
             const player = useMainPlayer();
             const queue = player.queues.cache.get(interaction.guildId || '');
             if (!queue) {
