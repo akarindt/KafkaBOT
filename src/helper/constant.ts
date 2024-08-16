@@ -1,8 +1,10 @@
+import { HoyoverseGame } from '@/infrastructure/hoyoverse';
 import dotenv from 'dotenv';
 import { join } from 'path';
 import { DataSourceOptions } from 'typeorm';
 
 dotenv.config({ path: '.env' });
+
 
 export class Misc {
     public static readonly PRIMARY_EMBED_COLOR = 0xeb86c6;
@@ -85,20 +87,79 @@ export class Misc {
     ];
 }
 
-export class Hoyolab {
-    //GENERAL
-    public static readonly HOYOLAB_USER_API = 'https://api-account-os.hoyoverse.com/account/binding/api/getUserGameRolesByCookieToken';
-    public static readonly HOYOLAB_BASE_API = 'https://sg-public-api.hoyolab.com/event';
-    public static readonly HOYOLAB_REFERER = 'https://act.hoyolab.com';
-    public static readonly HOYOLAB_ORIGIN = 'https://act.hoyolab.com';
+export class Hoyoverse {
 
-    // HSR
-    public static readonly HSR_CHECKIN_ENDPOINT = '/luna/os';
-    public static readonly HSR_CHECK_IN_ACT_ID = 'e202303301540311';
-    public static readonly HSR_REDEEM_API = 'https://sg-hkrpg-api.hoyolab.com/common/apicdkey/api/webExchangeCdkeyHyl';
-    public static readonly HSR_RPC_APP_VERSION = '2.42.0';
-    public static readonly HSR_RPC_CLIENT_TYPE = 4;
-    public static readonly HSR_CHECKIN_CRON_PATTERN = '0 0 0 * * *';
+    public static readonly GENSHIN: HoyoverseGame = {
+        ACT_ID: "e202102251931481",
+		success: "Congratulations, Traveler! You have successfully checked in today~",
+		signed: "Traveler, you've already checked in today~",
+		gameName: "Genshin Impact",
+		gameId: 2,
+		assets: {
+			author: "Paimon",
+			gameName: "Genshin Impact",
+			icon: "https://fastcdn.hoyoverse.com/static-resource-v2/2024/04/12/b700cce2ac4c68a520b15cafa86a03f0_2812765778371293568.png"
+		},
+		url: {
+			info: "https://sg-hk4e-api.hoyolab.com/event/sol/info",
+			home: "https://sg-hk4e-api.hoyolab.com/event/sol/home",
+			sign: "https://sg-hk4e-api.hoyolab.com/event/sol/sign"
+		}
+    }
+
+    public static readonly HONKAI: HoyoverseGame = {
+        ACT_ID: "e202110291205111",
+		success: "You have successfully checked in today, Captain~",
+		signed: "You've already checked in today, Captain~",
+		gameName: "Honkai Impact 3rd",
+		gameId: 1,
+		assets: {
+			author: "Kiana",
+			gameName: "Honkai Impact 3rd",
+			icon: "https://fastcdn.hoyoverse.com/static-resource-v2/2024/02/29/3d96534fd7a35a725f7884e6137346d1_3942255444511793944.png"
+		},
+		url: {
+			info: "https://sg-public-api.hoyolab.com/event/mani/info",
+			home: "https://sg-public-api.hoyolab.com/event/mani/home",
+			sign: "https://sg-public-api.hoyolab.com/event/mani/sign"
+		}
+    }
+
+    public static readonly STARRAIL: HoyoverseGame = {
+        ACT_ID: "e202303301540311",
+		success: "You have successfully checked in today, Trailblazer~",
+		signed: "You've already checked in today, Trailblazer~",
+		gameName: "Honkai: Star Rail",
+		gameId: 6,
+		assets: {
+			author: "PomPom",
+			gameName: "Honkai: Star Rail",
+			icon: "https://fastcdn.hoyoverse.com/static-resource-v2/2024/04/12/74330de1ee71ada37bbba7b72775c9d3_1883015313866544428.png"
+		},
+		url: {
+			info: "https://sg-public-api.hoyolab.com/event/luna/os/info",
+			home: "https://sg-public-api.hoyolab.com/event/luna/os/home",
+			sign: "https://sg-public-api.hoyolab.com/event/luna/os/sign"
+		}
+    }
+
+    public static readonly ZENLESS: HoyoverseGame = {
+        ACT_ID: "e202406031448091",
+		success: "Congratulations Proxy! You have successfully checked in today!~",
+		signed: "You have already checked in today, Proxy!~",
+		gameName: "Zenless Zone Zero",
+		gameId: 8,
+		assets: {
+			author: "Eous",
+			gameName: "Zenless Zone Zero",
+			icon: "https://hyl-static-res-prod.hoyolab.com/communityweb/business/nap.png"
+		},
+		url: {
+			info: "https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os/info",
+			home: "https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os/home",
+			sign: "https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os/sign"
+		}
+    }
 }
 
 export class DatabaseConfig {
