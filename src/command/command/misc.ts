@@ -1,4 +1,4 @@
-import { CommandInteraction, EmbedBuilder, PollData, PollLayoutType, SlashCommandBuilder } from 'discord.js';
+import { CommandInteraction, EmbedBuilder, PollData, PollLayoutType, SlashCommandBuilder, userMention } from 'discord.js';
 import { Utils } from '@/helper/util';
 import { Misc } from '@/helper/constant';
 import path from 'path';
@@ -307,6 +307,73 @@ export default [
                 .setImage(data.url)
                 .setTimestamp()
                 .setFooter({ text: 'Misc', iconURL: interaction.client.user.avatarURL() || '' });
+
+            await interaction.followUp({ embeds: [embed] });
+            return;
+        },
+    },
+    {
+        data: new SlashCommandBuilder().setName('kfme').setDescription("Get user's info"),
+        async execute(interaction: CommandInteraction) {
+            await interaction.deferReply();
+            const user = interaction.user;
+            const guild = interaction.guild;
+            const clientStatus = guild?.members.cache.get(user.id)?.presence?.clientStatus;
+            let statusText = '';
+
+            const statusObj = {
+                dnd: 'Do Not Disturb',
+                online: 'Online',
+                idle: 'Idle',
+            };
+
+            if (clientStatus?.desktop) {
+                statusText = `**Desktop: ** ${statusObj[clientStatus.desktop]}`;
+            } else if (clientStatus?.mobile) {
+                statusText = `**Mobile: ** ${statusObj[clientStatus.mobile]}`;
+            } else if (clientStatus?.web) {
+                statusText = `**Web: ** ${statusObj[clientStatus.web]}`;
+            } else {
+                statusText = 'Not online';
+            }
+
+            const embed = new EmbedBuilder()
+                .setColor(Misc.PRIMARY_EMBED_COLOR)
+                .setAuthor({
+                    name: interaction.user.username,
+                    iconURL: interaction.user.avatarURL() || '',
+                })
+                .setDescription(userMention(interaction.user.id))
+                .setThumbnail(interaction.user.avatarURL())
+                .setFields(
+                    { name: 'Information', value: `**Bot: ** ${user.bot ? 'Yes' : 'No'} \n **ID: ** \`${user.id}\``, inline: true },
+                    {
+                        name: 'Joined',
+                        value: `**Discord: ** ||${user.createdAt}|| \n **Guild: ** ||${guild?.members.cache.get(user.id)?.joinedAt}|| `,
+                        inline: true,
+                    },
+                    { name: '\n\r', value: '\n\r' },
+                    {
+                        name: 'Guild Specific',
+                        value: `**Owner: ** ${guild?.ownerId === user.id ? 'Yes' : 'No'}  \n **Roles (${
+                            guild?.members.cache.get(user.id)?.roles.cache.size
+                        }): ** ${guild?.members.cache
+                            .get(user.id)
+                            ?.roles.cache.map((role) => {
+                                return `\` ${role.name} \``;
+                            })
+                            .join(', ')}`,
+                    },
+                    { name: '\n\r', value: '\n\r' },
+                    { name: 'Status', value: statusText },
+                    { name: '\n\r', value: '\n\r' },
+                    {
+                        name: 'Urls',
+                        value: `**Banner URL: ** ${user.bannerURL() ? `[Link](${user.bannerURL()})` : 'Not available'} \n **Avatar URL: ** ${
+                            user.avatarURL() ? `[Link](${user.avatarURL()})` : 'Not available'
+                        }`,
+                    }
+                );
 
             await interaction.followUp({ embeds: [embed] });
             return;

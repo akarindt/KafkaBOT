@@ -7,10 +7,11 @@
 | :-----------------|:-------------------------------------:|:---------------------------------------------:|
 | `/kfping`         | `Reply with Pong!`                    | `None`                                        |
 | `/kfcommands`     | `Get all KafkaBOT's commands`         | `None`                                        |
-| `/kfpoll`         | `Create a Poll`                       | `question` - `multi` - `duratio` - `polls`    |
+| `/kfpoll`         | `Create a Poll`                       | `question` - `multi` - `duration` - `polls`   |
 | `/kftft`          | `Get TFT current meta`                | `None`                                        |
 | `/kfud`           | `Search a word on Urban Dictionary`   | `term`                                        |
 | `/kfmeme`         | `Summon a random meme at will`        | `None`                                        |
+| `/kfme`           | `Get user's discord info`             | `None`                                        |
 
 ## Music
 | Command           | Description                           | Parameters                                    |
@@ -30,6 +31,11 @@
 | Command           | Description                           | Parameters                                    |
 | :-----------------|:-------------------------------------:|:---------------------------------------------:|
 | `/kfsaucenao`     | `Find sauce`                          | `attachment`                                  |
+
+## Hoyolab
+| Command           | Description                           | Parameters                                    |
+| :-----------------|:-------------------------------------:|:---------------------------------------------:|
+| `/kfhoyo`         | `Assign hoyolab's cookie`             | `cookie`                                      |
 
 # Context Menu
 | Command           | Description                           | Type                                          |
@@ -58,6 +64,7 @@
 - [typeorm](https://www.npmjs.com/package/typeorm)
 - [List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words](https://github.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/tree/master)
 - [ffmpeg executable](https://www.ffmpeg.org/)
+- [Hoyolab-auto](https://github.com/torikushiii/hoyolab-auto)
 
 
 # LICENSE

@@ -9,10 +9,9 @@ export default class Hoyoverse {
     @Index()
     userDiscordId: string
 
-    @Column('varchar')
-    @Index()
-    game: string
-
     @Column('text')
-    cookies: string
+    cookie: string
+
+    @Column('int')
+    lastUpdated: string
 }

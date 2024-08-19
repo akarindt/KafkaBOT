@@ -58,5 +58,15 @@
         "commandName": "/kfmeme",
         "description": "Summon a random meme at will",
         "parameters": []
+    },
+    {
+        "commandName": "/kfhoyo",
+        "description": "Assign your Hoyolab cookie for checkin",
+        "parameters": ["cookie"]
+    },
+    {
+        "commandName": "/kfme",
+        "description": "Get your discord info",
+        "parameters": []
     }
 ]
