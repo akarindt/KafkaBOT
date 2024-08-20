@@ -65,7 +65,7 @@
         "parameters": ["cookie"]
     },
     {
-        "commandName": "/kfme",
+        "commandName": "/kfinfo",
         "description": "Get your discord info",
         "parameters": []
     }

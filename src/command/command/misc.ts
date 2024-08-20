@@ -313,7 +313,7 @@ export default [
         },
     },
     {
-        data: new SlashCommandBuilder().setName('kfme').setDescription("Get user's info"),
+        data: new SlashCommandBuilder().setName('kfinfo').setDescription("Get user's info"),
         async execute(interaction: CommandInteraction) {
             await interaction.deferReply();
             const user = interaction.user;

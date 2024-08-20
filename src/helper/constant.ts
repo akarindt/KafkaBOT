@@ -81,6 +81,19 @@ export class Misc {
 export class Hoyoverse {
     public static readonly HOYOVERSE_UPDATE_COOKIE_API = 'https://webapi-os.account.hoyoverse.com/Api/fetch_cookie_accountinfo';
     public static readonly HOYOVERSE_RECORD_CARD_API = 'https://bbs-api-os.hoyolab.com/game_record/card/wapi/getGameRecordCard';
+    public static readonly HOYOVERSE_HEADERS = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:129.0) Gecko/20100101 Firefox/129.0', 
+        'Referer': 'https://act.hoyolab.com', 
+        'x-rpc-app_version': '1.5.0', 
+        'x-rpc-client_type': '5', 
+        'x-rpc-language': 'en-us', 
+        'Host': 'webapi-os.account.hoyoverse.com'
+    }
+    public static readonly HOYOVERSE_REDEMTION_LINKS = {
+        GENSHIN: "https://genshin.hoyoverse.com/en/gift",
+        STARRAIL: "https://hsr.hoyoverse.com/gift",
+        ZENLESS: "https://zenless.hoyoverse.com/redemption"
+    }
     public static readonly HOYOVERSE_GAME_LIST: { [gameName: string]: HoyoverseGame } = {
         GENSHIN: {
             ACT_ID: 'e202102251931481',

@@ -4,6 +4,13 @@ import NsfwKeyword from '@/entity/nsfwKeyword';
 import { glob } from 'glob';
 import path from 'path';
 import fs from 'fs';
+
+type ParseCookieOption = {
+    whitelist: string[];
+    blacklist: string[];
+    separator: string
+}
+
 export class Utils {
     public static GetUrlPath = (url: string): string => {
         return url.replace(/^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/?\n]+)/, '');
@@ -98,4 +105,40 @@ export class Utils {
     public static importFile = async (filePath: string) => {
         return (await import(filePath))?.default;
     }
+
+    public static dateToInt = (date: Date) => {
+        const year = date.getFullYear();
+        const month = ('0' + (date.getMonth() + 1)).slice(-2);
+        const day = ('0' + date.getDate()).slice(-2);
+        return parseInt(`${year}${month}${day}`, 10);
+    }
+
+    public static parseCookie (cookie: string, options: ParseCookieOption) {
+		const { whitelist = [], blacklist = [], separator = ";" } = options;
+
+		const cookiesArray = cookie.split(separator).map(c => c.trim());
+		const cookieMap = Object.fromEntries(
+			cookiesArray.map(c => {
+				const [key, value] = c.split("=");
+				return [key, value];
+			})
+		);
+
+		if (whitelist.length !== 0) {
+			const filteredCookiesArray = Object.keys(cookieMap)
+				.filter(key => whitelist.includes(key))
+				.map(key => `${key}=${cookieMap[key]}`);
+
+			return filteredCookiesArray.join(`${separator} `);
+		}
+		if (blacklist.length !== 0) {
+			const filteredCookiesArray = Object.keys(cookieMap)
+				.filter(key => !blacklist.includes(key))
+				.map(key => `${key}=${cookieMap[key]}`);
+
+			return filteredCookiesArray.join(`${separator} `);
+		}
+
+		return cookie;
+	}
 }

@@ -13,5 +13,5 @@ export default class Hoyoverse {
     cookie: string
 
     @Column('int')
-    lastUpdated: string
+    lastUpdated: number
 }

@@ -8,6 +8,11 @@ import { YoutubeiExtractor } from 'discord-player-youtubei';
 import { Misc } from '@/helper/constant';
 import { Utils } from '@/helper/util';
 
+export type CustomOptions = {
+    param: string;
+    content: string;
+};
+
 export interface Command {
     data: any;
     execute(interaction: CommandInteraction): Promise<void>;
@@ -16,7 +21,7 @@ export interface Command {
 export interface CustomCommand {
     name: string;
     description: string;
-    execute(message: Message, parameters: string[]): Promise<void> | void;
+    execute(message: Message, options: CustomOptions): Promise<void> | void;
 }
 
 export class BotClient extends Client {
@@ -36,14 +41,14 @@ export class BotClient extends Client {
                 GatewayIntentBits.MessageContent,
                 GatewayIntentBits.GuildVoiceStates,
                 GatewayIntentBits.GuildMessagePolls,
-                GatewayIntentBits.GuildPresences
+                GatewayIntentBits.GuildPresences,
             ],
         });
     }
 
     public async StartBot() {
         if (!this.clientId && !this.clientToken) {
-            console.log('[ERR] Please provide CLIENT_ID and CLIENT_TOKEN');
+            console.log('[ERROR] Please provide CLIENT_ID and CLIENT_TOKEN');
             return;
         }
 
@@ -95,24 +100,12 @@ export class BotClient extends Client {
         });
 
         console.log(`[INFO] Started refreshing ${this.commands.size} (/) commands.`);
-        console.log(`[INFO] Started refreshing ${this.customs.size} custom (/) commands.`);
+        console.log(`[INFO] Started refreshing ${this.customs.size} custom (${process.env.COMMAND_PREFIX}) commands.`);
     }
 
     public async RegisterPlayer() {
         const player = new Player(this);
         await player.extractors.register(YoutubeiExtractor, {});
-
-        const embed = (message: string) => {
-            return new EmbedBuilder()
-                .setColor(Misc.PRIMARY_EMBED_COLOR)
-                .setAuthor({
-                    name: `${this.user?.displayName} - ${this.user?.tag}`,
-                    iconURL: this.user?.avatarURL() || '',
-                })
-                .setTitle(message)
-                .setTimestamp()
-                .setFooter({ text: 'SauceNAO', iconURL: this.user?.tag });
-        };
 
         player.events.on('playerStart', (queue, track) => {
             queue.metadata.channel.send(`🎶 Started playing: **[${track.title}](${track.url})** in **${queue.channel?.name}**!`);
@@ -155,7 +148,7 @@ export class BotClient extends Client {
         const client = interaction.client as BotClient;
         const command = client.commands.get(interaction.commandName);
         if (!command) {
-            console.log(`[ERR] No command matching ${interaction.commandName} was found.`);
+            console.log(`[ERROR] No command matching ${interaction.commandName} was found.`);
             return;
         }
 
@@ -175,39 +168,39 @@ export class BotClient extends Client {
 
     private async assignCustom(message: Message) {
         if (!message.guild) return;
-        const content = message.content;
+        let content = message.content;
         if (!content.startsWith(this.COMMAND_PREFIX!!)) return;
 
         // remove prefix from string
-        const removedPrefixContent = content.slice(1);
+        content = content.replace(new RegExp(this.COMMAND_PREFIX!!), '');
 
-        // split content to array
-        const contentArray = removedPrefixContent.split(' ');
-
-        // get first word as command name after remove prefix, to prevent multiple words in message
-        const commandName = contentArray[0] || null;
+        // get command name
+        const commandName = content.split(' ').length ? content.split(' ')[0] : undefined;
+        if (!commandName) return;
 
         // remove command name from current array
-        contentArray.splice(0, 1);
+        content = content.replace(new RegExp(commandName), '');
 
-        // assign remain items to parameter array
-        const parameters = contentArray;
+        // get param
+        const param = content.split(' ').length ? content.split(' ')[0] : undefined;
+        if (!param) return;
 
-        if (!commandName) return;
-        if (!parameters) return;
+        // remove param from content
+        content = content.replace(new RegExp(param), '');
+        if (!content.length) return;
 
         const client = message.client as BotClient;
         const command = client.customs.get(commandName);
         if (!command) {
-            console.error(`[ERR] No command matching ${commandName} was found.`);
+            console.error(`[ERROR] No command matching ${commandName} was found.`);
             return;
         }
 
         try {
-            await command.execute(message, parameters);
+            await command.execute(message, { param, content });
             return;
         } catch (error) {
-            await message.reply('[ERR] There was an error while executing this command!');
+            await message.reply('[ERROR] There was an error while executing this command!');
             return;
         }
     }

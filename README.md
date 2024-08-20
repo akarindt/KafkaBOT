@@ -11,7 +11,7 @@
 | `/kftft`          | `Get TFT current meta`                | `None`                                        |
 | `/kfud`           | `Search a word on Urban Dictionary`   | `term`                                        |
 | `/kfmeme`         | `Summon a random meme at will`        | `None`                                        |
-| `/kfme`           | `Get user's discord info`             | `None`                                        |
+| `/kfinfo`         | `Get user's discord info`             | `None`                                        |
 
 ## Music
 | Command           | Description                           | Parameters                                    |

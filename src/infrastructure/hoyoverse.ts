@@ -1,4 +1,5 @@
-import { Hoyoverse, Misc } from '@/helper/constant';
+import { Hoyoverse as HoyoConstant, Misc } from '@/helper/constant';
+import Hoyoverse from '@/entity/hoyoverse';
 import axios from 'axios';
 
 export type HoyoverseConstantName = 'GENSHIN' | 'HONKAI' | 'STARRAIL' | 'ZENLESS';
@@ -112,6 +113,7 @@ export type HoyoverseGame = {
 };
 
 export type ExecuteCheckIn = {
+    userDiscordId: string;
     platform: string;
     total: number;
     result: string;
@@ -125,6 +127,25 @@ export type ExecuteCheckIn = {
         name: string;
         count: number;
         icon: string;
+    };
+};
+
+export type UpdateHoyolabCookieResponse = {
+    code: number;
+    data?: {
+        cookie_info: {
+            account_id: number;
+            account_name: string;
+            area_code: string;
+            cookie_token: string;
+            cur_time: number;
+            email: string;
+            mobile: string;
+        };
+        info: string;
+        msg: string;
+        sign: string;
+        status: number;
     };
 };
 
@@ -158,18 +179,18 @@ type AwardsData = {
 export class HoyoverseClient {
     private _name: HoyoverseConstantName;
     private _game: HoyoverseGame;
-    private _data: string[];
+    private _data: Hoyoverse[];
     private _fullName: string;
     private _userAgent: string;
     private _updateApi: string;
 
-    constructor(name: HoyoverseConstantName, data: string[]) {
+    constructor(name: HoyoverseConstantName, data: Hoyoverse[]) {
         this._name = name;
         this._data = data;
-        this._fullName = Hoyoverse.HOYOVERSE_GAME_LIST[this._name].gameName;
-        this._game = Hoyoverse.HOYOVERSE_GAME_LIST[this._name];
+        this._fullName =  HoyoConstant.HOYOVERSE_GAME_LIST[this._name].gameName;
+        this._game =  HoyoConstant.HOYOVERSE_GAME_LIST[this._name];
         this._userAgent = Misc.USER_AGENT;
-        this._updateApi = Hoyoverse.HOYOVERSE_UPDATE_COOKIE_API;
+        this._updateApi =  HoyoConstant.HOYOVERSE_UPDATE_COOKIE_API;
 
         if (!this._data.length) {
             console.log(`[WARNING] No ${this._fullName} accounts provided. Skipping...`);
@@ -193,8 +214,9 @@ export class HoyoverseClient {
         }
 
         const success: ExecuteCheckIn[] = [];
-        for (const cookie of accounts) {
+        for (const account of accounts) {
             try {
+                const cookie = account.cookie;
                 const ltuid = cookie.match(/ltuid_v2=([^;]+)/);
                 let accountDetails: AccountDetails | null = null;
                 if (ltuid) {
@@ -254,6 +276,7 @@ export class HoyoverseClient {
                         region: accountDetails.region,
                     },
                     award: awardObj,
+                    userDiscordId: account.userDiscordId
                 });
             } catch (error) {
                 console.log(`[ERROR] CHECKIN - An error occurred`);
@@ -264,7 +287,7 @@ export class HoyoverseClient {
 
     async GetAccountDetails(cookie: string, ltuid: string): Promise<AccountDetails | null> {
         try {
-            const response = await axios.get(`${Hoyoverse.HOYOVERSE_RECORD_CARD_API}?uid=${ltuid}`, {
+            const response = await axios.get(`${ HoyoConstant.HOYOVERSE_RECORD_CARD_API}?uid=${ltuid}`, {
                 headers: {
                     'User-Agent': this._userAgent,
                     Cookie: cookie,
@@ -316,7 +339,7 @@ export class HoyoverseClient {
                 data: {
                     total: signInfo.total_sign_day,
                     today: signInfo.today,
-                    isSigned: signInfo.is_sign
+                    isSigned: signInfo.is_sign,
                 },
             };
         } catch (error) {

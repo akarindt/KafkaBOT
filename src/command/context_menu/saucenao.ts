@@ -23,7 +23,7 @@ export default {
 
         const saucenaoApiKey = process.env.SAUCENAO_APIKEY;
         if (!saucenaoApiKey) {
-            console.log('[ERR] SAUCENAO_APIKEY is required');
+            console.log('[ERROR] SAUCENAO_APIKEY is required');
             return;
         }
 

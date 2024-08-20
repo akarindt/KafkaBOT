@@ -5,11 +5,13 @@ export default class Quote {
     @PrimaryGeneratedColumn('increment')
     id: number;
 
+    @Index()
     @Column('varchar')
     serverId: string;
 
+    @Index()
     @Column('varchar')
-    indentifier: string;
+    identifier: string;
 
     @Column('varchar')
     content: string;
