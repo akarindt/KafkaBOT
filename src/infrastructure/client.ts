@@ -9,8 +9,8 @@ import { Misc } from '@/helper/constant';
 import { Utils } from '@/helper/util';
 
 export type CustomOptions = {
-    param: string;
-    content: string;
+    param?: string;
+    content?: string;
 };
 
 export interface Command {
@@ -168,7 +168,7 @@ export class BotClient extends Client {
 
     private async assignCustom(message: Message) {
         if (!message.guild) return;
-        let content = message.content;
+        let content: string | undefined = message.content;
         if (!content.startsWith(this.COMMAND_PREFIX!!)) return;
 
         // remove prefix from string
@@ -179,15 +179,13 @@ export class BotClient extends Client {
         if (!commandName) return;
 
         // remove command name from current array
-        content = content.replace(new RegExp(commandName), '');
+        content = content.replace(new RegExp(commandName), '').trim();
 
         // get param
         const param = content.split(' ').length ? content.split(' ')[0] : undefined;
-        if (!param) return;
 
         // remove param from content
-        content = content.replace(new RegExp(param), '');
-        if (!content.length) return;
+        content = param ? content.replace(new RegExp(param), '').trim() : undefined;
 
         const client = message.client as BotClient;
         const command = client.customs.get(commandName);
