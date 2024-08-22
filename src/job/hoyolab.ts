@@ -122,4 +122,3 @@ export const StartHoyolabCheckInJob = async (client: BotClient) => {
 
     console.log(`[INFO] Started cron job: HOYOVERSE-AUTO-DAILY-CHECK-IN`)
 };
-

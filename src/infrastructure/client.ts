@@ -1,16 +1,15 @@
-import { Client, Collection, EmbedBuilder, GatewayIntentBits, REST, Routes } from 'discord.js';
+import { Client, Collection, GatewayIntentBits, REST, Routes } from 'discord.js';
 import { CommandInteraction, Message } from 'discord.js';
 import { glob } from 'glob';
 import path from 'path';
 import url from 'url';
 import { Player } from 'discord-player';
 import { YoutubeiExtractor } from 'discord-player-youtubei';
-import { Misc } from '@/helper/constant';
 import { Utils } from '@/helper/util';
 
 export type CustomOptions = {
-    param?: string;
-    content?: string;
+    parameters: Collection<string, string | undefined>;
+    content: string | undefined;
 };
 
 export interface Command {
@@ -21,6 +20,7 @@ export interface Command {
 export interface CustomCommand {
     name: string;
     description: string;
+    parameters: string[];
     execute(message: Message, options: CustomOptions): Promise<void> | void;
 }
 
@@ -181,12 +181,6 @@ export class BotClient extends Client {
         // remove command name from current array
         content = content.replace(new RegExp(commandName), '').trim();
 
-        // get param
-        const param = content.split(' ').length ? content.split(' ')[0] : undefined;
-
-        // remove param from content
-        content = param ? content.replace(new RegExp(param), '').trim() : undefined;
-
         const client = message.client as BotClient;
         const command = client.customs.get(commandName);
         if (!command) {
@@ -194,8 +188,21 @@ export class BotClient extends Client {
             return;
         }
 
+        const parameters = new Collection<string, any>(); // Initialize parameters collection
+        let contentArr = content.split(' '); // Copy array
+
+        for (let i = 0; i < command.parameters.length; i++) {
+            const paramValue = contentArr[i] || undefined; // Assign parameter's value based on index
+            parameters.set(command.parameters[i], paramValue); // Set parameter's value
+            if (content && paramValue) {
+                content = content.replace(new RegExp(paramValue), '').trim(); // remove parameter from message content
+            }
+        }
+
+        content = content || undefined; // Just a step to assign content to undefined
+
         try {
-            await command.execute(message, { param, content });
+            await command.execute(message, { parameters, content });
             return;
         } catch (error) {
             await message.reply('[ERROR] There was an error while executing this command!');

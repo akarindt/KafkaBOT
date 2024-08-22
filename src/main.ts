@@ -3,6 +3,7 @@ import { BotClient } from './infrastructure/client';
 import { database } from './helper/datasource';
 import InitializeJob from './job';
 import schedule from 'node-schedule';
+import CloudinaryClient from './infrastructure/cloudinary';
 
 (async () => {
     try {

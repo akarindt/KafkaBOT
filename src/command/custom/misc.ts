@@ -1,17 +1,20 @@
 import Quote from '@/entity/quote';
 import { AppDataSource } from '@/helper/datasource';
 import { CustomOptions } from '@/infrastructure/client';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, Message } from 'discord.js';
+import CloudinaryClient from '@/infrastructure/cloudinary';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, Message, MessageEditOptions, MessageReplyOptions } from 'discord.js';
 
 export default [
     {
         name: '%',
         description: 'Save quote',
+        parameters: ['identifier'],
         async execute(message: Message, options: CustomOptions) {
-            const param = options.param;
+            const param = options.parameters.get('identifier');
             const content = options.content;
             const serverId = message.guildId;
             const quoteRepository = AppDataSource.getRepository(Quote);
+            const cloudinary = new CloudinaryClient();
 
             if (!serverId) {
                 await message.reply('❌ You cannot use this command in DM');
@@ -30,17 +33,17 @@ export default [
                     return;
                 }
 
-                const entites: Quote[] = attachments
+                attachments
                     .filter((attachment) => attachment.contentType?.startsWith('image'))
-                    .map((attachment) => {
+                    .forEach(async (attachment) => {
+                        const uploadResult = await cloudinary.uploader.upload(attachment.url);
                         const quote = new Quote();
                         quote.serverId = serverId;
                         quote.identifier = param;
-                        quote.content = attachment.url;
-                        return quote;
+                        quote.content = uploadResult.secure_url;
+                        await quoteRepository.insert(quote);
                     });
 
-                await quoteRepository.insert(entites);
                 await message.reply('✅ Saved');
                 return;
             }
@@ -57,8 +60,9 @@ export default [
     {
         name: '%%',
         description: 'Get quote',
+        parameters: ['identifier'],
         async execute(message: Message, options: CustomOptions) {
-            const param = options.param;
+            const param = options.parameters.get('identifier');
             const serverId = message.guildId;
 
             if (!param) {
@@ -89,13 +93,20 @@ export default [
 
             const quote = quotes[Math.floor(Math.random() * quotes.length)];
             let msg: Message;
-            if (quote.content.startsWith('https://cdn.discordapp.com/attachments')) {
-                msg = await message.reply({ files: [quote.content], components: quotes.length > 1 ? [button] : [] });
-            } else {
-                msg = await message.reply({ content: quote.content, components: quotes.length > 1 ? [button] : [] });
-            }
+            const replyObject: MessageReplyOptions = quote.content.startsWith('http')
+                ? {
+                      files: [quote.content],
+                      components: quotes.length > 1 ? [button] : [],
+                  }
+                : {
+                      content: quote.content,
+                      components: quotes.length > 1 ? [button] : [],
+                  };
+
+            msg = await message.reply(replyObject);
 
             const mc = msg.createMessageComponentCollector({ componentType: ComponentType.Button, time: 30 * 1000 });
+            let newQuote: Quote;
 
             mc.on('collect', async (i) => {
                 if (i.user.id !== message.author.id) {
@@ -105,18 +116,39 @@ export default [
 
                 await i.deferUpdate();
 
-                const newQuote = quotes[Math.floor(Math.random() * quotes.length)];
+                newQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
                 if (i.customId === 'random') {
-                    if (quote.content.startsWith('https://cdn.discordapp.com/attachments')) {
-                        msg = await message.edit({ files: [newQuote.content], components: quotes.length > 1 ? [button] : [] });
-                    } else {
-                        msg = await message.edit({ content: newQuote.content, components: quotes.length > 1 ? [button] : [] });
-                    }
+                    const newReplyObject: MessageEditOptions = newQuote.content.startsWith('http')
+                        ? {
+                              files: [newQuote.content],
+                              components: quotes.length > 1 ? [button] : [],
+                          }
+                        : {
+                              content: newQuote.content,
+                              components: quotes.length > 1 ? [button] : [],
+                          };
+
+                    await msg.edit(newReplyObject);
                 }
 
                 mc.resetTimer();
             });
+
+            mc.on('end', async () => {
+                if (!msg.content) {
+                    const attachment = msg.attachments.first();
+                    if (!attachment) return;
+
+                    await msg.edit({ files: [attachment.url], components: [] });
+                    return;
+                }
+
+                await msg.edit({ content: msg.content, components: [] });
+                return;
+            });
+
+            return;
         },
     },
 ];
