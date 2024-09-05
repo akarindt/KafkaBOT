@@ -9,7 +9,8 @@ export class Misc {
     public static readonly PRIMARY_EMBED_COLOR = 0xeb86c6;
     public static readonly DEFAULT_SIMILARITY_POINT = 60;
     public static readonly ITEM_PER_PAGES = 10;
-    public static readonly USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36";
+    public static readonly USER_AGENT =
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36';
     public static readonly NEGATIVE_PROMPTS = [
         'ugly',
         'duplicate',
@@ -76,24 +77,31 @@ export class Misc {
         'haze',
         'polysyndactyly',
     ];
+
+    public static readonly BOT_IMAGE_FOLDER = 'kafkaBOT';
+    public static readonly CLOUDINARY_IMAGE_QUALITY = 70;
+    public static readonly CLOUDINARY_IMAGE_FORMAT = "webp";
+    public static readonly CLOUDINARY_IMAGE_WIDTH = "500";
+    public static readonly CLOUDINARY_IMAGE_CROP = "scale";
+    public static readonly IMAGE_LIMIT_SIZE = 10000000 // 10 mb
 }
 
 export class Hoyoverse {
     public static readonly HOYOVERSE_UPDATE_COOKIE_API = 'https://webapi-os.account.hoyoverse.com/Api/fetch_cookie_accountinfo';
     public static readonly HOYOVERSE_RECORD_CARD_API = 'https://bbs-api-os.hoyolab.com/game_record/card/wapi/getGameRecordCard';
     public static readonly HOYOVERSE_HEADERS = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:129.0) Gecko/20100101 Firefox/129.0', 
-        'Referer': 'https://act.hoyolab.com', 
-        'x-rpc-app_version': '1.5.0', 
-        'x-rpc-client_type': '5', 
-        'x-rpc-language': 'en-us', 
-        'Host': 'webapi-os.account.hoyoverse.com'
-    }
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:129.0) Gecko/20100101 Firefox/129.0',
+        Referer: 'https://act.hoyolab.com',
+        'x-rpc-app_version': '1.5.0',
+        'x-rpc-client_type': '5',
+        'x-rpc-language': 'en-us',
+        Host: 'webapi-os.account.hoyoverse.com',
+    };
     public static readonly HOYOVERSE_REDEMTION_LINKS = {
-        GENSHIN: "https://genshin.hoyoverse.com/en/gift",
-        STARRAIL: "https://hsr.hoyoverse.com/gift",
-        ZENLESS: "https://zenless.hoyoverse.com/redemption"
-    }
+        GENSHIN: 'https://genshin.hoyoverse.com/en/gift',
+        STARRAIL: 'https://hsr.hoyoverse.com/gift',
+        ZENLESS: 'https://zenless.hoyoverse.com/redemption',
+    };
     public static readonly HOYOVERSE_GAME_LIST: { [gameName: string]: HoyoverseGame } = {
         GENSHIN: {
             ACT_ID: 'e202102251931481',

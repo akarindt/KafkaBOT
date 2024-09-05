@@ -1,8 +1,22 @@
 import Quote from '@/entity/quote';
+import { Misc } from '@/helper/constant';
 import { AppDataSource } from '@/helper/datasource';
 import { CustomOptions } from '@/infrastructure/client';
 import CloudinaryClient from '@/infrastructure/cloudinary';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, Message, MessageEditOptions, MessageReplyOptions } from 'discord.js';
+import {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    ComponentType,
+    EmbedBuilder,
+    Message,
+    MessageEditOptions,
+    MessageReplyOptions,
+} from 'discord.js';
+
+const imageEmbed = (imageUrl: string) => {
+    return new EmbedBuilder().setImage(imageUrl);
+};
 
 export default [
     {
@@ -34,9 +48,17 @@ export default [
                 }
 
                 attachments
-                    .filter((attachment) => attachment.contentType?.startsWith('image'))
+                    .filter((attachment) => attachment.contentType?.startsWith('image') && attachment.size <= Misc.IMAGE_LIMIT_SIZE)
                     .forEach(async (attachment) => {
-                        const uploadResult = await cloudinary.uploader.upload(attachment.url);
+                        const uploadResult = await cloudinary.uploader.upload(attachment.url, {
+                            folder: Misc.BOT_IMAGE_FOLDER,
+                            transformation: {
+                                quality: Misc.CLOUDINARY_IMAGE_QUALITY,
+                                fetch_format: Misc.CLOUDINARY_IMAGE_FORMAT,
+                                width: Misc.CLOUDINARY_IMAGE_WIDTH,
+                                crop: Misc.CLOUDINARY_IMAGE_CROP
+                            }
+                        });
                         const quote = new Quote();
                         quote.serverId = serverId;
                         quote.identifier = param;
@@ -95,7 +117,7 @@ export default [
             let msg: Message;
             const replyObject: MessageReplyOptions = quote.content.startsWith('http')
                 ? {
-                      files: [quote.content],
+                      embeds: [imageEmbed(quote.content)],
                       components: quotes.length > 1 ? [button] : [],
                   }
                 : {
@@ -121,7 +143,7 @@ export default [
                 if (i.customId === 'random') {
                     const newReplyObject: MessageEditOptions = newQuote.content.startsWith('http')
                         ? {
-                              files: [newQuote.content],
+                              embeds: [imageEmbed(newQuote.content)],
                               components: quotes.length > 1 ? [button] : [],
                           }
                         : {
@@ -137,10 +159,7 @@ export default [
 
             mc.on('end', async () => {
                 if (!msg.content) {
-                    const attachment = msg.attachments.first();
-                    if (!attachment) return;
-
-                    await msg.edit({ files: [attachment.url], components: [] });
+                    await msg.edit({ embeds: msg.embeds, components: [] });
                     return;
                 }
 
