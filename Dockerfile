@@ -2,11 +2,15 @@
 FROM node:20
 
 # Install Python3 and other build dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update
+RUN apt-get install -y \
     python3 \
     make \
     g++ \
-    && rm -rf /var/lib/apt/lists/*
+    ffmpeg
+
+# Remove package manager cache 
+RUN rm -rf /var/lib/apt/lists/*
 
 # Set the working directory
 WORKDIR /usr/KafkaBOT
