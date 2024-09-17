@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  db:
+  kafkabotdb:
     container_name: KafkaBOT_DB
     image: postgres:latest
     environment:
@@ -9,17 +9,34 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
       PGDATA: /data/postgres
+      PGPORT: "${POSTGRES_PORT}"
     volumes:
-      - db:/data/postgres
-    ports:
-      - "${POSTGRES_PORT}:5432"
+      - kafkabotdb:/data/postgres
     networks:
-      - db
+      - kafkabot_network
+    restart: unless-stopped
+  
+  kafkabotapp: 
+    container_name: KafkaBOT_APP
+    build: .
+    environment:
+        DB_HOST: ${POSTGRES_HOST}           # The service name of the database
+        DB_PORT: ${POSTGRES_PORT}           # The default PostgreSQL port
+        DB_USER: ${POSTGRES_USER}           # Database username
+        DB_PASSWORD: ${POSTGRES_PASSWORD}   # Database password
+        DB_NAME: ${POSTGRES_DB}             # Name of your database
+    ports:
+      - "8000:8000"                         # Expose app's port
+    depends_on:
+      - kafkabotdb                          # Ensure the database starts before the app
+    networks:
+      - kafkabot_network
     restart: unless-stopped
 
 networks:
-  db:
+  kafkabot_network:
+    name: kafkabot_network
     driver: bridge
 
 volumes:
-  db:
+  kafkabotdb:

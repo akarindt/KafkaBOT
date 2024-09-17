@@ -84,12 +84,22 @@ export class BotClient extends Client {
                 const imported = await Utils.importFile(url.pathToFileURL(filePath).href);
                 let command: any = (process.env.NODE_ENV == 'development' && imported) || imported.default;
 
-                if (Array.isArray(command)) {
-                    for (let item of command) {
-                        this.add(item, body, filePath);
+                if (Array.isArray(command) || Array.isArray(command.default)) {
+                    if ('default' in command) {
+                        for (let item of command.default) {
+                            this.add(item, body, filePath);
+                        }
+                    } else {
+                        for (let item of command) {
+                            this.add(item, body, filePath);
+                        }
                     }
                 } else {
-                    this.add(command, body, filePath);
+                    if ('default' in command) {
+                        this.add(command.default, body, filePath);
+                    } else {
+                        this.add(command, body, filePath);
+                    }
                 }
             })
         );
@@ -127,7 +137,7 @@ export class BotClient extends Client {
     private add(command: any, body: any[], filePath: string) {
         if ('data' in command && 'execute' in command) {
             this.commands.set(command.data.name, command);
-            body.push(command.default ? command.default.data.toJSON() : command.data.toJSON());
+            body.push(command.data.toJSON());
         } else if ('name' in command && 'execute' in command) {
             this.customs.set(command.name, command);
         } else {

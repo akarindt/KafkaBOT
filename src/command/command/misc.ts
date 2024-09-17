@@ -144,16 +144,16 @@ const listCommands = (interaction: CommandInteraction, commands: CommandItem[]) 
 export default [
     {
         data: new SlashCommandBuilder().setName('kfping').setDescription('Replies with Pong!'),
-        async execute(interaction: CommandInteraction) {
+        execute: async (interaction: CommandInteraction) => {
             const delay = Math.abs(Date.now() - interaction.createdTimestamp);
             await interaction.reply(`Delay: ${delay}ms - Pong!`);
         },
     },
     {
         data: new SlashCommandBuilder().setName('kfcommands').setDescription("Get KafkaBOT's command list"),
-        async execute(interaction: CommandInteraction) {
+        execute: async (interaction: CommandInteraction) => {
             await interaction.deferReply();
-            const pathFile = path.resolve(__dirname, '../../../extra/command-list.json');
+            const pathFile = path.resolve(process.cwd(), '/extra/command-list.json');
             const stringify = await fs.promises.readFile(pathFile, 'utf-8');
             const data: CommandItem[] = JSON.parse(stringify);
             await Utils.ButtonPagination(interaction, listCommands(interaction, data));
@@ -167,7 +167,7 @@ export default [
             .addBooleanOption((options) => options.setName('multi').setDescription('Allow multiple selection').setRequired(true))
             .addNumberOption((options) => options.setName('duration').setDescription("Poll's duration (hours)").setRequired(true))
             .addStringOption((options) => options.setName('polls').setDescription("Polls, seperated by '|||'").setRequired(true)),
-        async execute(interaction: CommandInteraction) {
+        execute: async (interaction: CommandInteraction) => {
             const question = interaction.options.get('question', true);
             const multi = interaction.options.get('multi', true);
             const duration = interaction.options.get('duration', true);
@@ -199,7 +199,7 @@ export default [
     },
     {
         data: new SlashCommandBuilder().setName('kftft').setDescription('Get current tft meta'),
-        async execute(interaction: CommandInteraction) {
+        execute: async (interaction: CommandInteraction) => {
             await interaction.deferReply();
             const url = 'https://tft.op.gg/meta-trends/comps';
 
@@ -237,7 +237,7 @@ export default [
             .setName('kfud')
             .setDescription('Search this word on Urban Dictionary')
             .addStringOption((options) => options.setName('term').setDescription('Give me a term').setRequired(true)),
-        async execute(interaction: CommandInteraction) {
+        execute: async (interaction: CommandInteraction) => {
             await interaction.deferReply();
             const option = interaction.options.get('term', true);
             if (!option.value) {
@@ -279,7 +279,7 @@ export default [
     },
     {
         data: new SlashCommandBuilder().setName('kfmeme').setDescription('Summon a random meme at will'),
-        async execute(interaction: CommandInteraction) {
+        execute: async (interaction: CommandInteraction) => {
             await interaction.deferReply();
             const api = 'https://meme-api.com/gimme';
             const subreddits = [
@@ -314,7 +314,7 @@ export default [
     },
     {
         data: new SlashCommandBuilder().setName('kfinfo').setDescription("Get user's info"),
-        async execute(interaction: CommandInteraction) {
+        execute: async (interaction: CommandInteraction) => {
             await interaction.deferReply();
             const user = interaction.user;
             const guild = interaction.guild;

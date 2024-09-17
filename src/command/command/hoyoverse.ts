@@ -6,9 +6,9 @@ export default [
     {
         data: new SlashCommandBuilder()
             .setName('kfhoyo')
-            .setDescription("Assign your Hoyolab cookie")
-            .addStringOption((options) => options.setName('cookie').setDescription("Your Hoyolab cookie").setRequired(true)),
-        async execute(interaction: CommandInteraction) {
+            .setDescription('Assign your Hoyolab cookie')
+            .addStringOption((options) => options.setName('cookie').setDescription('Your Hoyolab cookie').setRequired(true)),
+        execute: async (interaction: CommandInteraction) => {
             await interaction.deferReply();
             const option = interaction.options.get('cookie', true);
             if (!option.value) {

@@ -5,7 +5,7 @@ import sagiri from 'sagiri';
 
 export default {
     data: new ContextMenuCommandBuilder().setName('SauceNAO').setType(ApplicationCommandType.Message),
-    async execute(interaction: CommandInteraction) {
+    execute: async (interaction: CommandInteraction) => {
         const data = interaction.options.data;
         if (!data.length) return;
 

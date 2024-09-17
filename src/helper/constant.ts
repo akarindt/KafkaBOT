@@ -2,6 +2,9 @@ import { HoyoverseGame } from '@/infrastructure/hoyoverse';
 import dotenv from 'dotenv';
 import { join } from 'path';
 import { DataSourceOptions } from 'typeorm';
+import  HoyoverseEntity from '@/entity/hoyoverse';
+import NSFWKeyword from '@/entity/nsfwKeyword';
+import Quote from '@/entity/quote';
 
 dotenv.config({ path: '.env' });
 
@@ -185,7 +188,7 @@ export class DatabaseConfig {
         port: process.env.POSTGRES_PORT as unknown as number,
         host: process.env.POSTGRES_HOST,
         database: process.env.POSTGRES_DB,
-        entities: [join(__dirname, '../entity/*{.ts, .js}')],
+        entities: [HoyoverseEntity, NSFWKeyword, Quote],
         migrations: [join(__dirname, '../../migrations/*{.ts, .js}')],
         migrationsTableName: 'TBL_MIGRATION',
         synchronize: false,

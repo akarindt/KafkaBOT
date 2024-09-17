@@ -2,7 +2,7 @@ import { ContextMenuCommandBuilder, ApplicationCommandType, CommandInteraction }
 
 export default {
     data: new ContextMenuCommandBuilder().setName('Ping !').setType(ApplicationCommandType.User),
-    async execute(interaction: CommandInteraction) {
+    execute: async (interaction: CommandInteraction) => {
         const delay = Math.abs(Date.now() - interaction.createdTimestamp);
         await interaction.reply(`Delay: ${delay}ms - Pong!`);
     },

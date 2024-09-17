@@ -53,7 +53,7 @@ export default [
             .setName('kfplay')
             .setDescription('Play a song')
             .addStringOption((options) => options.setName('query').setDescription('The song you want to play').setRequired(true)),
-        async execute(interaction: CommandInteraction) {
+        execute: async (interaction: CommandInteraction) => {
             const player = useMainPlayer();
 
             if (!interaction.guildId) {
@@ -104,7 +104,7 @@ export default [
     },
     {
         data: new SlashCommandBuilder().setName('kfskip').setDescription('Skip to the current song'),
-        async execute(interaction: CommandInteraction) {
+        execute: async (interaction: CommandInteraction) => {
             const player = useMainPlayer();
             await interaction.deferReply();
 
@@ -136,7 +136,7 @@ export default [
     },
     {
         data: new SlashCommandBuilder().setName('kfqueue').setDescription('See the queue'),
-        async execute(interaction: CommandInteraction) {
+        execute: async (interaction: CommandInteraction) => {
             await interaction.deferReply();
             const player = useMainPlayer();
             const queue = player.queues.cache.get(interaction.guildId || '');
@@ -151,7 +151,7 @@ export default [
     },
     {
         data: new SlashCommandBuilder().setName('kfstop').setDescription('Stop the player'),
-        async execute(interaction: CommandInteraction) {
+        execute: async (interaction: CommandInteraction) => {
             const player = useMainPlayer();
             await interaction.deferReply();
 

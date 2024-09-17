@@ -1,6 +1,25 @@
-FROM node:alpine
+# Use node latest image
+FROM node:20
+
+# Install Python3 and other build dependencies
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set the working directory
 WORKDIR /usr/KafkaBOT
+
+# Copy the project files into the container
 COPY . .
-RUN npm install && npm install tsx -g
+
+# Install project dependencies
+RUN npm install && npm install -g tsx
+
+# Run migrations and build the project
 RUN npm run build
-CMD ["npm", "run", "start:prod"]
+
+# Run application
+RUN chmod +x ./extra/script/entrypoint.sh
+CMD ["./extra/script/entrypoint.sh"]

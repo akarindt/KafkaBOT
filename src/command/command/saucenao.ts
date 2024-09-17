@@ -10,7 +10,7 @@ export default {
     .addAttachmentOption(options => 
         options.setName("attachment").setDescription("Attachment for searching").setRequired(true)
     ),
-    async execute(interaction: CommandInteraction) {
+    execute: async (interaction: CommandInteraction) => {
         const data = interaction.options.get("attachment");
 
         if (!data) {

@@ -23,7 +23,7 @@ export default [
         name: '%',
         description: 'Save quote',
         parameters: ['identifier'],
-        async execute(message: Message, options: CustomOptions) {
+        execute: async (message: Message, options: CustomOptions) => {
             const param = options.parameters.get('identifier');
             const content = options.content;
             const serverId = message.guildId;
@@ -83,7 +83,7 @@ export default [
         name: '%%',
         description: 'Get quote',
         parameters: ['identifier'],
-        async execute(message: Message, options: CustomOptions) {
+        execute: async (message: Message, options: CustomOptions) => {
             const param = options.parameters.get('identifier');
             const serverId = message.guildId;
 

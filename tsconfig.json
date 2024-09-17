@@ -5,12 +5,10 @@
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": false,
         "allowSyntheticDefaultImports": true,
-        "moduleResolution": "node16",
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "useDefineForClassFields": false,
-        "target": "es5",
-        "lib": ["ES6", "DOM"],
+        "lib": ["es2023", "DOM"],
         "strictPropertyInitialization": false,
         "skipLibCheck": true,
         "allowJs": true,
@@ -19,6 +17,6 @@
             "@/*": ["src/*"]
         }
     },
-    "include": ["src/**/*.ts", "tests/**/*.ts"],
+    "include": ["src/**/*.ts", "tests/**/*.ts", "migrations/**/*.ts"],
     "exclude": ["node_modules", ".vscode"]
 }

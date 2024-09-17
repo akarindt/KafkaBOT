@@ -6,14 +6,13 @@ import fs from 'fs';
 import { AppDataSource } from '@/helper/datasource';
 import NSFWKeyword from '@/entity/nsfwKeyword';
 
-
 export default [
     {
         data: new SlashCommandBuilder()
             .setName('kfchat')
             .setDescription('Chat with AI')
             .addStringOption((options) => options.setName('question').setDescription('Ask me anything...').setRequired(true)),
-        async execute(interaction: CommandInteraction) {
+        execute: async (interaction: CommandInteraction) => {
             await interaction.deferReply();
             const herc = new Hercai();
             const question = interaction.options.get('question', true);
@@ -38,14 +37,14 @@ export default [
             .setName('kfdraw')
             .setDescription('Ask AI to draw a image')
             .addStringOption((options) => options.setName('idea').setDescription('Give me an idea...').setRequired(true)),
-        async execute(interaction: CommandInteraction) {
+        execute: async (interaction: CommandInteraction) => {
             await interaction.deferReply();
 
             const NSFWKeywordRepository = AppDataSource.getRepository(NSFWKeyword);
             const totalKeyword = await NSFWKeywordRepository.count();
             if (totalKeyword <= 0) {
                 console.log(`[INFO] Empty list, begin to add list of nsfw keywords`);
-                const fileContent = await fs.promises.readFile(path.join(__dirname, '../../../extra/nsfw-keywords/keywords.txt'), 'utf-8');
+                const fileContent = await fs.promises.readFile(path.join(process.cwd(), '/extra/nsfw-keywords/keywords.txt'), 'utf-8');
                 const data = fileContent.split(/\r?\n/);
                 const entities: NSFWKeyword[] = [];
                 for (const value of data) {
