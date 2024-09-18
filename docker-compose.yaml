@@ -1,42 +1,64 @@
 version: '3.8'
 
 services:
-  kafkabotdb:
-    container_name: KafkaBOT_DB
-    image: postgres:latest
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-      PGDATA: /data/postgres
-      PGPORT: "${POSTGRES_PORT}"
-    volumes:
-      - kafkabotdb:/data/postgres
-    networks:
-      - kafkabot_network
-    restart: unless-stopped
-  
-  kafkabotapp: 
-    container_name: KafkaBOT_APP
-    build: .
-    environment:
-        DB_HOST: ${POSTGRES_HOST}           # The service name of the database
-        DB_PORT: ${POSTGRES_PORT}           # The default PostgreSQL port
-        DB_USER: ${POSTGRES_USER}           # Database username
-        DB_PASSWORD: ${POSTGRES_PASSWORD}   # Database password
-        DB_NAME: ${POSTGRES_DB}             # Name of your database
-    ports:
-      - "8000:8000"                         # Expose app's port
-    depends_on:
-      - kafkabotdb                          # Ensure the database starts before the app
-    networks:
-      - kafkabot_network
-    restart: unless-stopped
+    kafkabotdb:
+        container_name: KafkaBOT_DB
+        image: postgres:latest
+        environment:
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            POSTGRES_DB: ${POSTGRES_DB}
+            PGDATA: /data/postgres
+            PGPORT: '${POSTGRES_PORT}'
+        volumes:
+            - kafkabotdb:/data/postgres
+        networks:
+            - kafkabot_network
+        healthcheck:
+            test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
+            interval: 30s
+            timeout: 60s
+            retries: 5
+            start_period: 80s
+        restart: unless-stopped
+
+    kafkabotapp:
+        container_name: KafkaBOT_APP
+        build: .
+        environment:
+            DB_HOST: ${POSTGRES_HOST}
+            DB_PORT: ${POSTGRES_PORT}
+            DB_USER: ${POSTGRES_USER}
+            DB_PASSWORD: ${POSTGRES_PASSWORD}
+            DB_NAME: ${POSTGRES_DB}
+            CLIENT_TOKEN: ${CLIENT_TOKEN}
+            CLIENT_ID: ${CLIENT_ID}
+            CLIENT_SECRET: ${CLIENT_SECRET}
+            SAUCENAO_APIKEY: ${SAUCENAO_APIKEY}
+            CLOUDINARY_API: ${CLOUDINARY_API}
+            CLOUDINARY_SECRET: ${CLOUDINARY_SECRET}
+            CLOUDINARY_NAME: ${CLOUDINARY_NAME}
+            NODE_ENV: ${NODE_ENV}
+            NODE_NO_WARNINGS: ${NODE_NO_WARNINGS}
+            COMMAND_PREFIX: ${COMMAND_PREFIX}
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            POSTGRES_DB: ${POSTGRES_DB}
+            POSTGRES_HOST: ${POSTGRES_HOST}
+            POSTGRES_PORT: ${POSTGRES_PORT}
+        ports:
+            - '8000:8000'
+        depends_on:
+            kafkabotdb:
+              condition: service_healthy
+        networks:
+            - kafkabot_network
+        restart: unless-stopped
 
 networks:
-  kafkabot_network:
-    name: kafkabot_network
-    driver: bridge
+    kafkabot_network:
+        name: kafkabot_network
+        driver: bridge
 
 volumes:
-  kafkabotdb:
+    kafkabotdb:

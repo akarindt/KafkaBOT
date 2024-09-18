@@ -17,6 +17,6 @@
             "@/*": ["src/*"]
         }
     },
-    "include": ["src/**/*.ts", "tests/**/*.ts", "migrations/**/*.ts"],
-    "exclude": ["node_modules", ".vscode"]
+    "include": ["src/**/*.ts", "tests/**/*.ts"],
+    "exclude": ["node_modules", ".vscode", "migrations"]
 }
