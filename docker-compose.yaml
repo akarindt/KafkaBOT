@@ -9,13 +9,15 @@ services:
             POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
             POSTGRES_DB: ${POSTGRES_DB}
             PGDATA: /data/postgres
-            PGPORT: '${POSTGRES_PORT}'
+            PGPORT: '${POSTGRES_DEFAULT_PORT}'
         volumes:
             - kafkabotdb:/data/postgres
+        ports:
+            - "${POSTGRES_MAP_PORT}:${POSTGRES_DEFAULT_PORT}"
         networks:
             - kafkabot_network
         healthcheck:
-            test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
+            test: ['CMD-SHELL', "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
             interval: 30s
             timeout: 60s
             retries: 5
@@ -50,7 +52,7 @@ services:
             - '8000:8000'
         depends_on:
             kafkabotdb:
-              condition: service_healthy
+                condition: service_healthy
         networks:
             - kafkabot_network
         restart: unless-stopped

@@ -68,5 +68,15 @@
         "commandName": "/kfinfo",
         "description": "Get your discord info",
         "parameters": []
+    },
+    {
+        "commandName": "%",
+        "description": "Save quotes",
+        "parameters": ["Identifier"]
+    },
+    {
+        "commandName": "%%",
+        "description": "Get quotes",
+        "parameters": ["Identifier"]
     }
 ]
