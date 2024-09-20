@@ -11,8 +11,7 @@ import schedule from 'node-schedule';
         await client.RegisterCommands();
         await client.RegisterPlayer();
         await client.StartBot();
-
-        // await InitializeJob(client);
+        await InitializeJob(client);
     } catch (error) {
         console.log(`[ERROR] An Error Occurred: ${error}`);
     }
