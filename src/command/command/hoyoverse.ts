@@ -1,5 +1,6 @@
 import Hoyoverse from '@/entity/hoyoverse';
 import { AppDataSource } from '@/helper/datasource';
+import { Utils } from '@/helper/util';
 import { CommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export default [
@@ -24,6 +25,7 @@ export default [
                 const entity = new Hoyoverse();
                 entity.userDiscordId = userDiscordId;
                 entity.cookie = cookie;
+                entity.lastUpdated = Utils.dateToInt(new Date())
                 await repository.insert(entity);
                 await interaction.followUp('✅ Assign successfully !');
                 return;
