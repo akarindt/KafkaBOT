@@ -279,7 +279,7 @@ export class HoyoverseClient {
                     userDiscordId: account.userDiscordId
                 });
             } catch (error) {
-                console.log(`[ERROR] CHECKIN - An error occurred`);
+                console.log(`[ERROR] An error occurred : ${error}`);
             }
         }
         return success;
