@@ -43,16 +43,6 @@ const sendDiscord = (client: BotClient, gameName: HoyoverseConstantName, data: H
                             inline: true,
                         },
                         {
-                            name: "Today's Reward",
-                            value: `${success.award.name} x${success.award.count}`,
-                            inline: true,
-                        },
-                        {
-                            name: 'Total Check-Ins',
-                            value: success.total.toString(),
-                            inline: true,
-                        },
-                        {
                             name: 'Result',
                             value: success.result,
                             inline: false,
@@ -71,15 +61,13 @@ const sendDiscord = (client: BotClient, gameName: HoyoverseConstantName, data: H
 
 export const StartHoyolabCheckInJob = async (client: BotClient) => {
     const hoyoverseRepository = AppDataSource.getRepository(Hoyoverse);
-    console.log(`[INFO] Stop previous cron job: HOYOVERSE-AUTO-DAILY-CHECK-IN`)
-    await schedule.gracefulShutdown();
-
+    
     schedule.scheduleJob('0 */2 * * *', async () => {
         const today = Utils.dateToInt(new Date());
         const accounts = await hoyoverseRepository.createQueryBuilder('hoyo').where(':today - hoyo.lastUpdated >= 2', { today }).getMany();
-
+    
         if (!accounts.length) return;
-
+    
         for (let account of accounts) {
             const response = await axios.get('https://webapi-os.account.hoyoverse.com/Api/fetch_cookie_accountinfo', {
                 headers: {
@@ -87,23 +75,23 @@ export const StartHoyolabCheckInJob = async (client: BotClient) => {
                     ...HoyoConstant.HOYOVERSE_HEADERS,
                 },
             });
-
+    
             if (response.status !== 200) {
                 await client.users.send(account.userDiscordId, `❌ Fetch cookie info failed! at index: #${account.id}`);
                 continue;
             }
-
+    
             const responseData = response.data as UpdateHoyolabCookieResponse;
             const { data, ...rest } = responseData;
             if (!data || data.status !== 1 || !data.cookie_info) {
                 await client.users.send(account.userDiscordId, `❌ Refresh token failed! at index: #${account.id}`);
                 continue;
             }
-
+    
             const cookieData = Utils.parseCookie(account.cookie, { blacklist: ['cookie_token', 'account_id'], whitelist: [], separator: ';' });
             const accountId = data.cookie_info.account_id;
             const token = data.cookie_info.cookie_token;
-
+    
             await hoyoverseRepository.save({
                 ...account,
                 cookie: `${cookieData}; cookie_token=${token}; account_id=${accountId}`,
@@ -111,13 +99,13 @@ export const StartHoyolabCheckInJob = async (client: BotClient) => {
             });
         }
     });
-
+    
     schedule.scheduleJob('0 0 16 * * *', async () => {
         const accounts = await hoyoverseRepository.find();
         sendDiscord(client, 'GENSHIN', accounts);
         sendDiscord(client, 'STARRAIL', accounts);
         sendDiscord(client, 'ZENLESS', accounts);
-
+    
     });
 
     console.log(`[INFO] Started cron job: HOYOVERSE-AUTO-DAILY-CHECK-IN`)

@@ -115,7 +115,6 @@ export type HoyoverseGame = {
 export type ExecuteCheckIn = {
     userDiscordId: string;
     platform: string;
-    total: number;
     result: string;
     assets: {
         author: string;
@@ -123,11 +122,6 @@ export type ExecuteCheckIn = {
         icon: string;
     };
     account: AccountDetails;
-    award: {
-        name: string;
-        count: number;
-        icon: string;
-    };
 };
 
 export type UpdateHoyolabCookieResponse = {
@@ -154,26 +148,6 @@ type AccountDetails = {
     nickname: string;
     rank: number;
     region: string;
-};
-
-type SignInfo = {
-    success: boolean;
-    data?: null | {
-        total: number;
-        today: string;
-        isSigned: boolean;
-    };
-};
-
-type AwardsData = {
-    success: boolean;
-    data?:
-        | null
-        | {
-              icon: string;
-              name: string;
-              cnt: number;
-          }[];
 };
 
 export class HoyoverseClient {
@@ -227,38 +201,6 @@ export class HoyoverseClient {
                     continue;
                 }
 
-                const info = await this.GetSignInfo(cookie);
-                if (!info.success) {
-                    continue;
-                }
-
-                const awardsData = await this.GetAwardsData(cookie);
-                if (!awardsData.success) {
-                    continue;
-                }
-
-                if (!info.data || !awardsData.data) {
-                    continue;
-                }
-
-                const awards = awardsData.data;
-                const data = {
-                    total: info.data.total,
-                    today: info.data.today,
-                    isSigned: info.data.isSigned,
-                };
-
-                if (data.isSigned) {
-                    continue;
-                }
-
-                const totalSigned = data.total;
-                const awardObj = {
-                    name: awards[totalSigned].name,
-                    count: awards[totalSigned].cnt,
-                    icon: awards[totalSigned].icon,
-                };
-
                 const sign = await this.Sign(cookie);
                 if (!sign.success) {
                     continue;
@@ -266,7 +208,6 @@ export class HoyoverseClient {
 
                 success.push({
                     platform: this._name,
-                    total: data.total + 1,
                     result: this._game.success,
                     assets: this._game.assets,
                     account: {
@@ -275,7 +216,6 @@ export class HoyoverseClient {
                         rank: accountDetails.rank,
                         region: accountDetails.region,
                     },
-                    award: awardObj,
                     userDiscordId: account.userDiscordId
                 });
             } catch (error) {
@@ -289,8 +229,8 @@ export class HoyoverseClient {
         try {
             const response = await axios.get(`${ HoyoConstant.HOYOVERSE_RECORD_CARD_API}?uid=${ltuid}`, {
                 headers: {
-                    'User-Agent': this._userAgent,
                     Cookie: cookie,
+                    'User-Agent': this._userAgent,
                 },
             });
 
@@ -315,62 +255,6 @@ export class HoyoverseClient {
         } catch (error) {
             console.log(`[ERROR] Error: ${error} at ${this._fullName}`);
             return null;
-        }
-    }
-
-    async GetSignInfo(cookie: string): Promise<SignInfo> {
-        try {
-            const response = await axios.get(`${this._game.url.home}?act_id=${this._game.ACT_ID}`, {
-                headers: {
-                    Cookies: cookie,
-                },
-            });
-
-            const data = response.data as HoyoverseResponse;
-            if (response.status !== 200 || data.retcode !== 0) {
-                console.log(`[ERROR] Failed to get sign info at ${this._fullName}: ${JSON.stringify(data.message)}`);
-                return { success: false };
-            }
-
-            const signInfo = data.data as HoyoverseSignInfo;
-
-            return {
-                success: true,
-                data: {
-                    total: signInfo.total_sign_day,
-                    today: signInfo.today,
-                    isSigned: signInfo.is_sign,
-                },
-            };
-        } catch (error) {
-            console.log(`[ERROR] Error: ${error} at ${this._fullName}`);
-            return { success: false };
-        }
-    }
-
-    async GetAwardsData(cookie: string): Promise<AwardsData> {
-        try {
-            const response = await axios.get(`${this._game.url.home}?act_id=${this._game.ACT_ID}`, {
-                headers: {
-                    Cookies: cookie,
-                },
-            });
-
-            const data = response.data as HoyoverseResponse;
-            if (response.status !== 200 || data.retcode !== 0) {
-                console.log(`[ERROR] Failed to get awards data at ${this._fullName}: ${JSON.stringify(data.message)}`);
-                return { success: false };
-            }
-
-            const awardData = data.data as HoyoverseAwardData;
-            if (!awardData.awards.length) {
-                console.log(`[WARNING] No awards data available at ${this._fullName}`);
-            }
-
-            return { success: true, data: awardData.awards };
-        } catch (error) {
-            console.log(`[ERROR] Error: ${error} at ${this._fullName}`);
-            return { success: false };
         }
     }
 

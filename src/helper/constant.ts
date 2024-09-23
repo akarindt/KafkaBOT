@@ -13,7 +13,7 @@ export class Misc {
     public static readonly DEFAULT_SIMILARITY_POINT = 60;
     public static readonly ITEM_PER_PAGES = 10;
     public static readonly USER_AGENT =
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36';
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Edg/129.0.0.0';
     public static readonly NEGATIVE_PROMPTS = [
         'ugly',
         'duplicate',
@@ -93,7 +93,7 @@ export class Hoyoverse {
     public static readonly HOYOVERSE_UPDATE_COOKIE_API = 'https://webapi-os.account.hoyoverse.com/Api/fetch_cookie_accountinfo';
     public static readonly HOYOVERSE_RECORD_CARD_API = 'https://bbs-api-os.hoyolab.com/game_record/card/wapi/getGameRecordCard';
     public static readonly HOYOVERSE_HEADERS = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:129.0) Gecko/20100101 Firefox/129.0',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Edg/129.0.0.0',
         Referer: 'https://act.hoyolab.com',
         'x-rpc-app_version': '1.5.0',
         'x-rpc-client_type': '5',

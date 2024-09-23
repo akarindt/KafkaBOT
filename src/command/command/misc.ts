@@ -153,7 +153,7 @@ export default [
         data: new SlashCommandBuilder().setName('kfcommands').setDescription("Get KafkaBOT's command list"),
         execute: async (interaction: CommandInteraction) => {
             await interaction.deferReply();
-            const pathFile = path.resolve(process.cwd(), '/extra/command-list.json');
+            const pathFile = path.join(process.cwd(), '/extra/command-list.json');
             const stringify = await fs.promises.readFile(pathFile, 'utf-8');
             const data: CommandItem[] = JSON.parse(stringify);
             await Utils.ButtonPagination(interaction, listCommands(interaction, data));
