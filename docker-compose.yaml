@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
     kafkabotdb:
         container_name: KafkaBOT_DB

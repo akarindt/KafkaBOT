@@ -109,6 +109,7 @@ export type HoyoverseGame = {
         info: string;
         home: string;
         sign: string;
+        redem?: string;
     };
 };
 

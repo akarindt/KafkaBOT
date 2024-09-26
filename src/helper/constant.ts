@@ -121,6 +121,7 @@ export class Hoyoverse {
                 info: 'https://sg-hk4e-api.hoyolab.com/event/sol/info',
                 home: 'https://sg-hk4e-api.hoyolab.com/event/sol/home',
                 sign: 'https://sg-hk4e-api.hoyolab.com/event/sol/sign',
+                redem: 'https://sg-hk4e-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey'
             },
         },
 
@@ -157,6 +158,7 @@ export class Hoyoverse {
                 info: 'https://sg-public-api.hoyolab.com/event/luna/os/info',
                 home: 'https://sg-public-api.hoyolab.com/event/luna/os/home',
                 sign: 'https://sg-public-api.hoyolab.com/event/luna/os/sign',
+                redem: 'https://sg-hkrpg-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey'
             },
         },
 
@@ -175,6 +177,7 @@ export class Hoyoverse {
                 info: 'https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os/info',
                 home: 'https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os/home',
                 sign: 'https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os/sign',
+                redem: 'https://public-operation-nap.hoyoverse.com/common/apicdkey/api/webExchangeCdkey'
             },
         },
     };
