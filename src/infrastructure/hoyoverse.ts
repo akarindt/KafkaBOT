@@ -110,6 +110,7 @@ export type HoyoverseGame = {
         home: string;
         sign: string;
         redem?: string;
+        checkCodeWeb?: string;
     };
 };
 
@@ -144,6 +145,14 @@ export type UpdateHoyolabCookieResponse = {
     };
 };
 
+export type HoyoverseCodeItem = {
+    gameName: string;
+    code: string;
+    rewards: string[];
+    isActivate: boolean;
+    server: string;
+};
+
 type AccountDetails = {
     uid: string;
     nickname: string;
@@ -162,10 +171,10 @@ export class HoyoverseClient {
     constructor(name: HoyoverseConstantName, data: Hoyoverse[]) {
         this._name = name;
         this._data = data;
-        this._fullName =  HoyoConstant.HOYOVERSE_GAME_LIST[this._name].gameName;
-        this._game =  HoyoConstant.HOYOVERSE_GAME_LIST[this._name];
+        this._fullName = HoyoConstant.HOYOVERSE_GAME_LIST[this._name].gameName;
+        this._game = HoyoConstant.HOYOVERSE_GAME_LIST[this._name];
         this._userAgent = Misc.USER_AGENT;
-        this._updateApi =  HoyoConstant.HOYOVERSE_UPDATE_COOKIE_API;
+        this._updateApi = HoyoConstant.HOYOVERSE_UPDATE_COOKIE_API;
 
         if (!this._data.length) {
             console.log(`[WARNING] No ${this._fullName} accounts provided. Skipping...`);
@@ -217,7 +226,7 @@ export class HoyoverseClient {
                         rank: accountDetails.rank,
                         region: accountDetails.region,
                     },
-                    userDiscordId: account.userDiscordId
+                    userDiscordId: account.userDiscordId,
                 });
             } catch (error) {
                 console.log(`[ERROR] An error occurred : ${error}`);
@@ -228,7 +237,7 @@ export class HoyoverseClient {
 
     async GetAccountDetails(cookie: string, ltuid: string): Promise<AccountDetails | null> {
         try {
-            const response = await axios.get(`${ HoyoConstant.HOYOVERSE_RECORD_CARD_API}?uid=${ltuid}`, {
+            const response = await axios.get(`${HoyoConstant.HOYOVERSE_RECORD_CARD_API}?uid=${ltuid}`, {
                 headers: {
                     Cookie: cookie,
                     'User-Agent': this._userAgent,

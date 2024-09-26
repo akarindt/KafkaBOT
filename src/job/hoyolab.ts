@@ -2,11 +2,14 @@ import Hoyoverse from '@/entity/hoyoverse';
 import { AppDataSource } from '@/helper/datasource';
 import { BotClient } from '@/infrastructure/client';
 import schedule from 'node-schedule';
-import { HoyoverseClient, HoyoverseConstantName, UpdateHoyolabCookieResponse } from '@/infrastructure/hoyoverse';
+import { HoyoverseClient, HoyoverseCodeItem, HoyoverseConstantName, UpdateHoyolabCookieResponse } from '@/infrastructure/hoyoverse';
 import { Utils } from '@/helper/util';
 import axios from 'axios';
 import { Hoyoverse as HoyoConstant, Misc } from '@/helper/constant';
 import { EmbedBuilder } from 'discord.js';
+import HoyoverseCode from '@/entity/hoyoverseCode';
+import puppeteer from 'puppeteer';
+import { In } from 'typeorm';
 
 const sendDiscord = (client: BotClient, gameName: HoyoverseConstantName, data: Hoyoverse[]) => {
     const game = new HoyoverseClient(gameName, data);
@@ -46,7 +49,7 @@ const sendDiscord = (client: BotClient, gameName: HoyoverseConstantName, data: H
                             name: 'Result',
                             value: success.result,
                             inline: false,
-                        },
+                        }
                     )
                     .setTimestamp()
                     .setFooter({
@@ -60,6 +63,74 @@ const sendDiscord = (client: BotClient, gameName: HoyoverseConstantName, data: H
         .catch((e) => {
             console.log(`[ERROR] An error occurred during checkin: ${e}`);
         });
+};
+
+const checkCode = async (gameName: HoyoverseConstantName) => {
+    try {
+        const hoyoverseCodeRepository = AppDataSource.getRepository(HoyoverseCode);
+        const url = HoyoConstant.HOYOVERSE_GAME_LIST[gameName].url.checkCodeWeb;
+    
+        if (!url) return;
+    
+        if (gameName == 'GENSHIN') {
+            const browser = await puppeteer.launch();
+            const page = await browser.newPage();
+    
+            await page.goto(url, {
+                waitUntil: 'domcontentloaded',
+            });
+    
+            const rows = await page.$$('#mw-content-text > div.mw-parser-output > table > tbody > tr');
+            let codes: HoyoverseCodeItem[] = [];
+    
+            for (const row of rows) {
+                const code = await (await row.$('td:nth-child(1) code'))?.evaluate((node) => node.textContent);
+                const server = (await (await row.$('td:nth-child(2)'))?.evaluate((node) => node.textContent)) ?? 'All';
+                const rewards = await Promise.all(
+                    (await row.$$('td:nth-child(3) .item-text')).map((x) => x.evaluate((node) => node.textContent?.trim().replace('\n', '') ?? ''))
+                );
+                const isActivate = (await (await row.$('td:nth-child(4)'))?.evaluate((node) => node.hasAttribute('style'))) ?? false;
+                if (!code) continue;
+    
+                codes.push({ gameName, server, code, rewards, isActivate });
+            }
+            await hoyoverseCodeRepository.upsert(codes, ['code', 'gameName']);
+        }
+    
+        if (gameName == 'STARRAIL') {
+            const browser = await puppeteer.launch();
+            const page = await browser.newPage();
+    
+            await page.goto(url, {
+                waitUntil: 'domcontentloaded',
+            });
+    
+            let codes: HoyoverseCodeItem[] = [];
+    
+            const rows = await page.$$('#mw-content-text > div.mw-parser-output > table > tbody > tr');
+            for (const row of rows) {
+                const code = await (await row.$('td:nth-child(1) code'))?.evaluate((node) => node.textContent);
+                const server = (await (await row.$('td:nth-child(2)'))?.evaluate((node) => node.textContent)) ?? 'All';
+                const rewards = await Promise.all(
+                    (await row.$$('td:nth-child(3) .item-text')).map((x) => x.evaluate((node) => node.textContent?.trim().replace('\n', '') ?? ''))
+                );
+                const isActivate = (await (await (await row.$('td:nth-child(4)'))?.evaluate((node) => node.className))?.includes('bg-new')) ?? false;
+                if (!code) continue;
+    
+                codes.push({ gameName, server, code, rewards, isActivate });
+            }
+    
+            await hoyoverseCodeRepository.upsert(codes, ['code', 'gameName']);
+        }
+    
+        if (gameName == 'ZENLESS') {
+
+        }
+
+        console.log(`[INFO] Update ${HoyoConstant.HOYOVERSE_GAME_LIST[gameName].gameName}'s redeem codes successfully`)
+    } catch (error) {
+        console.log(`[ERROR] Update ${HoyoConstant.HOYOVERSE_GAME_LIST[gameName].gameName}'s redeem codes failed`)
+    }
 };
 
 export const StartHoyolabCheckInJob = async (client: BotClient) => {
@@ -105,6 +176,8 @@ export const StartHoyolabCheckInJob = async (client: BotClient) => {
                 lastUpdated: today,
             });
         }
+
+        console.log(`[INFO] Refresh token success!`);
     });
 
     schedule.scheduleJob('0 0 16 * * *', async () => {
@@ -112,8 +185,14 @@ export const StartHoyolabCheckInJob = async (client: BotClient) => {
         sendDiscord(client, 'GENSHIN', accounts);
         sendDiscord(client, 'STARRAIL', accounts);
         sendDiscord(client, 'ZENLESS', accounts);
-
     });
 
     console.log(`[INFO] Started cron job: HOYOVERSE-AUTO-DAILY-CHECK-IN`);
+};
+
+export const StartCheckCodeJob = async () => {
+    console.log(`[INFO] Started cron job: HOYOVERSE-AUTO-DAILY-CODE-CHECKING`);
+    await checkCode('GENSHIN');
+    await checkCode('STARRAIL');
+    await checkCode("ZENLESS");
 };

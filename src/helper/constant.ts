@@ -5,6 +5,8 @@ import { DataSourceOptions } from 'typeorm';
 import  HoyoverseEntity from '@/entity/hoyoverse';
 import NSFWKeyword from '@/entity/nsfwKeyword';
 import Quote from '@/entity/quote';
+import HoyoverseCode from '@/entity/hoyoverseCode';
+import HoyoverseRedeem from '@/entity/hoyoverseRedeem';
 
 dotenv.config({ path: '.env' });
 
@@ -121,7 +123,8 @@ export class Hoyoverse {
                 info: 'https://sg-hk4e-api.hoyolab.com/event/sol/info',
                 home: 'https://sg-hk4e-api.hoyolab.com/event/sol/home',
                 sign: 'https://sg-hk4e-api.hoyolab.com/event/sol/sign',
-                redem: 'https://sg-hk4e-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey'
+                redem: 'https://sg-hk4e-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey',
+                checkCodeWeb: 'https://genshin-impact.fandom.com/wiki/Promotional_Code'
             },
         },
 
@@ -158,7 +161,8 @@ export class Hoyoverse {
                 info: 'https://sg-public-api.hoyolab.com/event/luna/os/info',
                 home: 'https://sg-public-api.hoyolab.com/event/luna/os/home',
                 sign: 'https://sg-public-api.hoyolab.com/event/luna/os/sign',
-                redem: 'https://sg-hkrpg-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey'
+                redem: 'https://sg-hkrpg-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey',
+                checkCodeWeb: 'https://honkai-star-rail.fandom.com/wiki/Redemption_Code'
             },
         },
 
@@ -177,7 +181,8 @@ export class Hoyoverse {
                 info: 'https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os/info',
                 home: 'https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os/home',
                 sign: 'https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os/sign',
-                redem: 'https://public-operation-nap.hoyoverse.com/common/apicdkey/api/webExchangeCdkey'
+                redem: 'https://public-operation-nap.hoyoverse.com/common/apicdkey/api/webExchangeCdkey',
+                checkCodeWeb: 'https://www.pcgamer.com/games/action/zenless-zone-zero-codes/'
             },
         },
     };
@@ -191,7 +196,7 @@ export class DatabaseConfig {
         port: process.env.POSTGRES_PORT as unknown as number,
         host: process.env.POSTGRES_HOST,
         database: process.env.POSTGRES_DB,
-        entities: [HoyoverseEntity, NSFWKeyword, Quote],
+        entities: [HoyoverseEntity, NSFWKeyword, Quote, HoyoverseCode, HoyoverseRedeem],
         migrations: [join(__dirname, '../../migrations/*{.ts, .js}')],
         migrationsTableName: 'TBL_MIGRATION',
         synchronize: false,
