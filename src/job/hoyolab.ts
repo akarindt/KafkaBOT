@@ -9,9 +9,8 @@ import { Hoyoverse as HoyoConstant, Misc } from '@/helper/constant';
 import { EmbedBuilder } from 'discord.js';
 import HoyoverseCode from '@/entity/hoyoverseCode';
 import puppeteer from 'puppeteer';
-import { In } from 'typeorm';
 
-const sendDiscord = (client: BotClient, gameName: HoyoverseConstantName, data: Hoyoverse[]) => {
+const sendDiscordCheckinStatus = (client: BotClient, gameName: HoyoverseConstantName, data: Hoyoverse[]) => {
     const game = new HoyoverseClient(gameName, data);
 
     game.CheckAndExecute()
@@ -65,71 +64,117 @@ const sendDiscord = (client: BotClient, gameName: HoyoverseConstantName, data: H
         });
 };
 
+const sendDiscordCodeRedeem = async (client: BotClient, gameName: HoyoverseConstantName, data: Hoyoverse[]) => {
+    const game = new HoyoverseClient(gameName, data);
+    await game.Redeem(client);
+};
+
 const checkCode = async (gameName: HoyoverseConstantName) => {
     try {
         const hoyoverseCodeRepository = AppDataSource.getRepository(HoyoverseCode);
         const url = HoyoConstant.HOYOVERSE_GAME_LIST[gameName].url.checkCodeWeb;
-    
+
         if (!url) return;
-    
+
         if (gameName == 'GENSHIN') {
             const browser = await puppeteer.launch();
             const page = await browser.newPage();
-    
+
             await page.goto(url, {
                 waitUntil: 'domcontentloaded',
             });
-    
+
             const rows = await page.$$('#mw-content-text > div.mw-parser-output > table > tbody > tr');
             let codes: HoyoverseCodeItem[] = [];
-    
+
             for (const row of rows) {
-                const code = await (await row.$('td:nth-child(1) code'))?.evaluate((node) => node.textContent);
-                const server = (await (await row.$('td:nth-child(2)'))?.evaluate((node) => node.textContent)) ?? 'All';
+                const code = await (await row.$('td:nth-child(1) code'))?.evaluate((node) => node.textContent?.trim().replace('\n', ''));
+                const server = (await (await row.$('td:nth-child(2)'))?.evaluate((node) => node.textContent?.trim().replace('\n', ''))) ?? 'All';
                 const rewards = await Promise.all(
                     (await row.$$('td:nth-child(3) .item-text')).map((x) => x.evaluate((node) => node.textContent?.trim().replace('\n', '') ?? ''))
                 );
                 const isActivate = (await (await row.$('td:nth-child(4)'))?.evaluate((node) => node.hasAttribute('style'))) ?? false;
                 if (!code) continue;
-    
+
                 codes.push({ gameName, server, code, rewards, isActivate });
             }
             await hoyoverseCodeRepository.upsert(codes, ['code', 'gameName']);
         }
-    
+
         if (gameName == 'STARRAIL') {
             const browser = await puppeteer.launch();
             const page = await browser.newPage();
-    
+
             await page.goto(url, {
                 waitUntil: 'domcontentloaded',
             });
-    
+
             let codes: HoyoverseCodeItem[] = [];
-    
+
             const rows = await page.$$('#mw-content-text > div.mw-parser-output > table > tbody > tr');
             for (const row of rows) {
-                const code = await (await row.$('td:nth-child(1) code'))?.evaluate((node) => node.textContent);
-                const server = (await (await row.$('td:nth-child(2)'))?.evaluate((node) => node.textContent)) ?? 'All';
+                const code = await (await row.$('td:nth-child(1) code'))?.evaluate((node) => node.textContent?.trim().replace('\n', ''));
+                const server = (await (await row.$('td:nth-child(2)'))?.evaluate((node) => node.textContent?.trim().replace('\n', ''))) ?? 'All';
                 const rewards = await Promise.all(
                     (await row.$$('td:nth-child(3) .item-text')).map((x) => x.evaluate((node) => node.textContent?.trim().replace('\n', '') ?? ''))
                 );
-                const isActivate = (await (await (await row.$('td:nth-child(4)'))?.evaluate((node) => node.className))?.includes('bg-new')) ?? false;
+                const isActivate = (await (await row.$('td:nth-child(4)'))?.evaluate((node) => node.className))?.includes('bg-new') ?? false;
                 if (!code) continue;
-    
+
                 codes.push({ gameName, server, code, rewards, isActivate });
             }
-    
+
             await hoyoverseCodeRepository.upsert(codes, ['code', 'gameName']);
         }
-    
-        if (gameName == 'ZENLESS') {
 
+        if (gameName == 'ZENLESS') {
+            const browser = await puppeteer.launch();
+            const page = await browser.newPage();
+
+            await page.goto(url, {
+                waitUntil: 'domcontentloaded',
+            });
+
+            let codes: HoyoverseCodeItem[] = [];
+            const activeUl = await page.$$('div#article-body > ul:nth-of-type(1) > li');
+            const expireUl = await page.$$('div#article-body > ul:nth-of-type(2) > li');
+            for (const li of activeUl) {
+                const content = await li.evaluate((node) => node.textContent);
+                if (!content) continue;
+                if (!content.includes('-')) continue;
+                const split = content.split('-');
+                let code = split[0].trim().replace('\n', '');
+
+                if (code.includes(' or ')) {
+                    code = code.split(' or ')[0];
+                }
+
+                const rewards = [split[1].trim().replace('\n', '')];
+                const server = 'All';
+                const isActivate = true;
+
+                codes.push({ gameName, code, rewards, server, isActivate });
+            }
+
+            for (const li of expireUl) {
+                const content = await li.evaluate((node) => node.textContent);
+                if (!content) continue;
+                if (!content.includes('-')) continue;
+                const split = content.split('-');
+                const code = split[0].trim().replace('\n', '');
+                const rewards = [split[1].trim().replace('\n', '')];
+                const server = 'All';
+                const isActivate = false;
+
+                codes.push({ gameName, code, rewards, server, isActivate });
+            }
+
+            await hoyoverseCodeRepository.upsert(codes, ['code', 'gameName']);
         }
 
-        console.log(`[INFO] Update ${HoyoConstant.HOYOVERSE_GAME_LIST[gameName].gameName}'s redeem codes successfully`)
+        console.log(`[INFO] Update ${HoyoConstant.HOYOVERSE_GAME_LIST[gameName].gameName}'s redeem codes successfully`);
     } catch (error) {
-        console.log(`[ERROR] Update ${HoyoConstant.HOYOVERSE_GAME_LIST[gameName].gameName}'s redeem codes failed`)
+        console.log(`[ERROR] Update ${HoyoConstant.HOYOVERSE_GAME_LIST[gameName].gameName}'s redeem codes failed`);
     }
 };
 
@@ -182,17 +227,27 @@ export const StartHoyolabCheckInJob = async (client: BotClient) => {
 
     schedule.scheduleJob('0 0 16 * * *', async () => {
         const accounts = await hoyoverseRepository.find();
-        sendDiscord(client, 'GENSHIN', accounts);
-        sendDiscord(client, 'STARRAIL', accounts);
-        sendDiscord(client, 'ZENLESS', accounts);
+        sendDiscordCheckinStatus(client, 'GENSHIN', accounts);
+        sendDiscordCheckinStatus(client, 'STARRAIL', accounts);
+        sendDiscordCheckinStatus(client, 'ZENLESS', accounts);
     });
 
     console.log(`[INFO] Started cron job: HOYOVERSE-AUTO-DAILY-CHECK-IN`);
 };
 
 export const StartCheckCodeJob = async () => {
+    schedule.scheduleJob('*/30 * * * *', async () => {
+        await Promise.all([await checkCode('GENSHIN'), await checkCode('STARRAIL'), await checkCode('ZENLESS')]);
+    });
     console.log(`[INFO] Started cron job: HOYOVERSE-AUTO-DAILY-CODE-CHECKING`);
-    await checkCode('GENSHIN');
-    await checkCode('STARRAIL');
-    await checkCode("ZENLESS");
+};
+
+export const StartHoyolabAutoRedeem = async (client: BotClient) => {
+    const hoyoverseRepository = AppDataSource.getRepository(Hoyoverse);
+    const accounts = await hoyoverseRepository.find();
+    await Promise.all([
+        // await sendDiscordCodeRedeem(client, 'STARRAIL', accounts),
+        // await sendDiscordCodeRedeem(client, 'ZENLESS', accounts),
+        await sendDiscordCodeRedeem(client, 'GENSHIN', accounts),
+    ]);
 };

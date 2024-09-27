@@ -7,7 +7,7 @@ export default class HoyoverseRedeem {
 
     @Column('int')
     @Index()
-    hoyoverseId: string;
+    hoyoverseId: number;
 
     @Column('varchar')
     @Index()

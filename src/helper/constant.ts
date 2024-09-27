@@ -102,7 +102,7 @@ export class Hoyoverse {
         'x-rpc-language': 'en-us',
         Host: 'webapi-os.account.hoyoverse.com',
     };
-    public static readonly HOYOVERSE_REDEMTION_LINKS = {
+    public static readonly HOYOVERSE_REDEMTION_LINKS: { [gameName: string]: string } = {
         GENSHIN: 'https://genshin.hoyoverse.com/en/gift',
         STARRAIL: 'https://hsr.hoyoverse.com/gift',
         ZENLESS: 'https://zenless.hoyoverse.com/redemption',
@@ -161,7 +161,7 @@ export class Hoyoverse {
                 info: 'https://sg-public-api.hoyolab.com/event/luna/os/info',
                 home: 'https://sg-public-api.hoyolab.com/event/luna/os/home',
                 sign: 'https://sg-public-api.hoyolab.com/event/luna/os/sign',
-                redem: 'https://sg-hkrpg-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey',
+                redem: 'https://sg-hkrpg-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkeyRisk',
                 checkCodeWeb: 'https://honkai-star-rail.fandom.com/wiki/Redemption_Code'
             },
         },

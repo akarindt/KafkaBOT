@@ -1,6 +1,13 @@
 import { Hoyoverse as HoyoConstant, Misc } from '@/helper/constant';
 import Hoyoverse from '@/entity/hoyoverse';
 import axios from 'axios';
+import HoyoverseCode from '@/entity/hoyoverseCode';
+import { Utils } from '@/helper/util';
+import { setTimeout } from 'timers/promises';
+import { AppDataSource } from '@/helper/datasource';
+import HoyoverseRedeem from '@/entity/hoyoverseRedeem';
+import { BotClient } from './client';
+import { EmbedBuilder } from 'discord.js';
 
 export type HoyoverseConstantName = 'GENSHIN' | 'HONKAI' | 'STARRAIL' | 'ZENLESS';
 
@@ -153,11 +160,25 @@ export type HoyoverseCodeItem = {
     server: string;
 };
 
+export type HoyoverseCodeRedeem = {
+    success: HoyoverseCode[];
+    failed: HoyoverseCode[];
+    account: AccountDetails;
+    userDiscordId: string;
+    assets: {
+        author: string;
+        gameName: string;
+        icon: string;
+    };
+    hoyoverseId: number
+};
+
 type AccountDetails = {
     uid: string;
     nickname: string;
     rank: number;
     region: string;
+    ingame_region: string;
 };
 
 export class HoyoverseClient {
@@ -225,6 +246,7 @@ export class HoyoverseClient {
                         nickname: accountDetails.nickname,
                         rank: accountDetails.rank,
                         region: accountDetails.region,
+                        ingame_region: accountDetails.ingame_region,
                     },
                     userDiscordId: account.userDiscordId,
                 });
@@ -261,6 +283,7 @@ export class HoyoverseClient {
                 nickname: accountData.nickname,
                 rank: accountData.level,
                 region: this.FixRegion(accountData.region),
+                ingame_region: accountData.region,
             };
         } catch (error) {
             console.log(`[ERROR] Error: ${error} at ${this._fullName}`);
@@ -294,6 +317,277 @@ export class HoyoverseClient {
         } catch (error) {
             console.log(`[ERROR] Error: ${error} at ${this._fullName}`);
             return { success: false };
+        }
+    }
+
+    async Redeem(client: BotClient) {
+        let url = this._game.url.redem;
+        if (!url) return [];
+
+        const accounts = this._data;
+        const success: HoyoverseCode[] = [];
+        const failed: HoyoverseCode[] = [];
+
+        if (!accounts.length) {
+            console.log(`[WARNING] No active accounts found for ${this._fullName}`);
+            return [];
+        }
+
+        const results: HoyoverseCodeRedeem[] = [];
+
+        for (const account of accounts) {
+            try {
+                const cookie = account.cookie;
+                const ltuid = cookie.match(/ltuid_v2=([^;]+)/);
+                let accountDetails: AccountDetails | null = null;
+
+                const currentId = await AppDataSource.getRepository(Hoyoverse)
+                    .createQueryBuilder('A')
+                    .where('A.userDiscordId = :userDiscordId', { userDiscordId: account.userDiscordId })
+                    .andWhere('A.cookie = :cookie', { cookie: account.cookie })
+                    .getOne();
+
+                if(!currentId) continue;
+
+                const codeList = await AppDataSource.getRepository(HoyoverseCode)
+                    .createQueryBuilder('A')
+                    .where((qb) => {
+                        const subQuery = qb
+                            .subQuery()
+                            .select('B.code')
+                            .from(HoyoverseRedeem, 'B')
+                            .innerJoin(Hoyoverse, 'C', 'B.hoyoverseId = C.id')
+                            .where('B.gameName = :gameName', { gameName: this._name })
+                            .andWhere('C.userDiscordId = :userDiscordId', { userDiscordId: account.userDiscordId })
+                            .andWhere('C.cookie = :cookie', { cookie: account.cookie })
+                            .getQuery();
+
+                        return 'A.code NOT IN ' + subQuery;
+                    })
+                    .setParameter('gameName', this._name)
+                    .setParameter('userDiscordId', account.userDiscordId)
+                    .setParameter('cookie', account.cookie)
+                    .andWhere('A.isActivate = :isActivate', { isActivate: true })
+                    .andWhere('A.gameName = :gameName', { gameName: this._name })
+                    .getMany();
+
+                if (ltuid) {
+                    accountDetails = await this.GetAccountDetails(cookie, ltuid[1]);
+                }
+
+                if (!accountDetails) {
+                    continue;
+                }
+
+                if (this._name == 'GENSHIN') {
+                    for (const code of codeList) {
+                        const cookieData = Utils.parseCookie(account.cookie, {
+                            whitelist: ['cookie_token_v2', 'account_mid_v2', 'account_id_v2', 'cookie_token', 'account_id'],
+                            blacklist: [],
+                            separator: ';',
+                        });
+
+                        let endp = `${url}?uid=${accountDetails.uid}&region=${accountDetails.ingame_region}&lang=en`;
+                        endp += `&cdkey=${code.code}&game_biz=hk4e_global&sLangKey=en-us`;
+
+                        const res = await axios.get(endp, {
+                            headers: {
+                                Cookie: cookieData,
+                                'User-Agent': this._userAgent,
+                            },
+                        });
+
+                        if (res.status !== 200) {
+                            console.log('[ERROR] Genshin: API returned non-200 status code.');
+                            failed.push(code);
+                            await setTimeout(7000);
+                            continue;
+                        }
+
+                        const data = res.data as HoyoverseResponse;
+                        if (data.retcode !== 0) {
+                            console.log('[ERROR] Genshin: API returned non-200 status code.');
+                            failed.push(code);
+                            await setTimeout(7000);
+                            continue;
+                        }
+
+                        success.push(code);
+                        await setTimeout(7000);
+                        continue;
+                    }
+                }
+
+                if (this._name == 'STARRAIL') {
+                    for (const code of codeList) {
+                        const cookieData = Utils.parseCookie(account.cookie, {
+                            whitelist: ['cookie_token_v2', 'account_mid_v2', 'account_id_v2', 'cookie_token', 'account_id'],
+                            blacklist: [],
+                            separator: ';',
+                        });
+
+                        const res = await axios.post(
+                            url,
+                            {
+                                cdkey: code.code,
+                                game_biz: 'hkrpg_global',
+                                lang: 'en',
+                                region: accountDetails.ingame_region,
+                                t: Date.now(),
+                                uid: accountDetails.uid,
+                            },
+                            {
+                                headers: {
+                                    Cookie: cookieData,
+                                },
+                            }
+                        );
+
+                        if (res.status !== 200) {
+                            console.log('[ERROR] STARRAIL: API returned non-200 status code.');
+                            failed.push(code);
+                            await setTimeout(7000);
+                            continue;
+                        }
+
+                        const data = res.data as HoyoverseResponse;
+                        if (data.retcode !== 0) {
+                            console.log('[ERROR] STARRAIL: API returned non-200 status code.');
+                            failed.push(code);
+                            await setTimeout(7000);
+                            continue;
+                        }
+
+                        success.push(code);
+                        await setTimeout(7000);
+                        continue;
+                    }
+                }
+
+                if (this._name == 'ZENLESS') {
+                    for (const code of codeList) {
+                        const cookieData = Utils.parseCookie(account.cookie, {
+                            whitelist: ['cookie_token_v2', 'account_mid_v2', 'account_id_v2', 'cookie_token', 'account_id'],
+                            blacklist: [],
+                            separator: ';',
+                        });
+
+                        let endp = `${url}?t=${Date.now()}&lang=en&game_biz=nap_global&uid=${accountDetails.uid}`;
+                        endp += `&region=${accountDetails.ingame_region}&cdkey=${code.code}`;
+
+                        const res = await axios.get(endp, {
+                            headers: {
+                                Cookie: cookieData,
+                                'User-Agent': this._userAgent,
+                            },
+                        });
+
+                        if (res.status !== 200) {
+                            console.log('[ERROR] ZENLESS: API returned non-200 status code.');
+                            failed.push(code);
+                            await setTimeout(7000);
+                            continue;
+                        }
+
+                        const data = res.data as HoyoverseResponse;
+                        if (data.retcode !== 0) {
+                            console.log('[ERROR] ZENLESS: API returned non-200 status code.');
+                            failed.push(code);
+                            await setTimeout(7000);
+                            continue;
+                        }
+
+                        success.push(code);
+                        await setTimeout(7000);
+                        continue;
+                    }
+                }
+
+                results.push({
+                    success,
+                    failed,
+                    hoyoverseId: currentId.id,
+                    userDiscordId: account.userDiscordId,
+                    account: {
+                        uid: accountDetails.uid,
+                        nickname: accountDetails.nickname,
+                        rank: accountDetails.rank,
+                        region: accountDetails.region,
+                        ingame_region: accountDetails.ingame_region,
+                    },
+                    assets: this._game.assets,
+                });
+            } catch (error) {
+                console.log(`[ERROR] An error occurred : ${error}`);
+            }
+        }
+
+        for (const result of results) {
+            const embed = new EmbedBuilder()
+                .setColor(Misc.PRIMARY_EMBED_COLOR)
+                .setTitle(`${result.assets.gameName} Code Redemption`)
+                .setAuthor({
+                    name: `${result.account.uid} - ${result.account.nickname}`,
+                    iconURL: result.assets.icon,
+                })
+                .setFields(
+                    {
+                        name: 'Nickname',
+                        value: result.account.nickname,
+                        inline: true,
+                    },
+                    {
+                        name: 'UID',
+                        value: result.account.uid,
+                        inline: true,
+                    },
+                    {
+                        name: 'Rank',
+                        value: result.account.rank.toString(),
+                        inline: true,
+                    },
+                    {
+                        name: 'Region',
+                        value: result.account.region,
+                        inline: true,
+                    },
+                    {
+                        name: 'Code',
+                        value: result.success
+                            .map((s) => {
+                                return `${s.code} - ${s.rewards.join(',')}`;
+                            })
+                            .join('\n\r'),
+                        inline: true,
+                    },
+                    {
+                        name: 'Failed (Invalid or Expired code)',
+                        value: result.failed
+                            .map((fail) => {
+                                return `[${fail.code}](${HoyoConstant.HOYOVERSE_REDEMTION_LINKS[this._name]}?code=${fail.code})`;
+                            })
+                            .join('\n\r'),
+                    }
+                )
+                .setTimestamp()
+                .setFooter({
+                    text: `${result.assets.gameName} Code Redemption`,
+                    iconURL: client.user?.avatarURL() || '',
+                });
+
+            const codes = [...result.success, ...result.failed];
+            const entites: HoyoverseRedeem[] = []
+            for(const code of codes) {
+                const entity = new HoyoverseRedeem();
+                entity.hoyoverseId = result.hoyoverseId,
+                entity.code = code.code,
+                entity.gameName = code.gameName,
+                entity.redeemAt = Utils.dateToInt(new Date())
+                entites.push(entity)
+            }
+
+            await AppDataSource.getRepository(HoyoverseRedeem).insert(entites);
+            await client.users.send(result.userDiscordId, { embeds: [embed] });
         }
     }
 
