@@ -44,7 +44,10 @@
 | `Ping`            | `Replies with Pong!`                  | `ApplicationCommandType.User`                 |
 
 # Custom commands
-- **Will be added later**
+| Command           | Description                           | Parameters                                    |
+| :-----------------|:-------------------------------------:|:---------------------------------------------:|
+| `%%`              | `Save quote`                          | `identifier` - `Image, chat input or reply`   |
+| `%%%`             | `Get quote`                           | `identifier`                                  |
 
 # Dependencies
 - [@discord-player/extractor](https://www.npmjs.com/package/@discord-player/extractor)
