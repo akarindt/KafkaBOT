@@ -1,5 +1,5 @@
 # Build stage
-FROM node:20 as build
+FROM node:20 AS build
 # Install Python3 and other build dependencies
 RUN apt-get update
 RUN apt-get install -y \
@@ -27,7 +27,7 @@ RUN npm install && npm install -g tsx
 RUN npm run build
 
 # Main stage
-FROM node:lts-alpine as main
+FROM node:lts-alpine AS main
 
 # Install dependencies
 ENV PYTHONUNBUFFERED=1
