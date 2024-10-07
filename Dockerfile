@@ -48,8 +48,6 @@ RUN apk add --no-cache \
         fontconfig \
         curl
 
-RUN yum update nss -y
-
 # Set work directory
 WORKDIR /app
 
