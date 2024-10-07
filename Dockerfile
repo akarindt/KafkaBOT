@@ -1,6 +1,5 @@
 # Build stage
 FROM node:20 as build
-
 # Install Python3 and other build dependencies
 RUN apt-get update
 RUN apt-get install -y \
@@ -32,12 +31,24 @@ FROM node:lts-alpine as main
 
 # Install dependencies
 ENV PYTHONUNBUFFERED=1
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
 RUN apk add --no-cache \ 
         python3 \ 
         py3-pip \
         make \
         g++ \
-        ffmpeg
+        ffmpeg \
+        chromium \
+        nss \
+        freetype \
+        freetype-dev \
+        harfbuzz \
+        ca-certificates \
+        fontconfig \
+        curl
+
+RUN yum update nss -y
 
 # Set work directory
 WORKDIR /app

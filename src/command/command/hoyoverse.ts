@@ -25,9 +25,9 @@ export default [
                 const entity = new Hoyoverse();
                 entity.userDiscordId = userDiscordId;
                 entity.cookie = cookie;
-                entity.lastUpdated = Utils.dateToInt(new Date())
+                entity.lastUpdated = Utils.dateToInt(new Date());
                 await repository.insert(entity);
-                await interaction.followUp('✅ Assign successfully !');
+                await interaction.followUp({ content: '✅ Assign successfully !', ephemeral: true });
                 return;
             } catch (error) {
                 await interaction.followUp('❌ Something wrong happened');
