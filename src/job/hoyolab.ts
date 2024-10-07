@@ -9,6 +9,7 @@ import { Hoyoverse as HoyoConstant, Misc } from '@/helper/constant';
 import { EmbedBuilder } from 'discord.js';
 import HoyoverseCode from '@/entity/hoyoverseCode';
 import puppeteer from 'puppeteer';
+import HoyoverseRedeem from '@/entity/hoyoverseRedeem';
 
 const sendDiscordCheckinStatus = (client: BotClient, gameName: HoyoverseConstantName, data: Hoyoverse[]) => {
     const game = new HoyoverseClient(gameName, data);
@@ -66,7 +67,75 @@ const sendDiscordCheckinStatus = (client: BotClient, gameName: HoyoverseConstant
 
 const sendDiscordCodeRedeem = async (client: BotClient, gameName: HoyoverseConstantName, data: Hoyoverse[]) => {
     const game = new HoyoverseClient(gameName, data);
-    await game.Redeem(client);
+    const results = await game.Redeem();
+    for (const result of results) {
+        if (result.success.length || result.failed.length) {
+            const embed = new EmbedBuilder()
+                .setColor(Misc.PRIMARY_EMBED_COLOR)
+                .setTitle(`${result.assets.gameName} Code Redemption`)
+                .setAuthor({
+                    name: `${result.account.uid} - ${result.account.nickname}`,
+                    iconURL: result.assets.icon,
+                })
+                .setFields(
+                    {
+                        name: 'Nickname',
+                        value: result.account.nickname,
+                        inline: true,
+                    },
+                    {
+                        name: 'UID',
+                        value: result.account.uid,
+                        inline: true,
+                    },
+                    {
+                        name: 'Rank',
+                        value: result.account.rank.toString(),
+                        inline: true,
+                    },
+                    {
+                        name: 'Region',
+                        value: result.account.region,
+                        inline: true,
+                    },
+                    {
+                        name: 'Code',
+                        value: `Redeem ${result.success.length} codes successfully, please check your ingame-mail !`,
+                        inline: true,
+                    },
+                    {
+                        name: 'Failed (Invalid or Expired code)',
+                        value:
+                            result.failed.length > 0
+                                ? result.failed
+                                      .map((fail) => {
+                                          return `[${fail.code}](${HoyoConstant.HOYOVERSE_REDEMTION_LINKS[gameName]}?code=${fail.code})`;
+                                      })
+                                      .join('\n')
+                                : '',
+                    }
+                )
+                .setTimestamp()
+                .setFooter({
+                    text: `${result.assets.gameName} Code Redemption`,
+                    iconURL: client.user?.avatarURL() || '',
+                });
+
+            const codes = [...result.success, ...result.failed];
+            const entites: HoyoverseRedeem[] = [];
+            for (const code of codes) {
+                const entity = new HoyoverseRedeem();
+                (entity.hoyoverseId = result.hoyoverseId),
+                    (entity.code = code.code),
+                    (entity.gameName = code.gameName),
+                    (entity.redeemAt = Utils.dateToInt(new Date()));
+                entites.push(entity);
+            }
+
+            await AppDataSource.getRepository(HoyoverseRedeem).insert(entites);
+            await client.users.send(result.userDiscordId, { embeds: [embed] });
+        }
+    }
 };
 
 const checkCode = async (gameName: HoyoverseConstantName) => {
@@ -77,7 +146,9 @@ const checkCode = async (gameName: HoyoverseConstantName) => {
         if (!url) return;
 
         if (gameName == 'GENSHIN') {
-            const browser = await puppeteer.launch();
+            const browser = await puppeteer.launch({
+                args: ['--disable-gpu', '--disable-setuid-sandbox', '--no-sandbox', '--no-zygote'],
+            });;
             const page = await browser.newPage();
 
             await page.goto(url, {
@@ -99,10 +170,17 @@ const checkCode = async (gameName: HoyoverseConstantName) => {
                 codes.push({ gameName, server, code, rewards, isActivate });
             }
             await hoyoverseCodeRepository.upsert(codes, ['code', 'gameName']);
+            const pages = await browser.pages();
+            for (let i = 0; i < pages.length; i++) {
+                await pages[i].close();
+            }
+            await browser.close()
         }
 
         if (gameName == 'STARRAIL') {
-            const browser = await puppeteer.launch();
+            const browser = await puppeteer.launch({
+                args: ['--disable-gpu', '--disable-setuid-sandbox', '--no-sandbox', '--no-zygote'],
+            });;
             const page = await browser.newPage();
 
             await page.goto(url, {
@@ -125,10 +203,17 @@ const checkCode = async (gameName: HoyoverseConstantName) => {
             }
 
             await hoyoverseCodeRepository.upsert(codes, ['code', 'gameName']);
+            const pages = await browser.pages();
+            for (let i = 0; i < pages.length; i++) {
+                await pages[i].close();
+            }
+            await browser.close()
         }
 
         if (gameName == 'ZENLESS') {
-            const browser = await puppeteer.launch();
+            const browser = await puppeteer.launch({
+                args: ['--disable-gpu', '--disable-setuid-sandbox', '--no-sandbox', '--no-zygote'],
+            });;
             const page = await browser.newPage();
 
             await page.goto(url, {
@@ -170,6 +255,11 @@ const checkCode = async (gameName: HoyoverseConstantName) => {
             }
 
             await hoyoverseCodeRepository.upsert(codes, ['code', 'gameName']);
+            const pages = await browser.pages();
+            for (let i = 0; i < pages.length; i++) {
+                await pages[i].close();
+            }
+            await browser.close()
         }
 
         console.log(`[INFO] Update ${HoyoConstant.HOYOVERSE_GAME_LIST[gameName].gameName}'s redeem codes successfully`);
@@ -243,11 +333,10 @@ export const StartCheckCodeJob = async () => {
 };
 
 export const StartHoyolabAutoRedeem = async (client: BotClient) => {
-    const hoyoverseRepository = AppDataSource.getRepository(Hoyoverse);
-    const accounts = await hoyoverseRepository.find();
-    await Promise.all([
-        // await sendDiscordCodeRedeem(client, 'STARRAIL', accounts),
-        // await sendDiscordCodeRedeem(client, 'ZENLESS', accounts),
-        await sendDiscordCodeRedeem(client, 'GENSHIN', accounts),
-    ]);
+    schedule.scheduleJob('0 0 16 * * *', async () => {
+        const hoyoverseRepository = AppDataSource.getRepository(Hoyoverse);
+        const accounts = await hoyoverseRepository.find();
+        await sendDiscordCodeRedeem(client, 'STARRAIL', accounts);
+    });
+    console.log(`[INFO] Started cron job: HOYOVERSE-AUTO-REDEEM-CODE`);
 };

@@ -6,8 +6,6 @@ import { Utils } from '@/helper/util';
 import { setTimeout } from 'timers/promises';
 import { AppDataSource } from '@/helper/datasource';
 import HoyoverseRedeem from '@/entity/hoyoverseRedeem';
-import { BotClient } from './client';
-import { EmbedBuilder } from 'discord.js';
 
 export type HoyoverseConstantName = 'GENSHIN' | 'HONKAI' | 'STARRAIL' | 'ZENLESS';
 
@@ -320,7 +318,7 @@ export class HoyoverseClient {
         }
     }
 
-    async Redeem(client: BotClient) {
+    async Redeem() {
         let url = this._game.url.redem;
         if (!url) return [];
 
@@ -522,73 +520,7 @@ export class HoyoverseClient {
             }
         }
 
-        for (const result of results) {
-            const embed = new EmbedBuilder()
-                .setColor(Misc.PRIMARY_EMBED_COLOR)
-                .setTitle(`${result.assets.gameName} Code Redemption`)
-                .setAuthor({
-                    name: `${result.account.uid} - ${result.account.nickname}`,
-                    iconURL: result.assets.icon,
-                })
-                .setFields(
-                    {
-                        name: 'Nickname',
-                        value: result.account.nickname,
-                        inline: true,
-                    },
-                    {
-                        name: 'UID',
-                        value: result.account.uid,
-                        inline: true,
-                    },
-                    {
-                        name: 'Rank',
-                        value: result.account.rank.toString(),
-                        inline: true,
-                    },
-                    {
-                        name: 'Region',
-                        value: result.account.region,
-                        inline: true,
-                    },
-                    {
-                        name: 'Code',
-                        value: result.success
-                            .map((s) => {
-                                return `${s.code} - ${s.rewards.join(',')}`;
-                            })
-                            .join('\n\r'),
-                        inline: true,
-                    },
-                    {
-                        name: 'Failed (Invalid or Expired code)',
-                        value: result.failed
-                            .map((fail) => {
-                                return `[${fail.code}](${HoyoConstant.HOYOVERSE_REDEMTION_LINKS[this._name]}?code=${fail.code})`;
-                            })
-                            .join('\n\r'),
-                    }
-                )
-                .setTimestamp()
-                .setFooter({
-                    text: `${result.assets.gameName} Code Redemption`,
-                    iconURL: client.user?.avatarURL() || '',
-                });
-
-            const codes = [...result.success, ...result.failed];
-            const entites: HoyoverseRedeem[] = []
-            for(const code of codes) {
-                const entity = new HoyoverseRedeem();
-                entity.hoyoverseId = result.hoyoverseId,
-                entity.code = code.code,
-                entity.gameName = code.gameName,
-                entity.redeemAt = Utils.dateToInt(new Date())
-                entites.push(entity)
-            }
-
-            await AppDataSource.getRepository(HoyoverseRedeem).insert(entites);
-            await client.users.send(result.userDiscordId, { embeds: [embed] });
-        }
+        return results;
     }
 
     FixRegion(region: string) {

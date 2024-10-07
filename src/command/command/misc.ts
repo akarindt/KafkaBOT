@@ -203,7 +203,9 @@ export default [
             await interaction.deferReply();
             const url = 'https://tft.op.gg/meta-trends/comps';
 
-            const browser = await puppeteer.launch();
+            const browser = await puppeteer.launch({
+                args: ['--disable-gpu', '--disable-setuid-sandbox', '--no-sandbox', '--no-zygote'],
+            });
             const page = await browser.newPage();
 
             await page.goto(url, {
@@ -229,6 +231,11 @@ export default [
             );
 
             comps = comps.sort((a, b) => a.sort - b.sort);
+            const pages = await browser.pages();
+            for (let i = 0; i < pages.length; i++) {
+                await pages[i].close();
+            }
+            await browser.close()
             await Utils.ButtonPagination(interaction, tftListEmbed(interaction, comps));
         },
     },
@@ -248,7 +255,9 @@ export default [
             const term = option.value as string;
             const url = `https://www.urbandictionary.com/define.php?term=${term}`;
 
-            const browser = await puppeteer.launch();
+            const browser = await puppeteer.launch({
+                args: ['--disable-gpu', '--disable-setuid-sandbox', '--no-sandbox', '--no-zygote'],
+            });;
             const page = await browser.newPage();
 
             await page.goto(url, {
@@ -265,6 +274,12 @@ export default [
             const contributor = await (await definition.$('.contributor'))?.evaluate((node) => node.textContent);
             const authorUrl = await (await definition.$('.contributor a'))?.evaluate((node) => node.getAttribute('href'));
 
+            const pages = await browser.pages();
+            for (let i = 0; i < pages.length; i++) {
+                await pages[i].close();
+            }
+            await browser.close()
+
             const embed = new EmbedBuilder()
                 .setColor(Misc.PRIMARY_EMBED_COLOR)
                 .setDescription(
@@ -272,7 +287,6 @@ export default [
                 )
                 .setTimestamp()
                 .setFooter({ text: 'Misc', iconURL: interaction.client.user.avatarURL() || '' });
-
             await interaction.followUp({ embeds: [embed] });
             return;
         },

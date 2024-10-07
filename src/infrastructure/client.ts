@@ -6,6 +6,8 @@ import url from 'url';
 import { Player } from 'discord-player';
 import { YoutubeiExtractor } from 'discord-player-youtubei';
 import { Utils } from '@/helper/util';
+import InitializeJob from '@/job';
+import { database } from '@/helper/datasource';
 
 export type CustomOptions = {
     parameters: Collection<string, string | undefined>;
@@ -122,6 +124,14 @@ export class BotClient extends Client {
         player.events.on('emptyQueue', (queue) => {
             queue.metadata.channel.send('✅ Queue finished!');
         });
+    }
+
+    public async RegisterCronJob() {
+        await InitializeJob(this);
+    }
+
+    public InitDB() {
+        database.InitializeDB();
     }
 
     private add(command: any, body: any[], filePath: string) {

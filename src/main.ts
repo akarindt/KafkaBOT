@@ -1,17 +1,15 @@
 import 'reflect-metadata';
 import { BotClient } from './infrastructure/client';
-import { database } from './helper/datasource';
-import InitializeJob from './job';
 import schedule from 'node-schedule';
 
 (async () => {
     try {
         const client = new BotClient();
-        database.InitializeDB();
+        client.InitDB();
         await client.RegisterCommands();
         await client.RegisterPlayer();
         await client.StartBot();
-        await InitializeJob(client);
+        await client.RegisterCronJob();
     } catch (error) {
         console.log(`[ERROR] An Error Occurred: ${error}`);
     }
