@@ -7,7 +7,7 @@ export default async function InitializeJob(client: BotClient) {
     // await schedule.gracefulShutdown();
 
     // Hoyolab checkin
-    // await StartHoyolabCheckInJob(client);
-    // await HoyolabCron.StartCheckCodeJob();
-    // await HoyolabCron.StartHoyolabAutoRedeem(client)
+    await HoyolabCron.StartHoyolabCheckInJob(client);
+    await HoyolabCron.StartCheckCodeJob();
+    await HoyolabCron.StartHoyolabAutoRedeem(client)
 }
