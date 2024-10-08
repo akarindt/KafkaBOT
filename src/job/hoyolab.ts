@@ -56,7 +56,6 @@ const sendDiscordCheckinStatus = (client: BotClient, gameName: HoyoverseConstant
                         text: `${success.assets.gameName} Daily Check-In`,
                         iconURL: client.user?.avatarURL() || '',
                     });
-
                 await client.users.send(success.userDiscordId, { embeds: [embed] });
             }
         })
@@ -69,7 +68,7 @@ const sendDiscordCodeRedeem = async (client: BotClient, gameName: HoyoverseConst
     const game = new HoyoverseClient(gameName, data);
     const results = await game.Redeem();
     for (const result of results) {
-        if (result.success.length || result.failed.length) {
+        if (result.success.length > 0 || result.failed.length > 0) {
             const embed = new EmbedBuilder()
                 .setColor(Misc.PRIMARY_EMBED_COLOR)
                 .setTitle(`${result.assets.gameName} Code Redemption`)
@@ -148,7 +147,7 @@ const checkCode = async (gameName: HoyoverseConstantName) => {
         if (gameName == 'GENSHIN') {
             const browser = await puppeteer.launch({
                 args: ['--disable-gpu', '--disable-setuid-sandbox', '--no-sandbox', '--no-zygote'],
-            });;
+            });
             const page = await browser.newPage();
 
             await page.goto(url, {
@@ -174,13 +173,13 @@ const checkCode = async (gameName: HoyoverseConstantName) => {
             for (let i = 0; i < pages.length; i++) {
                 await pages[i].close();
             }
-            await browser.close()
+            await browser.close();
         }
 
         if (gameName == 'STARRAIL') {
             const browser = await puppeteer.launch({
                 args: ['--disable-gpu', '--disable-setuid-sandbox', '--no-sandbox', '--no-zygote'],
-            });;
+            });
             const page = await browser.newPage();
 
             await page.goto(url, {
@@ -207,13 +206,13 @@ const checkCode = async (gameName: HoyoverseConstantName) => {
             for (let i = 0; i < pages.length; i++) {
                 await pages[i].close();
             }
-            await browser.close()
+            await browser.close();
         }
 
         if (gameName == 'ZENLESS') {
             const browser = await puppeteer.launch({
                 args: ['--disable-gpu', '--disable-setuid-sandbox', '--no-sandbox', '--no-zygote'],
-            });;
+            });
             const page = await browser.newPage();
 
             await page.goto(url, {
@@ -259,7 +258,7 @@ const checkCode = async (gameName: HoyoverseConstantName) => {
             for (let i = 0; i < pages.length; i++) {
                 await pages[i].close();
             }
-            await browser.close()
+            await browser.close();
         }
 
         console.log(`[INFO] Update ${HoyoConstant.HOYOVERSE_GAME_LIST[gameName].gameName}'s redeem codes successfully`);

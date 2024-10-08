@@ -4,7 +4,7 @@ import schedule from 'node-schedule';
 
 export default async function InitializeJob(client: BotClient) {
     console.log('[INFO] Shut down all previous job')
-    // await schedule.gracefulShutdown();
+    await schedule.gracefulShutdown();
 
     // Hoyolab checkin
     await HoyolabCron.StartHoyolabCheckInJob(client);

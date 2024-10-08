@@ -1,6 +1,11 @@
 import 'reflect-metadata';
 import { BotClient } from './infrastructure/client';
 import schedule from 'node-schedule';
+import { Utils } from './helper/util';
+
+const log = console.log;
+global.console.log = (...args) => log(`[${Utils.getLocalTime()}]`, ...args);
+
 
 (async () => {
     try {
