@@ -111,7 +111,7 @@ const sendDiscordCodeRedeem = async (client: BotClient, gameName: HoyoverseConst
                                           return `[${fail.code}](${HoyoConstant.HOYOVERSE_REDEMTION_LINKS[gameName]}?code=${fail.code})`;
                                       })
                                       .join('\n')
-                                : '',
+                                : "None",
                     }
                 )
                 .setTimestamp()
