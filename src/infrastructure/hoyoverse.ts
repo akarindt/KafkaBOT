@@ -369,13 +369,13 @@ export class HoyoverseClient {
                     .andWhere('A.gameName = :gameName', { gameName: this._name })
                     .getMany();
 
+                if(codeList.length <= 0) continue;
+
                 if (ltuid) {
                     accountDetails = await this.GetAccountDetails(cookie, ltuid[1]);
                 }
 
-                if (!accountDetails) {
-                    continue;
-                }
+                if (!accountDetails) continue;
 
                 if (this._name == 'GENSHIN') {
                     for (const code of codeList) {

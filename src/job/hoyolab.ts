@@ -111,7 +111,7 @@ const sendDiscordCodeRedeem = async (client: BotClient, gameName: HoyoverseConst
                                           return `[${fail.code}](${HoyoConstant.HOYOVERSE_REDEMTION_LINKS[gameName]}?code=${fail.code})`;
                                       })
                                       .join('\n')
-                                : "None",
+                                : 'None',
                     }
                 )
                 .setTimestamp()
@@ -133,6 +133,7 @@ const sendDiscordCodeRedeem = async (client: BotClient, gameName: HoyoverseConst
 
             await AppDataSource.getRepository(HoyoverseRedeem).insert(entites);
             await client.users.send(result.userDiscordId, { embeds: [embed] });
+            console.log(`[INFO] Index: #${result.hoyoverseId} Redeem success`);
         }
     }
 };
