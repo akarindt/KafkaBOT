@@ -1,9 +1,4 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CommandInteraction, ComponentType } from 'discord.js';
-import { AppDataSource } from './datasource';
-import NsfwKeyword from '@/entity/nsfwKeyword';
-import { glob } from 'glob';
-import path from 'path';
-import fs from 'fs';
 
 type ParseCookieOption = {
     whitelist: string[];

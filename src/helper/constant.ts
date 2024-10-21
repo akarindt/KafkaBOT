@@ -2,7 +2,7 @@ import { HoyoverseGame } from '@/infrastructure/hoyoverse';
 import dotenv from 'dotenv';
 import { join } from 'path';
 import { DataSourceOptions } from 'typeorm';
-import  HoyoverseEntity from '@/entity/hoyoverse';
+import HoyoverseEntity from '@/entity/hoyoverse';
 import NSFWKeyword from '@/entity/nsfwKeyword';
 import Quote from '@/entity/quote';
 import HoyoverseCode from '@/entity/hoyoverseCode';
@@ -85,10 +85,11 @@ export class Misc {
 
     public static readonly BOT_IMAGE_FOLDER = 'kafkaBOT';
     public static readonly CLOUDINARY_IMAGE_QUALITY = 70;
-    public static readonly CLOUDINARY_IMAGE_FORMAT = "webp";
-    public static readonly CLOUDINARY_IMAGE_WIDTH = "500";
-    public static readonly CLOUDINARY_IMAGE_CROP = "scale";
-    public static readonly IMAGE_LIMIT_SIZE = 10000000 // 10 mb
+    public static readonly CLOUDINARY_IMAGE_FORMAT = 'webp';
+    public static readonly CLOUDINARY_IMAGE_WIDTH = '500';
+    public static readonly CLOUDINARY_IMAGE_CROP = 'scale';
+    public static readonly IMAGE_LIMIT_SIZE = 10000000; // 10 mb
+    public static readonly MAX_TIME_OUT = 30000;
 }
 
 export class Hoyoverse {
@@ -102,6 +103,15 @@ export class Hoyoverse {
         'x-rpc-language': 'en-us',
         Host: 'webapi-os.account.hoyoverse.com',
     };
+
+    public static readonly HOYOVERSE_GAME_HEADERS: { [gameName: string]: { [key: string]: string } } = {
+        GENSHIN: {},
+        STARRAIL: {},
+        ZENLESS: {
+            'x-rpc-signgame': 'zzz',
+        },
+    };
+
     public static readonly HOYOVERSE_REDEMTION_LINKS: { [gameName: string]: string } = {
         GENSHIN: 'https://genshin.hoyoverse.com/en/gift',
         STARRAIL: 'https://hsr.hoyoverse.com/gift',
@@ -124,7 +134,10 @@ export class Hoyoverse {
                 home: 'https://sg-hk4e-api.hoyolab.com/event/sol/home',
                 sign: 'https://sg-hk4e-api.hoyolab.com/event/sol/sign',
                 redem: 'https://sg-hk4e-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey',
-                checkCodeWeb: 'https://genshin-impact.fandom.com/wiki/Promotional_Code'
+                checkCodeWeb: [
+                    'https://genshin-impact.fandom.com/wiki/Promotional_Code',
+                    'https://game8.co/games/Genshin-Impact/archives/304759'
+                ],
             },
         },
 
@@ -162,7 +175,10 @@ export class Hoyoverse {
                 home: 'https://sg-public-api.hoyolab.com/event/luna/os/home',
                 sign: 'https://sg-public-api.hoyolab.com/event/luna/os/sign',
                 redem: 'https://sg-hkrpg-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkeyRisk',
-                checkCodeWeb: 'https://honkai-star-rail.fandom.com/wiki/Redemption_Code'
+                checkCodeWeb: [
+                    'https://honkai-star-rail.fandom.com/wiki/Redemption_Code',
+                    'https://game8.co/games/Honkai-Star-Rail/archives/410296',
+                ],
             },
         },
 
@@ -180,9 +196,13 @@ export class Hoyoverse {
             url: {
                 info: 'https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os/info',
                 home: 'https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os/home',
-                sign: 'https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os/sign',
+                sign: 'https://sg-public-api.hoyolab.com/event/luna/zzz/os/sign',
                 redem: 'https://public-operation-nap.hoyoverse.com/common/apicdkey/api/webExchangeCdkey',
-                checkCodeWeb: 'https://www.pcgamer.com/games/action/zenless-zone-zero-codes/'
+                checkCodeWeb: [
+                    'https://www.pcgamer.com/games/action/zenless-zone-zero-codes/',
+                    'https://game8.co/games/Zenless-Zone-Zero/archives/435683',
+                    'https://www.pcgamesn.com/zenless-zone-zero/codes',
+                ],
             },
         },
     };

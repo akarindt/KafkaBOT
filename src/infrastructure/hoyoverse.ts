@@ -6,6 +6,7 @@ import { Utils } from '@/helper/util';
 import { setTimeout } from 'timers/promises';
 import { AppDataSource } from '@/helper/datasource';
 import HoyoverseRedeem from '@/entity/hoyoverseRedeem';
+import { In, Not } from 'typeorm';
 
 export type HoyoverseConstantName = 'GENSHIN' | 'HONKAI' | 'STARRAIL' | 'ZENLESS';
 
@@ -115,7 +116,7 @@ export type HoyoverseGame = {
         home: string;
         sign: string;
         redem?: string;
-        checkCodeWeb?: string;
+        checkCodeWeb?: string[];
     };
 };
 
@@ -168,7 +169,7 @@ export type HoyoverseCodeRedeem = {
         gameName: string;
         icon: string;
     };
-    hoyoverseId: number
+    hoyoverseId: number;
 };
 
 type AccountDetails = {
@@ -211,31 +212,20 @@ export class HoyoverseClient {
 
     async CheckAndExecute(): Promise<ExecuteCheckIn[]> {
         const accounts = this._data;
-        if (!accounts.length) {
-            console.log(`[WARNING] No active accounts found for ${this._fullName}`);
-            return [];
-        }
 
-        const success: ExecuteCheckIn[] = [];
-        for (const account of accounts) {
+        const CheckinPromises = accounts.map(async (account) => {
             try {
                 const cookie = account.cookie;
                 const ltuid = cookie.match(/ltuid_v2=([^;]+)/);
-                let accountDetails: AccountDetails | null = null;
-                if (ltuid) {
-                    accountDetails = await this.GetAccountDetails(cookie, ltuid[1]);
-                }
+                if (!ltuid) return null;
 
-                if (!accountDetails) {
-                    continue;
-                }
+                const accountDetails = await this.GetAccountDetails(cookie, ltuid[1]);
+                if (!accountDetails) return null;
 
                 const sign = await this.Sign(cookie);
-                if (!sign.success) {
-                    continue;
-                }
+                if (!sign.success) return null;
 
-                success.push({
+                return {
                     platform: this._name,
                     result: this._game.success,
                     assets: this._game.assets,
@@ -247,12 +237,15 @@ export class HoyoverseClient {
                         ingame_region: accountDetails.ingame_region,
                     },
                     userDiscordId: account.userDiscordId,
-                });
+                };
             } catch (error) {
-                console.log(`[ERROR] An error occurred : ${error}`);
+                console.log(`[ERROR] Checkin error: ${error}`);
+                return null;
             }
-        }
-        return success;
+        });
+
+        const results = await Promise.all(CheckinPromises);
+        return results.filter((result) => result != null);
     }
 
     async GetAccountDetails(cookie: string, ltuid: string): Promise<AccountDetails | null> {
@@ -301,6 +294,7 @@ export class HoyoverseClient {
                         'Content-Type': 'application/json',
                         'User-Agent': this._userAgent,
                         Cookie: cookie,
+                        ...HoyoConstant.HOYOVERSE_GAME_HEADERS[this._game.gameName],
                     },
                 }
             );
@@ -320,191 +314,122 @@ export class HoyoverseClient {
 
     async Redeem() {
         let url = this._game.url.redem;
-        if (!url) return [];
+        let accounts = this._data;
 
-        const accounts = this._data;
-        const success: HoyoverseCode[] = [];
-        const failed: HoyoverseCode[] = [];
-
-        if (!accounts.length) {
-            console.log(`[WARNING] No active accounts found for ${this._fullName}`);
+        if (!url) {
+            console.log(`[ERROR] Redeem code - ${this._game.gameName} doesn't have redeem function`);
             return [];
         }
 
-        const results: HoyoverseCodeRedeem[] = [];
-
-        for (const account of accounts) {
+        const RedeemPromises = accounts.map(async (account) => {
             try {
                 const cookie = account.cookie;
+
                 const ltuid = cookie.match(/ltuid_v2=([^;]+)/);
-                let accountDetails: AccountDetails | null = null;
+                if (!ltuid) return null;
 
-                const currentId = await AppDataSource.getRepository(Hoyoverse)
-                    .createQueryBuilder('A')
-                    .where('A.userDiscordId = :userDiscordId', { userDiscordId: account.userDiscordId })
-                    .andWhere('A.cookie = :cookie', { cookie: account.cookie })
-                    .getOne();
+                const accountDetails = await this.GetAccountDetails(cookie, ltuid[1]);
+                if (!accountDetails) return null;
 
-                if(!currentId) continue;
+                const hoyoverseRedeemRepository = AppDataSource.getRepository(HoyoverseRedeem);
+                const codeRepository = AppDataSource.getRepository(HoyoverseCode);
 
-                const codeList = await AppDataSource.getRepository(HoyoverseCode)
-                    .createQueryBuilder('A')
-                    .where((qb) => {
-                        const subQuery = qb
-                            .subQuery()
-                            .select('B.code')
-                            .from(HoyoverseRedeem, 'B')
-                            .innerJoin(Hoyoverse, 'C', 'B.hoyoverseId = C.id')
-                            .where('B.gameName = :gameName', { gameName: this._name })
-                            .andWhere('C.userDiscordId = :userDiscordId', { userDiscordId: account.userDiscordId })
-                            .andWhere('C.cookie = :cookie', { cookie: account.cookie })
-                            .getQuery();
+                const redeemedList = await hoyoverseRedeemRepository.find({
+                    where: {
+                        hoyoverseId: account.id,
+                    },
+                });
 
-                        return 'A.code NOT IN ' + subQuery;
-                    })
-                    .setParameter('gameName', this._name)
-                    .setParameter('userDiscordId', account.userDiscordId)
-                    .setParameter('cookie', account.cookie)
-                    .andWhere('A.isActivate = :isActivate', { isActivate: true })
-                    .andWhere('A.gameName = :gameName', { gameName: this._name })
-                    .getMany();
+                const codeList = await codeRepository.find({
+                    where: {
+                        isActivate: true,
+                        gameName: this._name,
+                        code: Not(In(redeemedList.map((x) => x.code))),
+                    },
+                });
 
-                if(codeList.length <= 0) continue;
+                if (!codeList.length) return null;
 
-                if (ltuid) {
-                    accountDetails = await this.GetAccountDetails(cookie, ltuid[1]);
-                }
+                const success: HoyoverseCode[] = [];
+                const failed: HoyoverseCode[] = [];
 
-                if (!accountDetails) continue;
-
-                if (this._name == 'GENSHIN') {
-                    for (const code of codeList) {
+                const CodeRedeemPromises = codeList.map(async (code) => {
+                    try {
                         const cookieData = Utils.parseCookie(account.cookie, {
                             whitelist: ['cookie_token_v2', 'account_mid_v2', 'account_id_v2', 'cookie_token', 'account_id'],
                             blacklist: [],
                             separator: ';',
                         });
 
-                        let endp = `${url}?uid=${accountDetails.uid}&region=${accountDetails.ingame_region}&lang=en`;
-                        endp += `&cdkey=${code.code}&game_biz=hk4e_global&sLangKey=en-us`;
-
-                        const res = await axios.get(endp, {
-                            headers: {
-                                Cookie: cookieData,
-                                'User-Agent': this._userAgent,
-                            },
-                        });
-
-                        if (res.status !== 200) {
-                            console.log('[ERROR] Genshin: API returned non-200 status code.');
-                            failed.push(code);
-                            await setTimeout(7000);
-                            continue;
+                        let endp = '';
+                        switch (this._name) {
+                            case 'GENSHIN':
+                                endp = url;
+                                endp += `?uid=${accountDetails.uid}`;
+                                endp += `&region=${accountDetails.ingame_region}`;
+                                endp += `&lang=en`;
+                                endp += `&cdkey=${code.code}`;
+                                endp += `&game_biz=hk4e_global`;
+                                endp += `&sLangKey=en-us`;
+                                break;
+                            case 'ZENLESS':
+                                endp = url;
+                                endp += `?t=${Date.now()}`;
+                                endp += `&lang=en`;
+                                endp += `&game_biz=nap_global`;
+                                endp += `&uid=${accountDetails.uid}`;
+                                endp += `&region=${accountDetails.ingame_region}`;
+                                endp += `&cdkey=${code.code}`;
+                                break;
+                            case 'STARRAIL':
+                                endp = url;
+                                break;
                         }
 
-                        const data = res.data as HoyoverseResponse;
-                        if (data.retcode !== 0) {
-                            console.log('[ERROR] Genshin: API returned non-200 status code.');
+                        const res = await (this._name === 'STARRAIL'
+                            ? axios.post(
+                                  endp,
+                                  {
+                                      cdkey: code.code,
+                                      game_biz: 'hkrpg_global',
+                                      lang: 'en',
+                                      region: accountDetails.ingame_region,
+                                      t: Date.now(),
+                                      uid: accountDetails.uid,
+                                  },
+                                  {
+                                      headers: {
+                                          Cookie: cookieData,
+                                      },
+                                  }
+                              )
+                            : axios.get(endp, {
+                                  headers: {
+                                      Cookie: cookieData,
+                                      'User-Agent': this._userAgent,
+                                  },
+                              }));
+
+                        if (res.status !== 200 || res.data.retcode !== 0) {
+                            console.log(`[ERROR] ${this._name}: API returned non-200 or error status code.`);
                             failed.push(code);
-                            await setTimeout(7000);
-                            continue;
+                        } else {
+                            success.push(code);
                         }
 
-                        success.push(code);
                         await setTimeout(7000);
-                        continue;
-                    }
-                }
-
-                if (this._name == 'STARRAIL') {
-                    for (const code of codeList) {
-                        const cookieData = Utils.parseCookie(account.cookie, {
-                            whitelist: ['cookie_token_v2', 'account_mid_v2', 'account_id_v2', 'cookie_token', 'account_id'],
-                            blacklist: [],
-                            separator: ';',
-                        });
-
-                        const res = await axios.post(
-                            url,
-                            {
-                                cdkey: code.code,
-                                game_biz: 'hkrpg_global',
-                                lang: 'en',
-                                region: accountDetails.ingame_region,
-                                t: Date.now(),
-                                uid: accountDetails.uid,
-                            },
-                            {
-                                headers: {
-                                    Cookie: cookieData,
-                                },
-                            }
-                        );
-
-                        if (res.status !== 200) {
-                            console.log('[ERROR] STARRAIL: API returned non-200 status code.');
-                            failed.push(code);
-                            await setTimeout(7000);
-                            continue;
-                        }
-
-                        const data = res.data as HoyoverseResponse;
-                        if (data.retcode !== 0) {
-                            console.log('[ERROR] STARRAIL: API returned non-200 status code.');
-                            failed.push(code);
-                            await setTimeout(7000);
-                            continue;
-                        }
-
-                        success.push(code);
+                    } catch (error) {
+                        console.log(`[ERROR] Code redemption error for ${this._name}: ${error}`);
+                        failed.push(code);
                         await setTimeout(7000);
-                        continue;
                     }
-                }
+                });
 
-                if (this._name == 'ZENLESS') {
-                    for (const code of codeList) {
-                        const cookieData = Utils.parseCookie(account.cookie, {
-                            whitelist: ['cookie_token_v2', 'account_mid_v2', 'account_id_v2', 'cookie_token', 'account_id'],
-                            blacklist: [],
-                            separator: ';',
-                        });
-
-                        let endp = `${url}?t=${Date.now()}&lang=en&game_biz=nap_global&uid=${accountDetails.uid}`;
-                        endp += `&region=${accountDetails.ingame_region}&cdkey=${code.code}`;
-
-                        const res = await axios.get(endp, {
-                            headers: {
-                                Cookie: cookieData,
-                                'User-Agent': this._userAgent,
-                            },
-                        });
-
-                        if (res.status !== 200) {
-                            console.log('[ERROR] ZENLESS: API returned non-200 status code.');
-                            failed.push(code);
-                            await setTimeout(7000);
-                            continue;
-                        }
-
-                        const data = res.data as HoyoverseResponse;
-                        if (data.retcode !== 0) {
-                            console.log('[ERROR] ZENLESS: API returned non-200 status code.');
-                            failed.push(code);
-                            await setTimeout(7000);
-                            continue;
-                        }
-
-                        success.push(code);
-                        await setTimeout(7000);
-                        continue;
-                    }
-                }
-
-                results.push({
+                await Promise.all(CodeRedeemPromises);
+                return {
                     success,
                     failed,
-                    hoyoverseId: currentId.id,
+                    hoyoverseId: account.id,
                     userDiscordId: account.userDiscordId,
                     account: {
                         uid: accountDetails.uid,
@@ -514,13 +439,15 @@ export class HoyoverseClient {
                         ingame_region: accountDetails.ingame_region,
                     },
                     assets: this._game.assets,
-                });
+                };
             } catch (error) {
-                console.log(`[ERROR] An error occurred : ${error}`);
+                console.log(`[ERROR] Code redeem error: ${error}`);
+                return null;
             }
-        }
+        });
 
-        return results;
+        const results = await Promise.all(RedeemPromises);
+        return results.filter((result) => result !== null);
     }
 
     FixRegion(region: string) {

@@ -6,7 +6,7 @@ import url from 'url';
 import { Player } from 'discord-player';
 import { YoutubeiExtractor } from 'discord-player-youtubei';
 import { Utils } from '@/helper/util';
-import InitializeJob from '@/job';
+import Job from '@/job';
 import { database } from '@/helper/datasource';
 
 export type CustomOptions = {
@@ -127,7 +127,7 @@ export class BotClient extends Client {
     }
 
     public async RegisterCronJob() {
-        await InitializeJob(this);
+        return await new Job(this).Initialize();
     }
 
     public InitDB() {

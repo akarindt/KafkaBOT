@@ -1,13 +1,24 @@
 import { BotClient } from '@/infrastructure/client';
-import * as HoyolabCron from './hoyolab';
+import HoyolabJob from './hoyolab';
 import schedule from 'node-schedule';
 
-export default async function InitializeJob(client: BotClient) {
-    console.log('[INFO] Shut down all previous job')
-    await schedule.gracefulShutdown();
+export default class Job {
+    private _client: BotClient;
 
-    // Hoyolab checkin
-    await HoyolabCron.StartHoyolabCheckInJob(client);
-    await HoyolabCron.StartCheckCodeJob();
-    await HoyolabCron.StartHoyolabAutoRedeem(client)
+    constructor(client: BotClient) {
+        this._client = client;
+    }
+
+    public async Initialize() {
+        console.log('[INFO] Shut down all previous job')
+        await schedule.gracefulShutdown();
+        
+        // Hoyolab
+        const HyJob = new HoyolabJob(this._client);
+        await HyJob.StartCheckCodeJob();
+        await HyJob.StartHoyolabCheckInJob();
+        await HyJob.StartHoyolabAutoRedeem();
+        // End Hoyolab
+
+    }
 }

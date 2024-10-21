@@ -1,27 +1,22 @@
 # Build stage
-FROM node:20 AS build
-# Install Python3 and other build dependencies
-RUN apt-get update
-RUN apt-get install -y \
-    python3 \
-    make \
-    g++ \
-    ffmpeg
+FROM node:latest AS build
 
-# Remove package manager cache 
-RUN rm -rf /var/lib/apt/lists/*
+# Install Python3 and other build dependencies
+RUN apt-get update && \
+    apt-get install -y python3 make g++ ffmpeg && \
+    rm -rf /var/lib/apt/lists/*  # Clean up apt cache in the same layer to reduce image size
 
 # Set the temp directory
 WORKDIR /tmp/app
 
-# Move source files
+# Copy package.json and package-lock.json first to leverage Docker layer caching
+COPY package*.json ./
+
+# Update npm and install project dependencies
+RUN npm install -g npm@latest && npm install && npm install -g tsx
+
+# Copy the rest of the project files
 COPY . .
-
-# Update npm 
-RUN npm install -g npm@latest
-
-# Install project dependencies
-RUN npm install && npm install -g tsx
 
 # Run migrations and build the project
 RUN npm run build
@@ -29,44 +24,38 @@ RUN npm run build
 # Main stage
 FROM node:lts-alpine AS main
 
-# Install dependencies
-ENV PYTHONUNBUFFERED=1
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
-RUN apk add --no-cache \ 
-        python3 \ 
-        py3-pip \
-        make \
-        g++ \
-        ffmpeg \
-        chromium \
-        nss \
-        freetype \
-        freetype-dev \
-        harfbuzz \
-        ca-certificates \
-        fontconfig \
-        curl
+# Install dependencies in one step to minimize layers
+RUN apk add --no-cache \
+    python3 \
+    py3-pip \
+    make \
+    g++ \
+    ffmpeg \
+    chromium \
+    nss \
+    freetype \
+    freetype-dev \
+    harfbuzz \
+    ca-certificates \
+    fontconfig \
+    curl
 
 # Set work directory
 WORKDIR /app
 
-# Copy package.json from build
-COPY --from=build /tmp/app/package.json /app/package.json
-
-# Update npm
-RUN npm install -g npm@latest
-
-# Install dependencies
+# Copy package.json and install only production dependencies
+COPY --from=build /tmp/app/package.json ./
 RUN npm install --omit=dev
 
-# Move build files
-COPY --from=build /tmp/app/build /app/build
-
-# Copy other files
-COPY --from=build /tmp/app/extra /app/extra
+# Copy the built files and other necessary files from build stage
+COPY --from=build /tmp/app/build ./build
+COPY --from=build /tmp/app/extra ./extra
 COPY --from=build /tmp/app /app/backup
 
-# Run application
+# Ensure script has execution permissions and run the application
 RUN chmod +x ./extra/script/entrypoint.sh
 CMD ["./extra/script/entrypoint.sh"]
