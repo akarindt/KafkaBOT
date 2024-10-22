@@ -5,11 +5,11 @@ export default class HoyoverseRedeem {
     @PrimaryGeneratedColumn('increment')
     id: number;
 
-    @Column('int')
+    @Column('int', { primary: true })
     @Index()
     hoyoverseId: number;
 
-    @Column('varchar')
+    @Column('varchar', { primary: true })
     @Index()
     code: string;
 

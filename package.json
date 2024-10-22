@@ -11,7 +11,9 @@
     "build": "tsc && tsc-alias",
     "migration:run": "npm run typeorm migration:run -- -d ./src/helper/datasource.ts",
     "stop:app": "docker compose stop kafkabotapp",
-    "stop:db": "docker compose stop kafkabotdb"
+    "stop:db": "docker compose stop kafkabotdb",
+    "log:app": "docker logs KafkaBOT_APP",
+    "log:db": "docker logs KafkaBOT_DB"
   },
   "keywords": [],
   "author": "",
