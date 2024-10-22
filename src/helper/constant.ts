@@ -96,12 +96,14 @@ export class Hoyoverse {
     public static readonly HOYOVERSE_UPDATE_COOKIE_API = 'https://webapi-os.account.hoyoverse.com/Api/fetch_cookie_accountinfo';
     public static readonly HOYOVERSE_RECORD_CARD_API = 'https://bbs-api-os.hoyolab.com/game_record/card/wapi/getGameRecordCard';
     public static readonly HOYOVERSE_HEADERS = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Edg/129.0.0.0',
-        Referer: 'https://act.hoyolab.com',
-        'x-rpc-app_version': '1.5.0',
-        'x-rpc-client_type': '5',
-        'x-rpc-language': 'en-us',
-        Host: 'webapi-os.account.hoyoverse.com',
+        'Accept': 'application/json, text/plain, */*',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Connection': 'keep-alive',
+        'x-rpc-app_version': '2.34.1',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+        'x-rpc-client_type': '4',
+        'Referer': 'https://act.hoyolab.com/',
+        'Origin': 'https://act.hoyolab.com',
     };
 
     public static readonly HOYOVERSE_GAME_HEADERS: { [gameName: string]: { [key: string]: string } } = {

@@ -222,6 +222,8 @@ export class HoyoverseClient {
                 const accountDetails = await this.GetAccountDetails(cookie, ltuid[1]);
                 if (!accountDetails) return null;
 
+                console.log(accountDetails)
+
                 const sign = await this.Sign(cookie);
                 if (!sign.success) return null;
 
@@ -291,10 +293,9 @@ export class HoyoverseClient {
                 },
                 {
                     headers: {
-                        'Content-Type': 'application/json',
-                        'User-Agent': this._userAgent,
                         Cookie: cookie,
-                        ...HoyoConstant.HOYOVERSE_GAME_HEADERS[this._game.gameName],
+                        ...HoyoConstant.HOYOVERSE_GAME_HEADERS[this._name],
+                        ...HoyoConstant.HOYOVERSE_HEADERS
                     },
                 }
             );
