@@ -222,8 +222,6 @@ export class HoyoverseClient {
                 const accountDetails = await this.GetAccountDetails(cookie, ltuid[1]);
                 if (!accountDetails) return null;
 
-                console.log(accountDetails)
-
                 const sign = await this.Sign(cookie);
                 if (!sign.success) return null;
 

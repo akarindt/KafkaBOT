@@ -159,43 +159,18 @@ export default class HoyolabJob {
         }
 
         if (currentUrl.includes('game8.co')) {
-            let pArr = await page.$$('h3#hm_1.a-header--3 + p.a-paragraph > b.a-bold');
-            let dateItem = [];
-            for (const p of pArr) {
-                const item = await p?.evaluate((node) => node.textContent);
-                if (!item) continue;
-
-                dateItem.push(item.trim());
-            }
-
-            let expiredDate = new Date(dateItem.join(' '));
-
-            const rows = await page.$$('h3#hm_2.a-header--3 + ol.a-orderedList > li.a-listItem');
+            const rows = await page.$$('h3#hm_1.a-header--3 + ul.a-list > li.a-listItem');
             for (const row of rows) {
-                const textContent = await row?.evaluate((node) => node.textContent);
-                if (!textContent) continue;
-
-                const split = textContent.split('-');
-                const code = split[0].trim();
-                const server = 'All';
-                const rewards = [split[1].trim().replace("'", '')];
-                const isActivate = expiredDate > new Date();
-
-                codes.push({ gameName, code, server, rewards, isActivate });
-            }
-
-            const rows2 = await page.$$('h3#hm_4.a-header--3 + ul.a-list > li.a-listItem');
-            for (const row of rows2) {
-                const textContent = await row?.evaluate((node) => node.textContent);
-                if (!textContent) continue;
+                const textContent = await row.evaluate((node) => node.textContent);
+                const code = await (await row.$("a.a-link:nth-of-type(1)"))?.evaluate(node => node.textContent);
+                if(!textContent || !code) continue;
 
                 const split = textContent.split(' (');
-                const code = split[0].trim();
                 const server = 'All';
                 const rewards = ['(' + split[1].trim().replace("'", '')];
                 const isActivate = true;
 
-                codes.push({ gameName, code, server, rewards, isActivate });
+                codes.push({ gameName, code: code.trim(), server, rewards, isActivate });
             }
 
             try {
@@ -346,7 +321,7 @@ export default class HoyolabJob {
                 const isActivate = expiredDate > new Date();
 
                 codes.push({ gameName, code, server, rewards, isActivate });
-            }
+            }          
 
             try {
                 await Promise.all([

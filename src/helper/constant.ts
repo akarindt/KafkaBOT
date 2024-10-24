@@ -137,8 +137,8 @@ export class Hoyoverse {
                 sign: 'https://sg-hk4e-api.hoyolab.com/event/sol/sign',
                 redem: 'https://sg-hk4e-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey',
                 checkCodeWeb: [
+                    'https://game8.co/games/Genshin-Impact/archives/304759',
                     'https://genshin-impact.fandom.com/wiki/Promotional_Code',
-                    'https://game8.co/games/Genshin-Impact/archives/304759'
                 ],
             },
         },
@@ -178,8 +178,8 @@ export class Hoyoverse {
                 sign: 'https://sg-public-api.hoyolab.com/event/luna/os/sign',
                 redem: 'https://sg-hkrpg-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkeyRisk',
                 checkCodeWeb: [
-                    'https://honkai-star-rail.fandom.com/wiki/Redemption_Code',
                     'https://game8.co/games/Honkai-Star-Rail/archives/410296',
+                    'https://honkai-star-rail.fandom.com/wiki/Redemption_Code',
                 ],
             },
         },
@@ -201,8 +201,8 @@ export class Hoyoverse {
                 sign: 'https://sg-public-api.hoyolab.com/event/luna/zzz/os/sign',
                 redem: 'https://public-operation-nap.hoyoverse.com/common/apicdkey/api/webExchangeCdkey',
                 checkCodeWeb: [
-                    'https://www.pcgamer.com/games/action/zenless-zone-zero-codes/',
                     'https://game8.co/games/Zenless-Zone-Zero/archives/435683',
+                    'https://www.pcgamer.com/games/action/zenless-zone-zero-codes/',
                     'https://www.pcgamesn.com/zenless-zone-zero/codes',
                 ],
             },
