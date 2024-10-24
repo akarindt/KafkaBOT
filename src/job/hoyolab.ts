@@ -42,18 +42,16 @@ export default class HoyolabJob {
 
                 codes.push({ gameName, server, code, rewards, isActivate });
                 try {
-                    await Promise.all([
-                        await hoyoverseCodeRepository.update(
-                            {
-                                gameName,
-                                code: Not(In(codes.map((x) => x.code))),
-                            },
-                            {
-                                isActivate: false,
-                            }
-                        ),
-                        await hoyoverseCodeRepository.upsert(codes, ['code', 'gameName']),
-                    ]);
+                    await hoyoverseCodeRepository.update(
+                        {
+                            gameName,
+                            code: Not(In(codes.map((x) => x.code))),
+                        },
+                        {
+                            isActivate: false,
+                        }
+                    );
+                    await hoyoverseCodeRepository.upsert(codes, ['code', 'gameName']);
                     console.log(`[INFO] Fetch: Code checking - ${gameName} success`);
                     return;
                 } catch (error) {
@@ -92,18 +90,16 @@ export default class HoyolabJob {
             }
 
             try {
-                await Promise.all([
-                    await hoyoverseCodeRepository.update(
-                        {
-                            gameName,
-                            code: Not(In(codes.map((x) => x.code))),
-                        },
-                        {
-                            isActivate: false,
-                        }
-                    ),
-                    await hoyoverseCodeRepository.upsert(codes, ['code', 'gameName']),
-                ]);
+                await hoyoverseCodeRepository.update(
+                    {
+                        gameName,
+                        code: Not(In(codes.map((x) => x.code))),
+                    },
+                    {
+                        isActivate: false,
+                    }
+                );
+                await hoyoverseCodeRepository.upsert(codes, ['code', 'gameName']);
                 console.log(`[INFO] Fetch: Code checking - ${gameName} success`);
                 return;
             } catch (error) {
@@ -137,18 +133,16 @@ export default class HoyolabJob {
                 codes.push({ gameName, server, code, rewards, isActivate });
 
                 try {
-                    await Promise.all([
-                        await hoyoverseCodeRepository.update(
-                            {
-                                gameName,
-                                code: Not(In(codes.map((x) => x.code))),
-                            },
-                            {
-                                isActivate: false,
-                            }
-                        ),
-                        await hoyoverseCodeRepository.upsert(codes, ['code', 'gameName']),
-                    ]);
+                    await hoyoverseCodeRepository.update(
+                        {
+                            gameName,
+                            code: Not(In(codes.map((x) => x.code))),
+                        },
+                        {
+                            isActivate: false,
+                        }
+                    );
+                    await hoyoverseCodeRepository.upsert(codes, ['code', 'gameName']);
                     console.log(`[INFO] Fetch: Code checking - ${gameName} success`);
                     return;
                 } catch (error) {
@@ -162,8 +156,8 @@ export default class HoyolabJob {
             const rows = await page.$$('h3#hm_1.a-header--3 + ul.a-list > li.a-listItem');
             for (const row of rows) {
                 const textContent = await row.evaluate((node) => node.textContent);
-                const code = await (await row.$("a.a-link:nth-of-type(1)"))?.evaluate(node => node.textContent);
-                if(!textContent || !code) continue;
+                const code = await (await row.$('a.a-link:nth-of-type(1)'))?.evaluate((node) => node.textContent);
+                if (!textContent || !code) continue;
 
                 const split = textContent.split(' (');
                 const server = 'All';
@@ -174,18 +168,16 @@ export default class HoyolabJob {
             }
 
             try {
-                await Promise.all([
-                    await hoyoverseCodeRepository.update(
-                        {
-                            gameName,
-                            code: Not(In(codes.map((x) => x.code))),
-                        },
-                        {
-                            isActivate: false,
-                        }
-                    ),
-                    await hoyoverseCodeRepository.upsert(codes, ['code', 'gameName']),
-                ]);
+                await hoyoverseCodeRepository.update(
+                    {
+                        gameName,
+                        code: Not(In(codes.map((x) => x.code))),
+                    },
+                    {
+                        isActivate: false,
+                    }
+                );
+                await hoyoverseCodeRepository.upsert(codes, ['code', 'gameName']);
                 console.log(`[INFO] Fetch: Code checking - ${gameName} success`);
                 return;
             } catch (error) {
@@ -244,18 +236,16 @@ export default class HoyolabJob {
             }
 
             try {
-                await Promise.all([
-                    await hoyoverseCodeRepository.update(
-                        {
-                            gameName,
-                            code: Not(In(codes.map((x) => x.code))),
-                        },
-                        {
-                            isActivate: false,
-                        }
-                    ),
-                    await hoyoverseCodeRepository.upsert(codes, ['code', 'gameName']),
-                ]);
+                await hoyoverseCodeRepository.update(
+                    {
+                        gameName,
+                        code: Not(In(codes.map((x) => x.code))),
+                    },
+                    {
+                        isActivate: false,
+                    }
+                );
+                await hoyoverseCodeRepository.upsert(codes, ['code', 'gameName']);
                 console.log(`[INFO] Fetch: Code checking - ${gameName} success`);
                 return;
             } catch (error) {
@@ -321,21 +311,19 @@ export default class HoyolabJob {
                 const isActivate = expiredDate > new Date();
 
                 codes.push({ gameName, code, server, rewards, isActivate });
-            }          
+            }
 
             try {
-                await Promise.all([
-                    await hoyoverseCodeRepository.update(
-                        {
-                            gameName,
-                            code: Not(In(codes.map((x) => x.code))),
-                        },
-                        {
-                            isActivate: false,
-                        }
-                    ),
-                    await hoyoverseCodeRepository.upsert(codes, ['code', 'gameName']),
-                ]);
+                await hoyoverseCodeRepository.update(
+                    {
+                        gameName,
+                        code: Not(In(codes.map((x) => x.code))),
+                    },
+                    {
+                        isActivate: false,
+                    }
+                );
+                await hoyoverseCodeRepository.upsert(codes, ['code', 'gameName']);
                 console.log(`[INFO] Fetch: Code checking - ${gameName} success`);
                 return;
             } catch (error) {
@@ -374,18 +362,16 @@ export default class HoyolabJob {
             }
 
             try {
-                await Promise.all([
-                    await hoyoverseCodeRepository.update(
-                        {
-                            gameName,
-                            code: Not(In(codes.map((x) => x.code))),
-                        },
-                        {
-                            isActivate: false,
-                        }
-                    ),
-                    await hoyoverseCodeRepository.upsert(codes, ['code', 'gameName']),
-                ]);
+                await hoyoverseCodeRepository.update(
+                    {
+                        gameName,
+                        code: Not(In(codes.map((x) => x.code))),
+                    },
+                    {
+                        isActivate: false,
+                    }
+                );
+                await hoyoverseCodeRepository.upsert(codes, ['code', 'gameName']);
                 console.log(`[INFO] Fetch: Code checking - ${gameName} success`);
                 return;
             } catch (error) {
