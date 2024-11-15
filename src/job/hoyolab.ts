@@ -625,7 +625,7 @@ export default class HoyolabJob {
 
     public async StartCheckCodeJob() {
         schedule.scheduleJob('*/30 * * * *', async () => {
-            await Promise.all([await this.CheckCode('GENSHIN'), await this.CheckCode('STARRAIL'), await this.CheckCode('ZENLESS')]);
+            await Promise.all([await this.CheckCode('STARRAIL'), await this.CheckCode('ZENLESS')]);
         });
         console.log(`[INFO] Started cron job: HOYOVERSE-AUTO-DAILY-CODE-CHECKING`);
     }
@@ -635,8 +635,6 @@ export default class HoyolabJob {
             const hoyoverseRepository = AppDataSource.getRepository(Hoyoverse);
             const accounts = await hoyoverseRepository.find();
             await Promise.all([
-                await this.SendDiscord('REDEMTION', this._client, 'STARRAIL', accounts),
-                await this.SendDiscord('REDEMTION', this._client, 'STARRAIL', accounts),
                 await this.SendDiscord('REDEMTION', this._client, 'STARRAIL', accounts),
             ]);
         });
