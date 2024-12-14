@@ -10,6 +10,17 @@ import { In, Not } from 'typeorm';
 
 export type HoyoverseConstantName = 'GENSHIN' | 'HONKAI' | 'STARRAIL' | 'ZENLESS';
 
+export type HoyoverseAxiosResponse = {
+    active: {
+        code: string,
+        reward: string[]
+    }[],
+    inactive: {
+        code: string,
+        reward: string[]
+    }[]
+}
+
 export type HoyoverseSignInfo = {
     total_sign_day: number;
     today: string;
@@ -314,21 +325,22 @@ export class HoyoverseClient {
     async Redeem() {
         let url = this._game.url.redem;
         let accounts = this._data;
+        let results = [];
 
         if (!url) {
             console.log(`[ERROR] Redeem code - ${this._game.gameName} doesn't have redeem function`);
             return [];
         }
 
-        const RedeemPromises = accounts.map(async (account) => {
+        for (const account of accounts) {
             try {
                 const cookie = account.cookie;
 
                 const ltuid = cookie.match(/ltuid_v2=([^;]+)/);
-                if (!ltuid) return null;
+                if (!ltuid) return [];
 
                 const accountDetails = await this.GetAccountDetails(cookie, ltuid[1]);
-                if (!accountDetails) return null;
+                if (!accountDetails) return [];
 
                 const hoyoverseRedeemRepository = AppDataSource.getRepository(HoyoverseRedeem);
                 const codeRepository = AppDataSource.getRepository(HoyoverseCode);
@@ -347,12 +359,12 @@ export class HoyoverseClient {
                     },
                 });
 
-                if (!codeList.length) return null;
+                if (!codeList.length) return [];
 
                 const success: HoyoverseCode[] = [];
                 const failed: HoyoverseCode[] = [];
 
-                const CodeRedeemPromises = codeList.map(async (code) => {
+                for (const code of codeList) {
                     try {
                         const cookieData = Utils.parseCookie(account.cookie, {
                             whitelist: ['cookie_token_v2', 'account_mid_v2', 'account_id_v2', 'cookie_token', 'account_id'],
@@ -387,27 +399,27 @@ export class HoyoverseClient {
 
                         const res = await (this._name === 'STARRAIL'
                             ? axios.post(
-                                  endp,
-                                  {
-                                      cdkey: code.code,
-                                      game_biz: 'hkrpg_global',
-                                      lang: 'en',
-                                      region: accountDetails.ingame_region,
-                                      t: Date.now(),
-                                      uid: accountDetails.uid,
-                                  },
-                                  {
-                                      headers: {
-                                          Cookie: cookieData,
-                                      },
-                                  }
-                              )
+                                endp,
+                                {
+                                    cdkey: code.code,
+                                    game_biz: 'hkrpg_global',
+                                    lang: 'en',
+                                    region: accountDetails.ingame_region,
+                                    t: Date.now(),
+                                    uid: accountDetails.uid,
+                                },
+                                {
+                                    headers: {
+                                        Cookie: cookieData,
+                                    },
+                                }
+                            )
                             : axios.get(endp, {
-                                  headers: {
-                                      Cookie: cookieData,
-                                      'User-Agent': this._userAgent,
-                                  },
-                              }));
+                                headers: {
+                                    Cookie: cookieData,
+                                    'User-Agent': this._userAgent,
+                                },
+                            }));
 
                         if (res.status !== 200 || res.data.retcode !== 0) {
                             console.log(`[ERROR] ${this._name}: API returned non-200 or error status code.`);
@@ -422,10 +434,9 @@ export class HoyoverseClient {
                         failed.push(code);
                         await setTimeout(7000);
                     }
-                });
+                }
 
-                await Promise.all(CodeRedeemPromises);
-                return {
+                results.push({
                     success,
                     failed,
                     hoyoverseId: account.id,
@@ -438,15 +449,13 @@ export class HoyoverseClient {
                         ingame_region: accountDetails.ingame_region,
                     },
                     assets: this._game.assets,
-                };
+                })
             } catch (error) {
                 console.log(`[ERROR] Code redeem error: ${error}`);
-                return null;
+                return [];
             }
-        });
-
-        const results = await Promise.all(RedeemPromises);
-        return results.filter((result) => result !== null);
+        }
+        return results;
     }
 
     FixRegion(region: string) {
