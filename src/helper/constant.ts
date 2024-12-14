@@ -137,7 +137,7 @@ export class Hoyoverse {
                 sign: 'https://sg-hk4e-api.hoyolab.com/event/sol/sign',
                 redem: 'https://sg-hk4e-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey',
                 checkCodeWeb: [
-                    'https://api.ennead.cc/mihoyo/starrail/codes'
+                    'https://api.ennead.cc/mihoyo/honkai/codes'
                 ],
             },
         },
@@ -177,7 +177,7 @@ export class Hoyoverse {
                 sign: 'https://sg-public-api.hoyolab.com/event/luna/os/sign',
                 redem: 'https://sg-hkrpg-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkeyRisk',
                 checkCodeWeb: [
-                    'https://api.ennead.cc/mihoyo/genshin/codes'
+                    'https://api.ennead.cc/mihoyo/starrail/codes'
                 ],
             },
         },
