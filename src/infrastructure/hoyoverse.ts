@@ -13,11 +13,11 @@ export type HoyoverseConstantName = 'GENSHIN' | 'HONKAI' | 'STARRAIL' | 'ZENLESS
 export type HoyoverseAxiosResponse = {
     active: {
         code: string,
-        reward: string[]
+        rewards: string[]
     }[],
     inactive: {
         code: string,
-        reward: string[]
+        rewards: string[]
     }[]
 }
 

@@ -34,7 +34,7 @@ export default class HoyolabJob {
                 codes.push({
                     gameName: gameName,
                     code: activeCode.code,
-                    rewards: activeCode.reward,
+                    rewards: activeCode.rewards,
                     isActivate: true,
                     server: 'All'
                 })
@@ -44,11 +44,12 @@ export default class HoyolabJob {
                 codes.push({
                     gameName: gameName,
                     code: inactiveCode.code,
-                    rewards: inactiveCode.reward,
+                    rewards: inactiveCode.rewards,
                     isActivate: false,
                     server: 'All'
                 })
             }
+            
             await hoyoverseCodeRepository.upsert(codes, ['code', 'gameName']);
             return;
         } catch (error) {
