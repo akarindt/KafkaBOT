@@ -14,7 +14,7 @@
     "stop:db": "docker compose stop kafkabotdb",
     "log:app": "docker logs KafkaBOT_APP",
     "log:db": "docker logs KafkaBOT_DB",
-    "package:update": "npx npm-check-updates -u && npm i"
+    "package:update" : "npm-check-updates -u && npm i"
   },
   "keywords": [],
   "author": "",

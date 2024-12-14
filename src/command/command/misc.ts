@@ -1,4 +1,4 @@
-import { CommandInteraction, EmbedBuilder, PollData, PollLayoutType, SlashCommandBuilder, userMention } from 'discord.js';
+import { CommandInteraction, EmbedBuilder, PollData, PollLayoutType, SlashCommandBuilder, TextChannel, userMention } from 'discord.js';
 import { Utils } from '@/helper/util';
 import { Misc } from '@/helper/constant';
 import path from 'path';
@@ -179,7 +179,7 @@ export default [
             }
 
             if (!question.value || !polls.value || typeof multi.value == 'undefined' || !duration.value) {
-                await interaction.channel.send('❌ Invalid parameters');
+                await (interaction.channel as TextChannel).send('❌ Invalid parameters');
                 return;
             }
 
@@ -193,7 +193,7 @@ export default [
                 layoutType: PollLayoutType.Default,
             };
 
-            await interaction.channel.send({ poll: poll });
+            await (interaction.channel as TextChannel).send({ poll: poll });
             return;
         },
     },

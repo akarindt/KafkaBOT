@@ -1,10 +1,10 @@
 import { Misc } from '@/helper/constant';
 import { Utils } from '@/helper/util';
-import { ContextMenuCommandBuilder, ApplicationCommandType, CommandInteraction, EmbedBuilder } from 'discord.js';
+import { ContextMenuCommandBuilder, ApplicationCommandType, CommandInteraction, EmbedBuilder, ContextMenuCommandType } from 'discord.js';
 import sagiri from 'sagiri';
 
 export default {
-    data: new ContextMenuCommandBuilder().setName('SauceNAO').setType(ApplicationCommandType.Message),
+    data: new ContextMenuCommandBuilder().setName('SauceNAO').setType(ApplicationCommandType.User as ContextMenuCommandType),
     execute: async (interaction: CommandInteraction) => {
         const data = interaction.options.data;
         if (!data.length) return;

@@ -8,14 +8,14 @@
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "useDefineForClassFields": false,
-        "lib": ["es2023", "DOM"],
+        "lib": ["es2023", "DOM", "esnext.disposable"],
         "strictPropertyInitialization": false,
         "skipLibCheck": true,
         "allowJs": true,
         "baseUrl": ".",
         "paths": {
             "@/*": ["src/*"]
-        }
+        },
     },
     "include": ["src/**/*.ts", "tests/**/*.ts"],
     "exclude": ["node_modules", ".vscode", "migrations"]
