@@ -13,14 +13,6 @@
 | `/kfmeme`         | `Summon a random meme at will`        | `None`                                        |
 | `/kfinfo`         | `Get user's discord info`             | `None`                                        |
 
-## Music
-| Command           | Description                           | Parameters                                    |
-| :-----------------|:-------------------------------------:|:---------------------------------------------:|
-| `/kfplay`         | `Play a song`                         | `query`                                       |
-| `/kfskip`         | `Skip the current song`               | `None`                                        |
-| `/kfstop`         | `Stop the player`                     | `None`                                        |
-| `/kfqueue`        | `Get the queue`                       | `None`                                        |
-
 ## Chat
 | Command           | Description                           | Parameters                                    |
 | :-----------------|:-------------------------------------:|:---------------------------------------------:|

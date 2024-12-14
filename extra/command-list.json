@@ -15,26 +15,6 @@
         "parameters": ["idea"]
     },
     {
-        "commandName": "/kfplay",
-        "description": "Play a song",
-        "parameters": ["query"]
-    },
-    {
-        "commandName": "/kfskip",
-        "description": "Skip a song",
-        "parameters": []
-    },
-    {
-        "commandName": "/kfqueue",
-        "description": "See the queue",
-        "parameters": []
-    },
-    {
-        "commandName": "/kfstop",
-        "description": "Stop the player",
-        "parameters": []
-    },
-    {
         "commandName": "/kfsaucenao",
         "description": "Find sauce",
         "parameters": ["attachment"]

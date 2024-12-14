@@ -3,8 +3,6 @@ import { CommandInteraction, Message } from 'discord.js';
 import { glob } from 'glob';
 import path from 'path';
 import url from 'url';
-import { Player } from 'discord-player';
-import { YoutubeiExtractor } from 'discord-player-youtubei';
 import { Utils } from '@/helper/util';
 import Job from '@/job';
 import { database } from '@/helper/datasource';
@@ -103,27 +101,6 @@ export class BotClient extends Client {
 
         console.log(`[INFO] Started refreshing ${this.commands.size} (/) commands.`);
         console.log(`[INFO] Started refreshing ${this.customs.size} custom (${process.env.COMMAND_PREFIX}) commands.`);
-    }
-
-    public async RegisterPlayer() {
-        const player = new Player(this);
-        await player.extractors.register(YoutubeiExtractor, {});
-
-        player.events.on('playerStart', (queue, track) => {
-            queue.metadata.channel.send(`🎶 Started playing: **[${track.title}](${track.url})** in **${queue.channel?.name}**!`);
-        });
-
-        player.events.on('disconnect', (queue) => {
-            queue.metadata.channel.send(`❌ I was manually disconnected from the voice channel, clearing queue!`);
-        });
-
-        player.events.on('emptyChannel', (queue) => {
-            queue.metadata.channel.send('❌ Nobody is in the voice channel, leaving...');
-        });
-
-        player.events.on('emptyQueue', (queue) => {
-            queue.metadata.channel.send('✅ Queue finished!');
-        });
     }
 
     public async RegisterCronJob() {

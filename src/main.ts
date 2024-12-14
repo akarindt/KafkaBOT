@@ -12,7 +12,6 @@ global.console.log = (...args) => log(`[${Utils.getLocalTime()}]`, ...args);
         const client = new BotClient();
         client.InitDB();
         await client.RegisterCommands();
-        await client.RegisterPlayer();
         await client.StartBot();
         await client.RegisterCronJob();
     } catch (error) {
