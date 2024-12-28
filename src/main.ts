@@ -4,7 +4,13 @@ import schedule from 'node-schedule';
 import { Utils } from './helper/util';
 
 const log = console.log;
-global.console.log = (...args) => log(`[${Utils.getLocalTime()}]`, ...args);
+global.console.log = (...args) => {
+    const stack = new Error().stack;
+    const callerLine = stack?.split('\n')[2];
+    const match = callerLine?.match(/at\s+(.*)\s+\((.*):(\d+):(\d+)\)/);
+    const fileName = match ? match[2].split('/').pop() : 'Unknown file';
+    log(`[${Utils.getLocalTime()}] [${fileName}]`, ...args);
+}
 
 
 (async () => {
