@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { BotClient } from './infrastructure/client';
 import schedule from 'node-schedule';
 import { Utils } from './helper/util';
+import path from 'path';
 
 const log = console.log;
 global.console.log = (...args) => {
@@ -9,12 +10,15 @@ global.console.log = (...args) => {
     const callerLine = stack?.split('\n')[2];
     const match = callerLine?.match(/at\s+(?:.*\s)?\((.*):(\d+):(\d+)\)/);
     if (match) {
-        const fileName = match[1].split('/').pop();
+        let fileName = match[1].split('/').pop();
+        if (fileName) {
+            fileName = path.basename(fileName);
+        }
         const lineNumber = match[2];
         const columnNumber = match[3];
         log(`[${Utils.getLocalTime()}] [${fileName}:${lineNumber}:${columnNumber}]`, ...args);
     } else {
-        log(`[${Utils.getLocalTime()}] [Unknown location]`, ...args);
+        log(`[${Utils.getLocalTime()}] [Dependencies]`, ...args);
     }
 };
 
