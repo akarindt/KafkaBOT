@@ -219,5 +219,10 @@ export class DatabaseConfig {
         migrationsTableName: 'TBL_MIGRATION',
         synchronize: false,
         logging: false,
+        extra: {
+            idleTimeoutMillis: 30000,
+            max: 10,
+            keepAlive: true
+          },
     };
 }

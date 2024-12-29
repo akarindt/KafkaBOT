@@ -7,10 +7,16 @@ const log = console.log;
 global.console.log = (...args) => {
     const stack = new Error().stack;
     const callerLine = stack?.split('\n')[2];
-    const match = callerLine?.match(/at\s+(.*)\s+\((.*):(\d+):(\d+)\)/);
-    const fileName = match ? match[2].split('/').pop() : 'Unknown file';
-    log(`[${Utils.getLocalTime()}] [${fileName}]`, ...args);
-}
+    const match = callerLine?.match(/at\s+(?:.*\s)?\((.*):(\d+):(\d+)\)/);
+    if (match) {
+        const fileName = match[1].split('/').pop();
+        const lineNumber = match[2];
+        const columnNumber = match[3];
+        log(`[${Utils.getLocalTime()}] [${fileName}:${lineNumber}:${columnNumber}]`, ...args);
+    } else {
+        log(`[${Utils.getLocalTime()}] [Unknown location]`, ...args);
+    }
+};
 
 
 (async () => {
