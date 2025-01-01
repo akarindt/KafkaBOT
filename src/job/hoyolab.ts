@@ -51,6 +51,7 @@ export default class HoyolabJob {
             }
             
             await hoyoverseCodeRepository.upsert(codes, ['code', 'gameName']);
+            console.log(`[INFO] ${gameName} - code checking success!`)
             return;
         } catch (error) {
             console.log(`[ERROR] Fetch: Code checking - ${gameName} failed: ${error}`);
@@ -251,7 +252,7 @@ export default class HoyolabJob {
     }
 
     public async StartCheckCodeJob() {
-        schedule.scheduleJob('*/30 * * * *', async () => {
+        schedule.scheduleJob('*/15 * * * *', async () => {
             await Promise.all([
                 await this.CheckCode('STARRAIL'),
                 await this.CheckCode('ZENLESS'),
