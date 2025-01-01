@@ -263,7 +263,7 @@ export default class HoyolabJob {
     }
 
     public async StartHoyolabAutoRedeem() {
-        schedule.scheduleJob('0 */2 * * * *', async () => {
+        schedule.scheduleJob('*/30 * * * *', async () => {
             const hoyoverseRepository = AppDataSource.getRepository(Hoyoverse);
             const accounts = await hoyoverseRepository.find();
             await this.SendDiscord('REDEMTION', this._client, 'STARRAIL', accounts)
