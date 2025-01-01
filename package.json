@@ -14,7 +14,8 @@
     "stop:db": "docker compose stop kafkabotdb",
     "log:app": "docker logs KafkaBOT_APP",
     "log:db": "docker logs KafkaBOT_DB",
-    "update:pkg": "npm-check-updates && ncu -u && npm i"
+    "update:pkg": "npm-check-updates && ncu -u && npm i",
+    "start:prod-no-docker": "node extra/script/script.init.js"
   },
   "keywords": [],
   "author": "",
