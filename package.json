@@ -15,7 +15,7 @@
     "log:app": "docker logs KafkaBOT_APP",
     "log:db": "docker logs KafkaBOT_DB",
     "update:pkg": "npm-check-updates && ncu -u && npm i",
-    "start:prod-no-docker": "node extra/script/script.init.js"
+    "start:bot": "node extra/script/entrypoint.init.js"
   },
   "keywords": [],
   "author": "",
@@ -33,6 +33,7 @@
   "dependencies": {
     "axios": "^1.7.9",
     "cloudinary": "^2.5.1",
+    "commander": "^13.0.0",
     "discord.js": "^14.16.3",
     "glob": "^11.0.0",
     "hercai": "^12.4.0",
