@@ -13,7 +13,13 @@ WORKDIR /tmp/app
 COPY package*.json ./
 
 # Update npm and install project dependencies
-RUN npm install -g npm@latest && npm install && npm install -g tsx
+RUN npm install -g npm@latest
+
+# Install global dependencies
+RUN npm install -g tsx npm-check-updates
+
+# Update & Install dependencies
+RUN npm run update:pkg
 
 # Copy the rest of the project files
 COPY . .
