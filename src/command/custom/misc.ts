@@ -3,6 +3,7 @@ import { Misc } from '@/helper/constant';
 import { AppDataSource } from '@/helper/datasource';
 import { CustomOptions } from '@/infrastructure/client';
 import CloudinaryClient from '@/infrastructure/cloudinary';
+import axios from 'axios';
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -14,8 +15,43 @@ import {
     MessageReplyOptions,
 } from 'discord.js';
 
+interface CurrencyResponse {
+    [key: string]:
+        | {
+              [key: string]: number;
+          }
+        | string;
+}
+
 const imageEmbed = (imageUrl: string) => {
     return new EmbedBuilder().setImage(imageUrl);
+};
+
+const sendCurrencyExchangeInfo = async (message: Message, response: CurrencyResponse, from: string, to: string, amount: string) => {
+    const data = response;
+    const date = data.date as string;
+    const rate = Number((data[from] as { [key: string]: number })[to]);
+    const result = parseFloat(amount) * rate;
+
+    from = from.toUpperCase();
+    to = to.toUpperCase();
+
+    const locale = Intl.DateTimeFormat().resolvedOptions().locale;
+    const formatedFrom = new Intl.NumberFormat(locale, {style: 'currency', currency: from}).format(parseFloat(amount));
+    const formatedTo = new Intl.NumberFormat(locale, {style: 'currency', currency: to}).format(result);
+
+    const embed = new EmbedBuilder()
+        .setTitle(`Currency exchange: ${from} -> ${to}`)
+        .setColor(Misc.PRIMARY_EMBED_COLOR)
+        .setDescription(`From: ${from}\nTo: ${to}\nAmount: ${formatedFrom}`)
+        .addFields({
+            name: 'Result',
+            value: `${formatedTo}`,
+        })
+        .setFooter({ text: `KafkaBOT - Currency exchange - ${date}`, iconURL: message.client.user.avatarURL() || '' });
+
+    await message.reply({ embeds: [embed] });
+    return;
 };
 
 export default [
@@ -56,8 +92,8 @@ export default [
                                 quality: Misc.CLOUDINARY_IMAGE_QUALITY,
                                 fetch_format: Misc.CLOUDINARY_IMAGE_FORMAT,
                                 width: Misc.CLOUDINARY_IMAGE_WIDTH,
-                                crop: Misc.CLOUDINARY_IMAGE_CROP
-                            }
+                                crop: Misc.CLOUDINARY_IMAGE_CROP,
+                            },
                         });
                         const quote = new Quote();
                         quote.serverId = serverId;
@@ -166,6 +202,43 @@ export default [
                 await msg.edit({ content: msg.content, components: [] });
                 return;
             });
+
+            return;
+        },
+    },
+    {
+        name: 'ce',
+        description: 'Exchange currency',
+        parameters: ['from', 'to', 'amount'],
+        execute: async (message: Message, options: CustomOptions) => {
+            let from = options.parameters.get('from');
+            let to = options.parameters.get('to');
+            let amount = options.parameters.get('amount');
+
+            if (!from || !to || !amount) {
+                await message.reply('❌ Invalid parameters');
+                return;
+            }
+
+            from = from.toLowerCase();
+            to = to.toLowerCase();
+
+            axios
+                .get<CurrencyResponse>(`${Misc.EXCHANGE_API}/${from}.min.json`)
+                .then(async (response) => {
+                    await sendCurrencyExchangeInfo(message, response.data, from, to, amount);
+                })
+                .catch(async (error) => {
+                    axios
+                        .get<CurrencyResponse>(`${Misc.EXCHANGE_API_FALLBACK}/${from}.min.json`)
+                        .then(async (response) => {
+                            await sendCurrencyExchangeInfo(message, response.data, from, to, amount);
+                        })
+                        .catch(async (error) => {
+                            await message.reply('❌ Something wrong happened');
+                            return;
+                        });
+                });
 
             return;
         },

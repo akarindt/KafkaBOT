@@ -7,6 +7,8 @@ import NSFWKeyword from '@/entity/nsfwKeyword';
 import Quote from '@/entity/quote';
 import HoyoverseCode from '@/entity/hoyoverseCode';
 import HoyoverseRedeem from '@/entity/hoyoverseRedeem';
+import WuwaNotify from '@/entity/wuwaNotify';
+import WuwaSubscribe from '@/entity/wuwaSubscribe';
 
 dotenv.config({ path: '.env' });
 
@@ -90,20 +92,22 @@ export class Misc {
     public static readonly CLOUDINARY_IMAGE_CROP = 'scale';
     public static readonly IMAGE_LIMIT_SIZE = 10000000; // 10 mb
     public static readonly MAX_TIME_OUT = 30000;
+    public static readonly EXCHANGE_API = 'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies';
+    public static readonly EXCHANGE_API_FALLBACK = 'https://latest.currency-api.pages.dev/v1/currencies';
 }
 
 export class Hoyoverse {
     public static readonly HOYOVERSE_UPDATE_COOKIE_API = 'https://webapi-os.account.hoyoverse.com/Api/fetch_cookie_accountinfo';
     public static readonly HOYOVERSE_RECORD_CARD_API = 'https://bbs-api-os.hoyolab.com/game_record/card/wapi/getGameRecordCard';
     public static readonly HOYOVERSE_HEADERS = {
-        'Accept': 'application/json, text/plain, */*',
+        Accept: 'application/json, text/plain, */*',
         'Accept-Encoding': 'gzip, deflate, br',
-        'Connection': 'keep-alive',
+        Connection: 'keep-alive',
         'x-rpc-app_version': '2.34.1',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
         'x-rpc-client_type': '4',
-        'Referer': 'https://act.hoyolab.com/',
-        'Origin': 'https://act.hoyolab.com',
+        Referer: 'https://act.hoyolab.com/',
+        Origin: 'https://act.hoyolab.com',
     };
 
     public static readonly HOYOVERSE_GAME_HEADERS: { [gameName: string]: { [key: string]: string } } = {
@@ -136,9 +140,7 @@ export class Hoyoverse {
                 home: 'https://sg-hk4e-api.hoyolab.com/event/sol/home',
                 sign: 'https://sg-hk4e-api.hoyolab.com/event/sol/sign',
                 redem: 'https://sg-hk4e-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey',
-                checkCodeWeb: [
-                    'https://api.ennead.cc/mihoyo/honkai/codes'
-                ],
+                checkCodeWeb: ['https://api.ennead.cc/mihoyo/honkai/codes'],
             },
         },
 
@@ -176,9 +178,7 @@ export class Hoyoverse {
                 home: 'https://sg-public-api.hoyolab.com/event/luna/os/home',
                 sign: 'https://sg-public-api.hoyolab.com/event/luna/os/sign',
                 redem: 'https://sg-hkrpg-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkeyRisk',
-                checkCodeWeb: [
-                    'https://api.ennead.cc/mihoyo/starrail/codes'
-                ],
+                checkCodeWeb: ['https://api.ennead.cc/mihoyo/starrail/codes'],
             },
         },
 
@@ -198,9 +198,7 @@ export class Hoyoverse {
                 home: 'https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os/home',
                 sign: 'https://sg-public-api.hoyolab.com/event/luna/zzz/os/sign',
                 redem: 'https://public-operation-nap.hoyoverse.com/common/apicdkey/api/webExchangeCdkey',
-                checkCodeWeb: [
-                    'https://api.ennead.cc/mihoyo/zenless/codes'
-                ],
+                checkCodeWeb: ['https://api.ennead.cc/mihoyo/zenless/codes'],
             },
         },
     };
@@ -214,7 +212,7 @@ export class DatabaseConfig {
         port: process.env.POSTGRES_PORT as unknown as number,
         host: process.env.POSTGRES_HOST,
         database: process.env.POSTGRES_DB,
-        entities: [HoyoverseEntity, NSFWKeyword, Quote, HoyoverseCode, HoyoverseRedeem],
+        entities: [HoyoverseEntity, NSFWKeyword, Quote, HoyoverseCode, HoyoverseRedeem, WuwaNotify, WuwaSubscribe],
         migrations: [join(__dirname, '../../migrations/*{.ts, .js}')],
         migrationsTableName: 'TBL_MIGRATION',
         synchronize: false,
@@ -222,7 +220,7 @@ export class DatabaseConfig {
         extra: {
             idleTimeoutMillis: 30000,
             max: 10,
-            keepAlive: true
-          },
+            keepAlive: true,
+        },
     };
 }

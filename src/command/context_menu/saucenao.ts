@@ -58,7 +58,7 @@ export default {
                     .join('\n'),
             })
             .setTimestamp()
-            .setFooter({ text: 'SauceNAO', iconURL: interaction.client.user.avatarURL() || '' });
+            .setFooter({ text: 'KafkaBOT - SauceNAO', iconURL: interaction.client.user.avatarURL() || '' });
 
         await interaction.reply({ embeds: [embed] });
         return;

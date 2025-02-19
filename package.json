@@ -1,7 +1,7 @@
 {
   "name": "kafkabot",
   "version": "1.0.0",
-  "description": "",
+  "description": "Just a simple discord bot",
   "main": "index.js",
   "scripts": {
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
@@ -13,11 +13,10 @@
     "stop:app": "docker compose stop kafkabotapp",
     "stop:db": "docker compose stop kafkabotdb",
     "log:app": "docker logs KafkaBOT_APP",
-    "log:db": "docker logs KafkaBOT_DB",
-    "update:pkg": "npm-check-updates && ncu -u && npm i"
+    "log:db": "docker logs KafkaBOT_DB"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["discord", "bot", "multi-purpose bot"],
+  "author": "Akari",
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
     "@types/node": "^22.10.2",
@@ -36,7 +35,6 @@
     "glob": "^11.0.0",
     "hercai": "^12.4.0",
     "node-schedule": "^2.1.1",
-    "npm-check-updates": "^17.1.12",
     "pg": "^8.13.1",
     "puppeteer": "^23.11.1",
     "reflect-metadata": "^0.2.2",

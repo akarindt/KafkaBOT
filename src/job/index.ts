@@ -10,8 +10,6 @@ export default class Job {
     }
 
     public async Initialize() {
-        console.log('[INFO] Shut down all previous job')
-        await schedule.gracefulShutdown();
         
         // Hoyolab
         const HyJob = new HoyolabJob(this._client);

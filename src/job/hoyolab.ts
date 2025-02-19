@@ -2,7 +2,13 @@ import Hoyoverse from '@/entity/hoyoverse';
 import { AppDataSource } from '@/helper/datasource';
 import { BotClient } from '@/infrastructure/client';
 import schedule from 'node-schedule';
-import { HoyoverseAxiosResponse, HoyoverseClient, HoyoverseCodeItem, HoyoverseConstantName, UpdateHoyolabCookieResponse } from '@/infrastructure/hoyoverse';
+import {
+    HoyoverseAxiosResponse,
+    HoyoverseClient,
+    HoyoverseCodeItem,
+    HoyoverseConstantName,
+    UpdateHoyolabCookieResponse,
+} from '@/infrastructure/hoyoverse';
 import { Utils } from '@/helper/util';
 import axios from 'axios';
 import { Hoyoverse as HoyoConstant, Misc } from '@/helper/constant';
@@ -17,41 +23,40 @@ export default class HoyolabJob {
         this._client = client;
     }
 
-
     private async CheckCode(gameName: HoyoverseConstantName) {
         try {
             const url = (HoyoConstant.HOYOVERSE_GAME_LIST[gameName].url.checkCodeWeb ?? []).pop();
             if (!url) return;
-    
+
             const response = await axios.get<HoyoverseAxiosResponse>(url);
             if (response.status !== 200) return;
-    
+
             const data = response.data;
             let codes: HoyoverseCodeItem[] = [];
             const hoyoverseCodeRepository = AppDataSource.getRepository(HoyoverseCode);
-    
+
             for (let activeCode of data.active) {
                 codes.push({
                     gameName: gameName,
                     code: activeCode.code,
                     rewards: activeCode.rewards,
                     isActivate: true,
-                    server: 'All'
-                })
+                    server: 'All',
+                });
             }
-    
+
             for (let inactiveCode of data.inactive) {
                 codes.push({
                     gameName: gameName,
                     code: inactiveCode.code,
                     rewards: inactiveCode.rewards,
                     isActivate: false,
-                    server: 'All'
-                })
+                    server: 'All',
+                });
             }
-            
+
             await hoyoverseCodeRepository.upsert(codes, ['code', 'gameName']);
-            console.log(`[INFO] ${gameName} - code checking success!`)
+            console.log(`[INFO] ${gameName} - code checking success!`);
             return;
         } catch (error) {
             console.log(`[ERROR] Fetch: Code checking - ${gameName} failed: ${error}`);
@@ -61,7 +66,7 @@ export default class HoyolabJob {
 
     private async SendDiscord(methodName: string, client: BotClient, gameName: HoyoverseConstantName, data: Hoyoverse[]) {
         const game = new HoyoverseClient(gameName, data);
-
+        
         try {
             switch (methodName) {
                 case 'CHECKIN':
@@ -103,7 +108,7 @@ export default class HoyolabJob {
                             )
                             .setTimestamp()
                             .setFooter({
-                                text: `${result.assets.gameName} Daily Check-In`,
+                                text: `KafkaBOT - ${result.assets.gameName} Daily Check-In`,
                                 iconURL: client.user?.avatarURL() || '',
                             });
                         await client.users.send(result.userDiscordId, { embeds: [embed] });
@@ -115,76 +120,77 @@ export default class HoyolabJob {
                 case 'REDEMTION':
                     const redeemResults = await game.Redeem();
                     const SendRedeemPromises = redeemResults.map(async (result) => {
-                        if (result.success.length || result.failed.length) {
-                            const embed = new EmbedBuilder()
-                                .setColor(Misc.PRIMARY_EMBED_COLOR)
-                                .setTitle(`${result.assets.gameName} Code Redemption`)
-                                .setAuthor({
-                                    name: `${result.account.uid} - ${result.account.nickname}`,
-                                    iconURL: result.assets.icon,
-                                })
-                                .setFields(
-                                    {
-                                        name: 'Nickname',
-                                        value: result.account.nickname,
-                                        inline: true,
-                                    },
-                                    {
-                                        name: 'UID',
-                                        value: result.account.uid,
-                                        inline: true,
-                                    },
-                                    {
-                                        name: 'Rank',
-                                        value: result.account.rank.toString(),
-                                        inline: true,
-                                    },
-                                    {
-                                        name: 'Region',
-                                        value: result.account.region,
-                                        inline: true,
-                                    },
-                                    {
-                                        name: 'Code',
-                                        value: `Redeem ${result.success.length} codes successfully, please check your ingame-mail !`,
-                                        inline: true,
-                                    },
-                                    {
-                                        name: 'Failed (Invalid or Expired code)',
-                                        value:
-                                            result.failed.length > 0
-                                                ? result.failed
-                                                    .map((fail) => {
-                                                        return `[${fail.code}](${HoyoConstant.HOYOVERSE_REDEMTION_LINKS[gameName]}?code=${fail.code})`;
-                                                    })
-                                                    .join('\n')
-                                                : 'None',
-                                    }
-                                )
-                                .setTimestamp()
-                                .setFooter({
-                                    text: `${result.assets.gameName} Code Redemption`,
-                                    iconURL: client.user?.avatarURL() || '',
-                                });
+                        const embed = new EmbedBuilder()
+                            .setColor(Misc.PRIMARY_EMBED_COLOR)
+                            .setTitle(`${result.assets.gameName} Code Redemption`)
+                            .setAuthor({
+                                name: `${result.account.uid} - ${result.account.nickname}`,
+                                iconURL: result.assets.icon,
+                            })
+                            .setFields(
+                                {
+                                    name: 'Nickname',
+                                    value: result.account.nickname,
+                                    inline: true,
+                                },
+                                {
+                                    name: 'UID',
+                                    value: result.account.uid,
+                                    inline: true,
+                                },
+                                {
+                                    name: 'Rank',
+                                    value: result.account.rank.toString(),
+                                    inline: true,
+                                },
+                                {
+                                    name: 'Region',
+                                    value: result.account.region,
+                                    inline: true,
+                                },
+                                {
+                                    name: 'Code',
+                                    value: `Redeem ${result.success.length} codes successfully, please check your ingame-mail !`,
+                                    inline: true,
+                                },
+                                {
+                                    name: 'Failed (Invalid or Expired code)',
+                                    value:
+                                        result.failed.length > 0
+                                            ? result.failed
+                                                  .map((fail) => {
+                                                      return `[${fail.code}](${HoyoConstant.HOYOVERSE_REDEMTION_LINKS[gameName]}?code=${fail.code})`;
+                                                  })
+                                                  .join('\n')
+                                            : 'None',
+                                }
+                            )
+                            .setTimestamp()
+                            .setFooter({
+                                text: `KafkaBOT - ${result.assets.gameName} Code Redemption`,
+                                iconURL: client.user?.avatarURL() || '',
+                            });
 
-                            const codes = [...result.success, ...result.failed];
-                            const entites: HoyoverseRedeem[] = [];
-                            for (const code of codes) {
-                                const entity = new HoyoverseRedeem();
-                                entity.hoyoverseId = result.hoyoverseId;
-                                entity.code = code.code;
-                                entity.gameName = code.gameName;
-                                entity.redeemAt = Utils.dateToInt(new Date());
-                                entites.push(entity);
-                            }
+                        const codes = [...result.success, ...result.failed];
+                        const entites: HoyoverseRedeem[] = [];
+                        for (const code of codes) {
+                            const entity = new HoyoverseRedeem();
+                            entity.hoyoverseId = result.hoyoverseId;
+                            entity.code = code.code;
+                            entity.gameName = code.gameName;
+                            entity.redeemAt = Utils.dateToInt(new Date());
+                            entites.push(entity);
+                        }
 
-                            await AppDataSource.getRepository(HoyoverseRedeem).insert(entites);
+                        await AppDataSource.getRepository(HoyoverseRedeem).insert(entites);
+                        if (result.success.length > 0 || result.failed.length > 0) {
                             await client.users.send(result.userDiscordId, { embeds: [embed] });
                         }
                     });
                     await Promise.all(SendRedeemPromises);
                     break;
             }
+            console.log(`[INFO] ${gameName} - ${methodName} success!`);
             return;
         } catch (error) {
             console.log(`[ERROR] ${methodName} - An error occurred: ${error}`);
@@ -253,11 +259,7 @@ export default class HoyolabJob {
 
     public async StartCheckCodeJob() {
         schedule.scheduleJob('*/15 * * * *', async () => {
-            await Promise.all([
-                await this.CheckCode('STARRAIL'),
-                await this.CheckCode('ZENLESS'),
-                await this.CheckCode('GENSHIN')
-            ]);
+            await Promise.all([await this.CheckCode('STARRAIL'), await this.CheckCode('ZENLESS'), await this.CheckCode('GENSHIN')]);
         });
         console.log(`[INFO] Started cron job: HOYOVERSE-AUTO-DAILY-CODE-CHECKING`);
     }
@@ -266,7 +268,7 @@ export default class HoyolabJob {
         schedule.scheduleJob('*/30 * * * *', async () => {
             const hoyoverseRepository = AppDataSource.getRepository(Hoyoverse);
             const accounts = await hoyoverseRepository.find();
-            await this.SendDiscord('REDEMTION', this._client, 'STARRAIL', accounts)
+            await this.SendDiscord('REDEMTION', this._client, 'STARRAIL', accounts);
         });
         console.log(`[INFO] Started cron job: HOYOVERSE-AUTO-REDEEM-CODE`);
     }

@@ -20,7 +20,7 @@ services:
             timeout: 60s
             retries: 5
             start_period: 80s
-        restart: unless-stopped
+        restart: on-failure
 
     kafkabotapp:
         container_name: KafkaBOT_APP
@@ -53,7 +53,7 @@ services:
                 condition: service_healthy
         networks:
             - kafkabot_network
-        restart: unless-stopped
+        restart: on-failure
 
 networks:
     kafkabot_network:

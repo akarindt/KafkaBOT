@@ -1,4 +1,5 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CommandInteraction, ComponentType } from 'discord.js';
+import path from 'path';
 
 type ParseCookieOption = {
     whitelist: string[];
@@ -141,7 +142,37 @@ export class Utils {
         const now = new Date();
         const offsetMs = now.getTimezoneOffset() * 60 * 1000;
         const dateLocal = new Date(now.getTime() - offsetMs);
-        const str = dateLocal.toISOString().slice(0, 19).replace(/-/g, '/').replace('T', ' ');
-        return str;
+        return dateLocal.toISOString().slice(0, 19).replace(/-/g, '/').replace('T', ' ');
+    }
+
+    public static traceCaller(n: number) {
+        if (isNaN(n) || n < 0) n = 1;
+        n += 1;
+        let s = new Error().stack;
+
+        if (!s) return '[Dependencies]';
+
+        let a = s.indexOf('\n', 5);
+
+        while (n--) {
+            a = s.indexOf('\n', a + 1);
+            if (a < 0) {
+                a = s.lastIndexOf('\n', s.length);
+                break;
+            }
+        }
+        var b = s.indexOf('\n', a + 1);
+        if (b < 0) b = s.length;
+        a = Math.max(s.lastIndexOf(' ', b), s.lastIndexOf('/', b));
+        b = s.lastIndexOf(':', b);
+        s = s.substring(a + 1, b);
+        return `[${path.basename(s)}]`;
+    }
+
+    public static AssignGlobal() {
+        const log = console.log;
+        global.console.log = (...args) => {
+            log(`[${Utils.getLocalTime()}]`, Utils.traceCaller(1), ...args);
+        };
     }
 }

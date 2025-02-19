@@ -41,8 +41,18 @@
     },
     {
         "commandName": "/kfhoyo",
-        "description": "Assign your Hoyolab cookie for checkin",
+        "description": "Assign your Hoyolab cookie",
         "parameters": ["cookie"]
+    },
+    {
+        "commandName": "/kfhyupdate",
+        "description": "Update your Hoyolab cookie",
+        "parameters": ["cookie"]
+    },
+    {
+        "commandName": "/kfhoyohelp",
+        "description": "Find out how to get Hoyolab cookie",
+        "parameters": [""]
     },
     {
         "commandName": "/kfinfo",
@@ -50,13 +60,28 @@
         "parameters": []
     },
     {
-        "commandName": "%",
+        "commandName": "/kfwuwa",
+        "description": "Enable Wuthering Waves new codes notification",
+        "parameters": []
+    },
+    {
+        "commandName": "/kfunwuwa",
+        "description": "Disable Wuthering Waves new codes notification",
+        "parameters": []
+    },
+    {
+        "commandName": "%%",
         "description": "Save quotes",
         "parameters": ["Identifier"]
     },
     {
-        "commandName": "%%",
+        "commandName": "%%%",
         "description": "Get quotes",
         "parameters": ["Identifier"]
+    },
+    {
+        "commandName": "%ce",
+        "description": "Currency exchange",
+        "parameters": ["From", "To", "Amount"]
     }
 ]

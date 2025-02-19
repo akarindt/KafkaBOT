@@ -60,7 +60,7 @@ const tftListEmbed = (interaction: CommandInteraction, tftMetaList: TfTMetaItem[
                         .join('\n')
                 )
                 .setTimestamp()
-                .setFooter({ text: 'Misc', iconURL: interaction.client.user.avatarURL() || '' }),
+                .setFooter({ text: 'KafkaBOT - Misc', iconURL: interaction.client.user.avatarURL() || '' }),
         ];
     }
 
@@ -85,7 +85,7 @@ const tftListEmbed = (interaction: CommandInteraction, tftMetaList: TfTMetaItem[
                     .join('\n')
             )
             .setTimestamp()
-            .setFooter({ text: 'Misc', iconURL: interaction.client.user.avatarURL() || '' });
+            .setFooter({ text: 'KafkaBOT - Misc', iconURL: interaction.client.user.avatarURL() || '' });
     });
 };
 
@@ -112,7 +112,7 @@ const listCommands = (interaction: CommandInteraction, commands: CommandItem[]) 
                         .join('\n')
                 )
                 .setTimestamp()
-                .setFooter({ text: 'Misc', iconURL: interaction.client.user.avatarURL() || '' }),
+                .setFooter({ text: 'KafkaBOT - Misc', iconURL: interaction.client.user.avatarURL() || '' }),
         ];
     }
 
@@ -137,7 +137,7 @@ const listCommands = (interaction: CommandInteraction, commands: CommandItem[]) 
                     .join('\n')
             )
             .setTimestamp()
-            .setFooter({ text: 'Misc', iconURL: interaction.client.user.avatarURL() || '' });
+            .setFooter({ text: 'KafkaBOT - Misc', iconURL: interaction.client.user.avatarURL() || '' });
     });
 };
 
@@ -286,7 +286,7 @@ export default [
                     `**Term: [${term}](${url})** \n **Definition: ** ${meaning} \n  - [${contributor}](https://www.urbandictionary.com${authorUrl})`
                 )
                 .setTimestamp()
-                .setFooter({ text: 'Misc', iconURL: interaction.client.user.avatarURL() || '' });
+                .setFooter({ text: 'KafkaBOT - Misc', iconURL: interaction.client.user.avatarURL() || '' });
             await interaction.followUp({ embeds: [embed] });
             return;
         },
@@ -320,7 +320,7 @@ export default [
                 .setColor(Misc.PRIMARY_EMBED_COLOR)
                 .setImage(data.url)
                 .setTimestamp()
-                .setFooter({ text: 'Misc', iconURL: interaction.client.user.avatarURL() || '' });
+                .setFooter({ text: 'KafkaBOT - Misc', iconURL: interaction.client.user.avatarURL() || '' });
 
             await interaction.followUp({ embeds: [embed] });
             return;
