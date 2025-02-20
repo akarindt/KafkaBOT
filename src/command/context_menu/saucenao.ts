@@ -42,7 +42,7 @@ export default {
             .setColor(Misc.PRIMARY_EMBED_COLOR)
             .setAuthor({
                 name: `${interaction.user.displayName} - ${interaction.user.tag}`,
-                iconURL: interaction.user.avatarURL() || '',
+                iconURL: interaction.user.avatarURL() || Misc.BOT_FALLBACK_IMG,
             })
             .setTitle(`[${item.site}] - ${item.authorName || 'Name not available'}`)
             .setURL(item.url)
@@ -58,7 +58,7 @@ export default {
                     .join('\n'),
             })
             .setTimestamp()
-            .setFooter({ text: 'KafkaBOT - SauceNAO', iconURL: interaction.client.user.avatarURL() || '' });
+            .setFooter({ text: 'KafkaBOT - SauceNAO', iconURL: interaction.client.user.avatarURL() || Misc.BOT_FALLBACK_IMG });
 
         await interaction.reply({ embeds: [embed] });
         return;

@@ -28,6 +28,14 @@
 | Command           | Description                           | Parameters                                    |
 | :-----------------|:-------------------------------------:|:---------------------------------------------:|
 | `/kfhoyo`         | `Assign hoyolab's cookie`             | `cookie`                                      |
+| `/kfhyupdate`     | `Update hoyolab's cookie`             | `cookie`                                      |
+| `/kfhelp`         | `Find out how to get hoyolab's cookie`| `None`                                        |
+
+## Wuthering Waves
+| Command           | Description                           | Parameters                                    |
+| :-----------------|:-------------------------------------:|:---------------------------------------------:|
+| `/kfwuwa`         | `Enable WuWa new codes notification`  | `None`                                        |
+| `/kfunwuwa`       | `Disable WuWa new codes notification` | `None`                                        |
 
 # Context Menu
 | Command           | Description                           | Type                                          |
@@ -40,16 +48,13 @@
 | :-----------------|:-------------------------------------:|:---------------------------------------------:|
 | `%%`              | `Save quote`                          | `identifier` - `Image, chat input or reply`   |
 | `%%%`             | `Get quote`                           | `identifier`                                  |
+| `%ce`             | `Currency exchange`                   | `From` - `To` - `Amount`                      |
 
 # Dependencies
 - [@discord-player/extractor](https://www.npmjs.com/package/@discord-player/extractor)
 - [@discordjs/opus](https://www.npmjs.com/package/@discordjs/opus)
 - [axios](https://www.npmjs.com/package/axios)
-- [discord-player](https://www.npmjs.com/package/discord-player)
-- [disocrd-player-youtubei](https://www.npmjs.com/package/discord-player-youtubei)
 - [discord.js](https://www.npmjs.com/package/discord.js)
-- [ffmpeg](https://www.npmjs.com/package/ffmpeg)
-- [fluent-ffmpeg](https://www.npmjs.com/package/fluent-ffmpeg)
 - [glob](https://www.npmjs.com/package/glob)
 - [hercai](https://www.npmjs.com/package/hercai)
 - [pg](https://www.npmjs.com/package/pg)
@@ -58,14 +63,15 @@
 - [sagiri](https://www.npmjs.com/package/sagiri)
 - [typeorm](https://www.npmjs.com/package/typeorm)
 - [List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words](https://github.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/tree/master)
-- [ffmpeg executable](https://www.ffmpeg.org/)
 - [Hoyolab-auto](https://github.com/torikushiii/hoyolab-auto)
+- [cloudinary](https://www.npmjs.com/package/cloudinary)
+- [exchange-api](https://github.com/fawazahmed0/exchange-api)
 
 
 # LICENSE
 MIT License
 
-Copyright (c) 2024 ThawsgNotWjbu3103
+Copyright (c) 2024 Akari
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

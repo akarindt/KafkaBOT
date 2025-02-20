@@ -26,7 +26,7 @@ export default [
                 .setColor(Misc.PRIMARY_EMBED_COLOR)
                 .setDescription(`** ${interaction.user.displayName} asked **: ${response.content} \n ** KafkaBOT **: ${response.reply}`)
                 .setTimestamp()
-                .setFooter({ text: 'KafkaBOT - Chat with AI', iconURL: interaction.client.user.avatarURL() || '' });
+                .setFooter({ text: 'KafkaBOT - Chat with AI', iconURL: interaction.client.user.avatarURL() || Misc.BOT_FALLBACK_IMG });
 
             await interaction.followUp({ embeds: [embed] });
             return;
@@ -91,7 +91,7 @@ export default [
                 )
                 .setImage(response.url)
                 .setTimestamp()
-                .setFooter({ text: 'KafkaBOT - Chat with AI', iconURL: interaction.client.user.avatarURL() || '' });
+                .setFooter({ text: 'KafkaBOT - Chat with AI', iconURL: interaction.client.user.avatarURL() || Misc.BOT_FALLBACK_IMG });
 
             await interaction.followUp({ embeds: [embed] });
             return;

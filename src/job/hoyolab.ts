@@ -109,7 +109,7 @@ export default class HoyolabJob {
                             .setTimestamp()
                             .setFooter({
                                 text: `KafkaBOT - ${result.assets.gameName} Daily Check-In`,
-                                iconURL: client.user?.avatarURL() || '',
+                                iconURL: client.user?.avatarURL() || Misc.BOT_FALLBACK_IMG,
                             });
                         await client.users.send(result.userDiscordId, { embeds: [embed] });
                     });
@@ -168,7 +168,7 @@ export default class HoyolabJob {
                             .setTimestamp()
                             .setFooter({
                                 text: `KafkaBOT - ${result.assets.gameName} Code Redemption`,
-                                iconURL: client.user?.avatarURL() || '',
+                                iconURL: client.user?.avatarURL() || Misc.BOT_FALLBACK_IMG,
                             });
 
                         const codes = [...result.success, ...result.failed];

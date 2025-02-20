@@ -96,7 +96,7 @@ export default [
                 .setDescription(message)
                 .setImage('https://res.cloudinary.com/dbivuiucl/image/upload/v1739938838/kafkaBOT/how_to_get_wml3jj.png')
                 .setTimestamp()
-                .setFooter({ text: 'KafkaBOT - How to get Hoyolab cookies', iconURL: interaction.client.user.avatarURL() || '' });
+                .setFooter({ text: 'KafkaBOT - How to get Hoyolab cookies', iconURL: interaction.client.user.avatarURL() || Misc.BOT_FALLBACK_IMG });
 
             await interaction.followUp({ embeds: [embed], ephemeral: true });
             return;

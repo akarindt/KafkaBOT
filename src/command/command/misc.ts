@@ -45,7 +45,7 @@ const tftListEmbed = (interaction: CommandInteraction, tftMetaList: TfTMetaItem[
                 .setColor(Misc.PRIMARY_EMBED_COLOR)
                 .setAuthor({
                     name: `${interaction.user.displayName} - ${interaction.user.tag}`,
-                    iconURL: interaction.user.avatarURL() || '',
+                    iconURL: interaction.user.avatarURL() || Misc.BOT_FALLBACK_IMG,
                 })
                 .setTitle('TFT current meta list')
                 .setDescription(
@@ -60,7 +60,7 @@ const tftListEmbed = (interaction: CommandInteraction, tftMetaList: TfTMetaItem[
                         .join('\n')
                 )
                 .setTimestamp()
-                .setFooter({ text: 'KafkaBOT - Misc', iconURL: interaction.client.user.avatarURL() || '' }),
+                .setFooter({ text: 'KafkaBOT - Misc', iconURL: interaction.client.user.avatarURL() || Misc.BOT_FALLBACK_IMG }),
         ];
     }
 
@@ -70,7 +70,7 @@ const tftListEmbed = (interaction: CommandInteraction, tftMetaList: TfTMetaItem[
             .setColor(Misc.PRIMARY_EMBED_COLOR)
             .setAuthor({
                 name: `${interaction.user.displayName} - ${interaction.user.tag}`,
-                iconURL: interaction.user.avatarURL() || '',
+                iconURL: interaction.user.avatarURL() || Misc.BOT_FALLBACK_IMG,
             })
             .setTitle('TFT current meta list')
             .setDescription(
@@ -85,7 +85,7 @@ const tftListEmbed = (interaction: CommandInteraction, tftMetaList: TfTMetaItem[
                     .join('\n')
             )
             .setTimestamp()
-            .setFooter({ text: 'KafkaBOT - Misc', iconURL: interaction.client.user.avatarURL() || '' });
+            .setFooter({ text: 'KafkaBOT - Misc', iconURL: interaction.client.user.avatarURL() || Misc.BOT_FALLBACK_IMG });
     });
 };
 
@@ -97,7 +97,7 @@ const listCommands = (interaction: CommandInteraction, commands: CommandItem[]) 
                 .setColor(Misc.PRIMARY_EMBED_COLOR)
                 .setAuthor({
                     name: `${interaction.user.displayName} - ${interaction.user.tag}`,
-                    iconURL: interaction.user.avatarURL() || '',
+                    iconURL: interaction.user.avatarURL() || Misc.BOT_FALLBACK_IMG,
                 })
                 .setTitle('Command list')
                 .setDescription(
@@ -112,7 +112,7 @@ const listCommands = (interaction: CommandInteraction, commands: CommandItem[]) 
                         .join('\n')
                 )
                 .setTimestamp()
-                .setFooter({ text: 'KafkaBOT - Misc', iconURL: interaction.client.user.avatarURL() || '' }),
+                .setFooter({ text: 'KafkaBOT - Misc', iconURL: interaction.client.user.avatarURL() || Misc.BOT_FALLBACK_IMG }),
         ];
     }
 
@@ -122,7 +122,7 @@ const listCommands = (interaction: CommandInteraction, commands: CommandItem[]) 
             .setColor(Misc.PRIMARY_EMBED_COLOR)
             .setAuthor({
                 name: `${interaction.user.displayName} - ${interaction.user.tag}`,
-                iconURL: interaction.user.avatarURL() || '',
+                iconURL: interaction.user.avatarURL() || Misc.BOT_FALLBACK_IMG,
             })
             .setTitle('Command list')
             .setDescription(
@@ -137,7 +137,7 @@ const listCommands = (interaction: CommandInteraction, commands: CommandItem[]) 
                     .join('\n')
             )
             .setTimestamp()
-            .setFooter({ text: 'KafkaBOT - Misc', iconURL: interaction.client.user.avatarURL() || '' });
+            .setFooter({ text: 'KafkaBOT - Misc', iconURL: interaction.client.user.avatarURL() || Misc.BOT_FALLBACK_IMG });
     });
 };
 
@@ -286,7 +286,7 @@ export default [
                     `**Term: [${term}](${url})** \n **Definition: ** ${meaning} \n  - [${contributor}](https://www.urbandictionary.com${authorUrl})`
                 )
                 .setTimestamp()
-                .setFooter({ text: 'KafkaBOT - Misc', iconURL: interaction.client.user.avatarURL() || '' });
+                .setFooter({ text: 'KafkaBOT - Misc', iconURL: interaction.client.user.avatarURL() || Misc.BOT_FALLBACK_IMG });
             await interaction.followUp({ embeds: [embed] });
             return;
         },
@@ -320,7 +320,7 @@ export default [
                 .setColor(Misc.PRIMARY_EMBED_COLOR)
                 .setImage(data.url)
                 .setTimestamp()
-                .setFooter({ text: 'KafkaBOT - Misc', iconURL: interaction.client.user.avatarURL() || '' });
+                .setFooter({ text: 'KafkaBOT - Misc', iconURL: interaction.client.user.avatarURL() || Misc.BOT_FALLBACK_IMG });
 
             await interaction.followUp({ embeds: [embed] });
             return;
@@ -355,7 +355,7 @@ export default [
                 .setColor(Misc.PRIMARY_EMBED_COLOR)
                 .setAuthor({
                     name: interaction.user.username,
-                    iconURL: interaction.user.avatarURL() || '',
+                    iconURL: interaction.user.avatarURL() || Misc.BOT_FALLBACK_IMG,
                 })
                 .setDescription(userMention(interaction.user.id))
                 .setThumbnail(interaction.user.avatarURL())

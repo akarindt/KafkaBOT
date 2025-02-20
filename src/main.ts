@@ -11,7 +11,7 @@ Utils.AssignGlobal();
         client.InitDB();
         await client.RegisterCommands();
         await client.StartBot();
-        // await client.RegisterCronJob();
+        await client.RegisterCronJob();
     } catch (error) {
         console.log(`[ERROR] An Error Occurred: ${error}`);
     }

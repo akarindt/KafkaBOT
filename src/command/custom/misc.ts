@@ -48,7 +48,7 @@ const sendCurrencyExchangeInfo = async (message: Message, response: CurrencyResp
             name: 'Result',
             value: `${formatedTo}`,
         })
-        .setFooter({ text: `KafkaBOT - Currency exchange - ${date}`, iconURL: message.client.user.avatarURL() || '' });
+        .setFooter({ text: `KafkaBOT - Currency exchange - ${date}`, iconURL: message.client.user.avatarURL() || Misc.BOT_FALLBACK_IMG });
 
     await message.reply({ embeds: [embed] });
     return;

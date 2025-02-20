@@ -94,6 +94,7 @@ export class Misc {
     public static readonly MAX_TIME_OUT = 30000;
     public static readonly EXCHANGE_API = 'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies';
     public static readonly EXCHANGE_API_FALLBACK = 'https://latest.currency-api.pages.dev/v1/currencies';
+    public static readonly BOT_FALLBACK_IMG = 'https://res.cloudinary.com/dbivuiucl/image/upload/v1740018170/kafkaBOT/f20b98957e9d10a82ce1806d31b8e864_worwxa.jpg';
 }
 
 export class Hoyoverse {
