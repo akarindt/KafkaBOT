@@ -17,6 +17,8 @@ RUN npm install -g npm@latest
 
 RUN npm install typescript tsc-alias -g
 
+RUN npm install 
+
 # Copy the rest of the project files
 COPY . .
 
