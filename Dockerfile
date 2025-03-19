@@ -15,6 +15,8 @@ COPY package*.json ./
 # Update npm and install project dependencies
 RUN npm install -g npm@latest
 
+RUN npm install tsc tsc-alias -g
+
 # Copy the rest of the project files
 COPY . .
 
