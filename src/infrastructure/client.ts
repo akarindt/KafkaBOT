@@ -82,7 +82,13 @@ export class BotClient extends Client {
         await Promise.all(
             files.map(async (filePath) => {
                 const imported = await Utils.importFile(url.pathToFileURL(filePath).href);
-                let command: any = (process.env.NODE_ENV == 'development' && imported) || imported.default;
+                let command: any;
+
+                if ("default" in imported) {
+                    command = imported.default;
+                } else {
+                    command = imported
+                }
 
                 if (Array.isArray(command)) {
                     for (let item of command) {
