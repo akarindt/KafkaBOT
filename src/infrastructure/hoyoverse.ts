@@ -337,10 +337,10 @@ export class HoyoverseClient {
                 const cookie = account.cookie;
 
                 const ltuid = cookie.match(/ltuid_v2=([^;]+)/);
-                if (!ltuid) return [];
+                if (!ltuid) continue;
 
                 const accountDetails = await this.GetAccountDetails(cookie, ltuid[1]);
-                if (!accountDetails) return [];
+                if (!accountDetails) continue;
 
                 const hoyoverseRedeemRepository = AppDataSource.getRepository(HoyoverseRedeem);
                 const codeRepository = AppDataSource.getRepository(HoyoverseCode);
@@ -359,8 +359,7 @@ export class HoyoverseClient {
                     },
                 });
 
-                if (!codeList.length) return [];
-
+                if (!codeList.length) continue;
                 const success: HoyoverseCode[] = [];
                 const failed: HoyoverseCode[] = [];
 

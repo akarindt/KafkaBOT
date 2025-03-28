@@ -66,7 +66,7 @@ export default class HoyolabJob {
 
     private async SendDiscord(methodName: string, client: BotClient, gameName: HoyoverseConstantName, data: Hoyoverse[]) {
         const game = new HoyoverseClient(gameName, data);
-        
+
         try {
             switch (methodName) {
                 case 'CHECKIN':
@@ -259,7 +259,7 @@ export default class HoyolabJob {
 
     public async StartCheckCodeJob() {
         schedule.scheduleJob('*/15 * * * *', async () => {
-            await Promise.all([await this.CheckCode('STARRAIL'), await this.CheckCode('ZENLESS'), await this.CheckCode('GENSHIN')]);
+            await this.CheckCode('STARRAIL');
         });
         console.log(`[INFO] Started cron job: HOYOVERSE-AUTO-DAILY-CODE-CHECKING`);
     }

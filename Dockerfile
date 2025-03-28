@@ -15,11 +15,9 @@ COPY package*.json ./
 # Update npm and install project dependencies
 RUN npm install -g npm@latest
 
-# Install global dependencies
-RUN npm install -g tsx npm-check-updates
+RUN npm install typescript tsc-alias -g
 
-# Update & Install dependencies
-RUN npm run update:pkg
+RUN npm install 
 
 # Copy the rest of the project files
 COPY . .
