@@ -1,56 +1,67 @@
 # Introduction
+
 - Greeting ! This is KafkaBOT (pronounced as **kaaf·kuh**) - A simple multipurpose Discord bot that i made for fun
 - Currently i've implemented custom commands register function, i'm not create a custom command because i'm lazy asf
+
 # Slash commands
+
 ## Misc
-| Command           | Description                           | Parameters                                    |
-| :-----------------|:-------------------------------------:|:---------------------------------------------:|
-| `/kfping`         | `Reply with Pong!`                    | `None`                                        |
-| `/kfcommands`     | `Get all KafkaBOT's commands`         | `None`                                        |
-| `/kfpoll`         | `Create a Poll`                       | `question` - `multi` - `duration` - `polls`   |
-| `/kftft`          | `Get TFT current meta`                | `None`                                        |
-| `/kfud`           | `Search a word on Urban Dictionary`   | `term`                                        |
-| `/kfmeme`         | `Summon a random meme at will`        | `None`                                        |
-| `/kfinfo`         | `Get user's discord info`             | `None`                                        |
+
+| Command       |             Description             |                 Parameters                  |
+| :------------ | :---------------------------------: | :-----------------------------------------: |
+| `/kfping`     |         `Reply with Pong!`          |                   `None`                    |
+| `/kfcommands` |    `Get all KafkaBOT's commands`    |                   `None`                    |
+| `/kfpoll`     |           `Create a Poll`           | `question` - `multi` - `duration` - `polls` |
+| `/kftft`      |       `Get TFT current meta`        |                   `None`                    |
+| `/kfud`       | `Search a word on Urban Dictionary` |                   `term`                    |
+| `/kfmeme`     |   `Summon a random meme at will`    |                   `None`                    |
+| `/kfinfo`     |      `Get user's discord info`      |                   `None`                    |
 
 ## Chat
-| Command           | Description                           | Parameters                                    |
-| :-----------------|:-------------------------------------:|:---------------------------------------------:|
-| `/kfchat`         | `Chat with AI`                        | `question`                                    |
-| `/kfdraw`         | `Ask AI to draw a image`              | `idea`                                        |
+
+| Command   |       Description        | Parameters |
+| :-------- | :----------------------: | :--------: |
+| `/kfchat` |      `Chat with AI`      | `question` |
+| `/kfdraw` | `Ask AI to draw a image` |   `idea`   |
 
 ## SauceNAO
-| Command           | Description                           | Parameters                                    |
-| :-----------------|:-------------------------------------:|:---------------------------------------------:|
-| `/kfsaucenao`     | `Find sauce`                          | `attachment`                                  |
+
+| Command       | Description  |  Parameters  |
+| :------------ | :----------: | :----------: |
+| `/kfsaucenao` | `Find sauce` | `attachment` |
 
 ## Hoyolab
-| Command           | Description                           | Parameters                                    |
-| :-----------------|:-------------------------------------:|:---------------------------------------------:|
-| `/kfhoyo`         | `Assign hoyolab's cookie`             | `cookie`                                      |
-| `/kfhyupdate`     | `Update hoyolab's cookie`             | `cookie`                                      |
-| `/kfhelp`         | `Find out how to get hoyolab's cookie`| `None`                                        |
+
+| Command       |              Description               | Parameters |
+| :------------ | :------------------------------------: | :--------: |
+| `/kfhoyo`     |       `Assign hoyolab's cookie`        |  `cookie`  |
+| `/kfhyupdate` |       `Update hoyolab's cookie`        |  `cookie`  |
+| `/kfhelp`     | `Find out how to get hoyolab's cookie` |   `None`   |
 
 ## Wuthering Waves
-| Command           | Description                           | Parameters                                    |
-| :-----------------|:-------------------------------------:|:---------------------------------------------:|
-| `/kfwuwa`         | `Enable WuWa new codes notification`  | `None`                                        |
-| `/kfunwuwa`       | `Disable WuWa new codes notification` | `None`                                        |
+
+| Command     |              Description              | Parameters |
+| :---------- | :-----------------------------------: | :--------: |
+| `/kfwuwa`   | `Enable WuWa new codes notification`  |   `None`   |
+| `/kfunwuwa` | `Disable WuWa new codes notification` |   `None`   |
 
 # Context Menu
-| Command           | Description                           | Type                                          |
-| :-----------------|:-------------------------------------:|:---------------------------------------------:|
-| `SauceNao`        | `Find sauce`                          | `ApplicationCommandType.Message`              |
-| `Ping`            | `Replies with Pong!`                  | `ApplicationCommandType.User`                 |
+
+| Command    |     Description      |               Type               |
+| :--------- | :------------------: | :------------------------------: |
+| `SauceNao` |     `Find sauce`     | `ApplicationCommandType.Message` |
+| `Ping`     | `Replies with Pong!` |  `ApplicationCommandType.User`   |
 
 # Custom commands
-| Command           | Description                           | Parameters                                    |
-| :-----------------|:-------------------------------------:|:---------------------------------------------:|
-| `%%`              | `Save quote`                          | `identifier` - `Image, chat input or reply`   |
-| `%%%`             | `Get quote`                           | `identifier`                                  |
-| `%ce`             | `Currency exchange`                   | `From` - `To` - `Amount`                      |
+
+| Command |     Description     |                 Parameters                  |
+| :------ | :-----------------: | :-----------------------------------------: |
+| `%%`    |    `Save quote`     | `identifier` - `Image, chat input or reply` |
+| `%%%`   |     `Get quote`     |                `identifier`                 |
+| `%ce`   | `Currency exchange` |          `From` - `To` - `Amount`           |
 
 # Dependencies
+
 - [@discord-player/extractor](https://www.npmjs.com/package/@discord-player/extractor)
 - [@discordjs/opus](https://www.npmjs.com/package/@discordjs/opus)
 - [axios](https://www.npmjs.com/package/axios)
@@ -67,8 +78,8 @@
 - [cloudinary](https://www.npmjs.com/package/cloudinary)
 - [exchange-api](https://github.com/fawazahmed0/exchange-api)
 
-
 # LICENSE
+
 MIT License
 
 Copyright (c) 2024 Akari

@@ -37,8 +37,8 @@ const sendCurrencyExchangeInfo = async (message: Message, response: CurrencyResp
     to = to.toUpperCase();
 
     const locale = Intl.DateTimeFormat().resolvedOptions().locale;
-    const formatedFrom = new Intl.NumberFormat(locale, {style: 'currency', currency: from}).format(parseFloat(amount));
-    const formatedTo = new Intl.NumberFormat(locale, {style: 'currency', currency: to}).format(result);
+    const formatedFrom = new Intl.NumberFormat(locale, { style: 'currency', currency: from }).format(parseFloat(amount));
+    const formatedTo = new Intl.NumberFormat(locale, { style: 'currency', currency: to }).format(result);
 
     const embed = new EmbedBuilder()
         .setTitle(`Currency exchange: ${from} -> ${to}`)

@@ -1,11 +1,11 @@
-import { Index, Entity, Column, PrimaryGeneratedColumn } from "typeorm";
+import { Index, Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity("TBL_KEYWORD")
+@Entity('TBL_KEYWORD')
 export default class NSFWKeyword {
-    @PrimaryGeneratedColumn("increment")
-    id: number
+    @PrimaryGeneratedColumn('increment')
+    id: number;
 
     @Index()
-    @Column("text")
-    keyword: string
+    @Column('text')
+    keyword: string;
 }

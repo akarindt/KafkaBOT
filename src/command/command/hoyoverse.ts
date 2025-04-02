@@ -72,23 +72,20 @@ export default [
         },
     },
     {
-        data: new SlashCommandBuilder()
-            .setName('kfhoyohelp')
-            .setDescription('Find out how to get your Hoyolab cookie'),
+        data: new SlashCommandBuilder().setName('kfhoyohelp').setDescription('Find out how to get your Hoyolab cookie'),
         execute: async (interaction: CommandInteraction) => {
             await interaction.deferReply();
 
-            let message = `- Go to [HoYoLAB](https://www.hoyolab.com/) (<https://www.hoyolab.com/>) and log in. (Highly recommend using incognito mode) \n`
-            message += `- Go to your profile page. \n`
-            message += `- Open the developer tools (F12 or Ctrl+Shift+I). \n`
-            message += `- Go to the "Network" tab. \n`
-            message += `- Click on the "Preserve Log" / "Persist Logs" button. (On FireFox this is under the gear icon in the top right of the network tab). \n`
-            message += `- Refresh the page. \n`
-            message += `- Click on the getGameRecordCard request where the method is "GET" (it should be named "getGameRecordCard" with your HoYoLab UID). \n`
-            message += `- Scroll down to the "Request Headers" section. \n`
-            message += `- Find the "cookie" header. \n`
-            message += `- Copy the value of the "cookie" header. \n`
-
+            let message = `- Go to [HoYoLAB](https://www.hoyolab.com/) (<https://www.hoyolab.com/>) and log in. (Highly recommend using incognito mode) \n`;
+            message += `- Go to your profile page. \n`;
+            message += `- Open the developer tools (F12 or Ctrl+Shift+I). \n`;
+            message += `- Go to the "Network" tab. \n`;
+            message += `- Click on the "Preserve Log" / "Persist Logs" button. (On FireFox this is under the gear icon in the top right of the network tab). \n`;
+            message += `- Refresh the page. \n`;
+            message += `- Click on the getGameRecordCard request where the method is "GET" (it should be named "getGameRecordCard" with your HoYoLab UID). \n`;
+            message += `- Scroll down to the "Request Headers" section. \n`;
+            message += `- Find the "cookie" header. \n`;
+            message += `- Copy the value of the "cookie" header. \n`;
 
             const embed = new EmbedBuilder()
                 .setTitle('Here is how to get your Hoyolab cookie')
@@ -100,6 +97,6 @@ export default [
 
             await interaction.followUp({ embeds: [embed], ephemeral: true });
             return;
-        }
-    }
+        },
+    },
 ];

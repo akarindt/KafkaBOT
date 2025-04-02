@@ -1,7 +1,7 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class UpdateTableForHoyoverseCodeRedeem51727337647711 implements MigrationInterface {
-    name = 'UpdateTableForHoyoverseCodeRedeem51727337647711'
+    name = 'UpdateTableForHoyoverseCodeRedeem51727337647711';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`DROP INDEX "public"."IDX_4d31645f3a5576c34462365050"`);
@@ -22,5 +22,4 @@ export class UpdateTableForHoyoverseCodeRedeem51727337647711 implements Migratio
         await queryRunner.query(`CREATE INDEX "IDX_0824566934eaefbc78e0ca05ab" ON "TBL_HOYOVERSE_CODE" ("gameName") `);
         await queryRunner.query(`CREATE INDEX "IDX_4d31645f3a5576c34462365050" ON "TBL_HOYOVERSE_CODE" ("code") `);
     }
-
 }

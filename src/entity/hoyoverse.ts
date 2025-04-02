@@ -7,11 +7,11 @@ export default class Hoyoverse {
 
     @Column('varchar')
     @Index()
-    userDiscordId: string
+    userDiscordId: string;
 
     @Column('text')
-    cookie: string
+    cookie: string;
 
     @Column('int')
-    lastUpdated: number
+    lastUpdated: number;
 }

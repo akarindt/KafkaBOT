@@ -1,44 +1,40 @@
 {
-  "name": "kafkabot",
-  "version": "1.0.0",
-  "description": "Just a simple discord bot",
-  "main": "index.js",
-  "scripts": {
-    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
-    "compose:up": "docker compose up --build",
-    "start:dev": "nodemon src/main.ts",
-    "start:prod": "node build/main.js",
-    "build": "tsc && tsc-alias",
-    "migration:run": "npm run typeorm migration:run -- -d ./src/helper/datasource.ts",
-    "stop:app": "docker compose stop kafkabotapp",
-    "stop:db": "docker compose stop kafkabotdb",
-    "log:app": "docker logs KafkaBOT_APP",
-    "log:db": "docker logs KafkaBOT_DB"
-  },
-  "keywords": ["discord", "bot", "multi-purpose bot"],
-  "author": "Akari",
-  "devDependencies": {
-    "@tsconfig/node20": "^20.1.4",
-    "@types/node": "^22.10.2",
-    "@types/node-schedule": "^2.1.7",
-    "nodemon": "^3.1.9",
-    "ts-node": "^10.9.2",
-    "tsc-alias": "^1.8.10",
-    "tsconfig-paths": "^4.2.0",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.2"
-  },
-  "dependencies": {
-    "axios": "^1.7.9",
-    "cloudinary": "^2.5.1",
-    "discord.js": "^14.18.0",
-    "glob": "^11.0.0",
-    "hercai": "^12.4.0",
-    "node-schedule": "^2.1.1",
-    "pg": "^8.13.1",
-    "puppeteer": "^23.11.1",
-    "reflect-metadata": "^0.2.2",
-    "sagiri": "^4.2.3",
-    "typeorm": "^0.3.20"
-  }
+    "name": "kafkabot",
+    "description": "Just a simple discord bot",
+    "scripts": {
+        "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
+        "compose:up": "docker compose up --build",
+        "start:dev": "nodemon src/main.ts",
+        "start:prod": "node build/main.js",
+        "build": "tsc && tsc-alias",
+        "migration:run": "npm run typeorm migration:run -- -d ./src/helper/datasource.ts"
+    },
+    "keywords": [
+        "discord",
+        "bot",
+        "multi-purpose bot"
+    ],
+    "author": "Akari",
+    "devDependencies": {
+        "@tsconfig/recommended": "^1.0.8",
+        "@types/node": "^22.13.17",
+        "@types/node-cron": "^3.0.11",
+        "nodemon": "^3.1.9",
+        "tsc-alias": "^1.8.13",
+        "tsx": "^4.19.3",
+        "typescript": "^5.8.2"
+    },
+    "dependencies": {
+        "axios": "^1.8.4",
+        "cloudinary": "^2.6.0",
+        "discord.js": "^14.18.0",
+        "glob": "^11.0.1",
+        "hercai": "^12.4.0",
+        "node-cron": "^3.0.3",
+        "pg": "^8.14.1",
+        "puppeteer": "^23.11.1",
+        "reflect-metadata": "^0.2.2",
+        "sagiri": "^4.3.0",
+        "typeorm": "^0.3.21"
+    }
 }

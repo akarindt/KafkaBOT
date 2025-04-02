@@ -84,10 +84,10 @@ export class BotClient extends Client {
                 const imported = await Utils.importFile(url.pathToFileURL(filePath).href);
                 let command: any;
 
-                if ("default" in imported) {
+                if ('default' in imported) {
                     command = imported.default;
                 } else {
-                    command = imported
+                    command = imported;
                 }
 
                 if (Array.isArray(command)) {
