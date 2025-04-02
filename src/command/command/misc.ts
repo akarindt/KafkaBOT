@@ -235,7 +235,7 @@ export default [
             for (let i = 0; i < pages.length; i++) {
                 await pages[i].close();
             }
-            await browser.close()
+            await browser.close();
             await Utils.ButtonPagination(interaction, tftListEmbed(interaction, comps));
         },
     },
@@ -257,7 +257,7 @@ export default [
 
             const browser = await puppeteer.launch({
                 args: ['--disable-gpu', '--disable-setuid-sandbox', '--no-sandbox', '--no-zygote'],
-            });;
+            });
             const page = await browser.newPage();
 
             await page.goto(url, {
@@ -278,7 +278,7 @@ export default [
             for (let i = 0; i < pages.length; i++) {
                 await pages[i].close();
             }
-            await browser.close()
+            await browser.close();
 
             const embed = new EmbedBuilder()
                 .setColor(Misc.PRIMARY_EMBED_COLOR)

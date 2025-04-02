@@ -1,7 +1,7 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class UpdateTableForHoyoverseCodeRedeem31727337109767 implements MigrationInterface {
-    name = 'UpdateTableForHoyoverseCodeRedeem31727337109767'
+    name = 'UpdateTableForHoyoverseCodeRedeem31727337109767';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`ALTER TABLE "TBL_HOYOVERSE_CODE" ADD "server" character varying NOT NULL`);
@@ -14,5 +14,4 @@ export class UpdateTableForHoyoverseCodeRedeem31727337109767 implements Migratio
         await queryRunner.query(`ALTER TABLE "TBL_HOYOVERSE_CODE" DROP CONSTRAINT "UQ_4d31645f3a5576c34462365050c"`);
         await queryRunner.query(`ALTER TABLE "TBL_HOYOVERSE_CODE" DROP COLUMN "server"`);
     }
-
 }

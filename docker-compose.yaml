@@ -11,7 +11,7 @@ services:
         volumes:
             - kafkabotdb:/data/postgres
         ports:
-            - "${POSTGRES_MAP_PORT}:${POSTGRES_DEFAULT_PORT}"
+            - '${POSTGRES_MAP_PORT}:${POSTGRES_DEFAULT_PORT}'
         networks:
             - kafkabot_network
         healthcheck:

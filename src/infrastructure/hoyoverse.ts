@@ -12,14 +12,14 @@ export type HoyoverseConstantName = 'GENSHIN' | 'HONKAI' | 'STARRAIL' | 'ZENLESS
 
 export type HoyoverseAxiosResponse = {
     active: {
-        code: string,
-        rewards: string[]
-    }[],
+        code: string;
+        rewards: string[];
+    }[];
     inactive: {
-        code: string,
-        rewards: string[]
-    }[]
-}
+        code: string;
+        rewards: string[];
+    }[];
+};
 
 export type HoyoverseSignInfo = {
     total_sign_day: number;
@@ -304,7 +304,7 @@ export class HoyoverseClient {
                     headers: {
                         Cookie: cookie,
                         ...HoyoConstant.HOYOVERSE_GAME_HEADERS[this._name],
-                        ...HoyoConstant.HOYOVERSE_HEADERS
+                        ...HoyoConstant.HOYOVERSE_HEADERS,
                     },
                 }
             );
@@ -398,27 +398,27 @@ export class HoyoverseClient {
 
                         const res = await (this._name === 'STARRAIL'
                             ? axios.post(
-                                endp,
-                                {
-                                    cdkey: code.code,
-                                    game_biz: 'hkrpg_global',
-                                    lang: 'en',
-                                    region: accountDetails.ingame_region,
-                                    t: Date.now(),
-                                    uid: accountDetails.uid,
-                                },
-                                {
-                                    headers: {
-                                        Cookie: cookieData,
-                                    },
-                                }
-                            )
+                                  endp,
+                                  {
+                                      cdkey: code.code,
+                                      game_biz: 'hkrpg_global',
+                                      lang: 'en',
+                                      region: accountDetails.ingame_region,
+                                      t: Date.now(),
+                                      uid: accountDetails.uid,
+                                  },
+                                  {
+                                      headers: {
+                                          Cookie: cookieData,
+                                      },
+                                  }
+                              )
                             : axios.get(endp, {
-                                headers: {
-                                    Cookie: cookieData,
-                                    'User-Agent': this._userAgent,
-                                },
-                            }));
+                                  headers: {
+                                      Cookie: cookieData,
+                                      'User-Agent': this._userAgent,
+                                  },
+                              }));
 
                         if (res.status !== 200 || res.data.retcode !== 0) {
                             console.log(`[ERROR] ${this._name}: API returned non-200 or error status code.`);
@@ -448,7 +448,7 @@ export class HoyoverseClient {
                         ingame_region: accountDetails.ingame_region,
                     },
                     assets: this._game.assets,
-                })
+                });
             } catch (error) {
                 console.log(`[ERROR] Code redeem error: ${error}`);
                 return [];

@@ -1,7 +1,7 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class AddChangeQuoteTable1724138686425 implements MigrationInterface {
-    name = 'AddChangeQuoteTable1724138686425'
+    name = 'AddChangeQuoteTable1724138686425';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`ALTER TABLE "TBL_QUOTE" RENAME COLUMN "indentifier" TO "identifier"`);
@@ -16,5 +16,4 @@ export class AddChangeQuoteTable1724138686425 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "TBL_HOYOVERSE" ALTER COLUMN "lastUpdated" SET DEFAULT (to_char((CURRENT_DATE), 'YYYYMMDD'))`);
         await queryRunner.query(`ALTER TABLE "TBL_QUOTE" RENAME COLUMN "identifier" TO "indentifier"`);
     }
-
 }

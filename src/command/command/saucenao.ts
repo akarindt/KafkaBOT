@@ -5,25 +5,23 @@ import sagiri from 'sagiri';
 
 export default {
     data: new SlashCommandBuilder()
-    .setName("kfsaucenao")
-    .setDescription("Find sauce")
-    .addAttachmentOption(options => 
-        options.setName("attachment").setDescription("Attachment for searching").setRequired(true)
-    ),
+        .setName('kfsaucenao')
+        .setDescription('Find sauce')
+        .addAttachmentOption((options) => options.setName('attachment').setDescription('Attachment for searching').setRequired(true)),
     execute: async (interaction: CommandInteraction) => {
-        const data = interaction.options.get("attachment");
+        const data = interaction.options.get('attachment');
 
         if (!data) {
             await interaction.reply('❌ Image required.');
             return;
         }
 
-        if(!data.attachment) {
+        if (!data.attachment) {
             await interaction.reply('❌ Image required.');
             return;
         }
 
-        if(!data.attachment.contentType?.startsWith("image")) {
+        if (!data.attachment.contentType?.startsWith('image')) {
             await interaction.reply('❌ The attachment is in wrong format.');
             return;
         }
@@ -69,5 +67,5 @@ export default {
 
         await interaction.reply({ embeds: [embed] });
         return;
-    }
-}
+    },
+};
