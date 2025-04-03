@@ -1,9 +1,8 @@
 import 'reflect-metadata';
-import { BotClient } from './infrastructure/client';
-import schedule from 'node-schedule';
-import { Utils } from './helper/util';
+import { BotClient } from './infrastructure/client.infrastructure';
+import { AssignGlobal } from './helper/util.helper';
 
-Utils.AssignGlobal();
+AssignGlobal();
 
 (async () => {
     try {
@@ -16,8 +15,3 @@ Utils.AssignGlobal();
         console.log(`[ERROR] An Error Occurred: ${error}`);
     }
 })();
-
-process.on('SIGINT', async () => {
-    await schedule.gracefulShutdown();
-    process.exit(0);
-});

@@ -1,145 +1,11 @@
 import { CommandInteraction, EmbedBuilder, PollData, PollLayoutType, SlashCommandBuilder, TextChannel, userMention } from 'discord.js';
-import { Utils } from '@/helper/util';
-import { Misc } from '@/helper/constant';
+import { ButtonPagination, ListCommands, TftListEmbed } from '@helper/util.helper';
+import { BOT_FALLBACK_IMG, PRIMARY_EMBED_COLOR } from '@helper/constant.helper';
 import path from 'path';
 import fs from 'fs';
 import puppeteer from 'puppeteer';
 import axios from 'axios';
-
-type CommandItem = {
-    commandName: string;
-    description: string;
-    parameters: string[];
-};
-
-type TfTMetaItem = {
-    id: string | null | undefined;
-    title: string | null | undefined;
-    tag: string | null | undefined;
-    totalCost: string | null | undefined;
-    avgPlace: string | null | undefined;
-    top1Rate: string | null | undefined;
-    top4Rate: string | null | undefined;
-    pickRate: string | null | undefined;
-    redirectUrl: string | null | undefined;
-    sort: number;
-};
-
-type MemeResponse = {
-    postLink: string;
-    subreddit: string;
-    title: string;
-    url: string;
-    nsfw: boolean;
-    spoiler: boolean;
-    author: string;
-    ups: number;
-    preview: string[];
-};
-
-const tftListEmbed = (interaction: CommandInteraction, tftMetaList: TfTMetaItem[]) => {
-    if (tftMetaList.length <= 0) return [];
-    if (tftMetaList.length <= Misc.ITEM_PER_PAGES) {
-        return [
-            new EmbedBuilder()
-                .setColor(Misc.PRIMARY_EMBED_COLOR)
-                .setAuthor({
-                    name: `${interaction.user.displayName} - ${interaction.user.tag}`,
-                    iconURL: interaction.user.avatarURL() || Misc.BOT_FALLBACK_IMG,
-                })
-                .setTitle('TFT current meta list')
-                .setDescription(
-                    tftMetaList
-                        .map((tftItem) => {
-                            return (
-                                `- **[${tftItem.title}](${tftItem.redirectUrl})**: ` +
-                                `Avg: **${tftItem.avgPlace}** - 1st: **${tftItem.top1Rate}** - Top 4: **${tftItem.top4Rate}** - ` +
-                                `Cost: **${tftItem.totalCost}**`
-                            );
-                        })
-                        .join('\n')
-                )
-                .setTimestamp()
-                .setFooter({ text: 'KafkaBOT - Misc', iconURL: interaction.client.user.avatarURL() || Misc.BOT_FALLBACK_IMG }),
-        ];
-    }
-
-    const embeds = Utils.ChunkArray(tftMetaList, Misc.ITEM_PER_PAGES);
-    return embeds.map((tftList) => {
-        return new EmbedBuilder()
-            .setColor(Misc.PRIMARY_EMBED_COLOR)
-            .setAuthor({
-                name: `${interaction.user.displayName} - ${interaction.user.tag}`,
-                iconURL: interaction.user.avatarURL() || Misc.BOT_FALLBACK_IMG,
-            })
-            .setTitle('TFT current meta list')
-            .setDescription(
-                tftList
-                    .map((tftItem) => {
-                        return (
-                            `- **[${tftItem.title}](${tftItem.redirectUrl})**: ` +
-                            `Avg: **${tftItem.avgPlace}** - 1st: **${tftItem.top1Rate}** - Top 4: **${tftItem.top4Rate}** - ` +
-                            `Cost: **${tftItem.totalCost}**`
-                        );
-                    })
-                    .join('\n')
-            )
-            .setTimestamp()
-            .setFooter({ text: 'KafkaBOT - Misc', iconURL: interaction.client.user.avatarURL() || Misc.BOT_FALLBACK_IMG });
-    });
-};
-
-const listCommands = (interaction: CommandInteraction, commands: CommandItem[]) => {
-    if (commands.length <= 0) return [];
-    if (commands.length <= Misc.ITEM_PER_PAGES) {
-        return [
-            new EmbedBuilder()
-                .setColor(Misc.PRIMARY_EMBED_COLOR)
-                .setAuthor({
-                    name: `${interaction.user.displayName} - ${interaction.user.tag}`,
-                    iconURL: interaction.user.avatarURL() || Misc.BOT_FALLBACK_IMG,
-                })
-                .setTitle('Command list')
-                .setDescription(
-                    commands
-                        .map((command) => {
-                            return `- **${command.commandName}  ${command.parameters
-                                .map((parameter) => {
-                                    return `{${parameter}}`;
-                                })
-                                .join('-')}**: ${command.description}`;
-                        })
-                        .join('\n')
-                )
-                .setTimestamp()
-                .setFooter({ text: 'KafkaBOT - Misc', iconURL: interaction.client.user.avatarURL() || Misc.BOT_FALLBACK_IMG }),
-        ];
-    }
-
-    const embeds = Utils.ChunkArray(commands, Misc.ITEM_PER_PAGES);
-    return embeds.map((commandList) => {
-        return new EmbedBuilder()
-            .setColor(Misc.PRIMARY_EMBED_COLOR)
-            .setAuthor({
-                name: `${interaction.user.displayName} - ${interaction.user.tag}`,
-                iconURL: interaction.user.avatarURL() || Misc.BOT_FALLBACK_IMG,
-            })
-            .setTitle('Command list')
-            .setDescription(
-                commandList
-                    .map((command) => {
-                        return `- **${command.commandName}  ${command.parameters
-                            .map((parameter) => {
-                                return `{${parameter}}`;
-                            })
-                            .join('-')}**: ${command.description}`;
-                    })
-                    .join('\n')
-            )
-            .setTimestamp()
-            .setFooter({ text: 'KafkaBOT - Misc', iconURL: interaction.client.user.avatarURL() || Misc.BOT_FALLBACK_IMG });
-    });
-};
+import { CommandItem, MemeResponse, TfTMetaItem } from '@/interface';
 
 export default [
     {
@@ -156,7 +22,7 @@ export default [
             const pathFile = path.join(process.cwd(), '/extra/command-list.json');
             const stringify = await fs.promises.readFile(pathFile, 'utf-8');
             const data: CommandItem[] = JSON.parse(stringify);
-            await Utils.ButtonPagination(interaction, listCommands(interaction, data));
+            await ButtonPagination(interaction, ListCommands(interaction, data));
         },
     },
     {
@@ -236,7 +102,7 @@ export default [
                 await pages[i].close();
             }
             await browser.close();
-            await Utils.ButtonPagination(interaction, tftListEmbed(interaction, comps));
+            await ButtonPagination(interaction, TftListEmbed(interaction, comps));
         },
     },
     {
@@ -281,12 +147,12 @@ export default [
             await browser.close();
 
             const embed = new EmbedBuilder()
-                .setColor(Misc.PRIMARY_EMBED_COLOR)
+                .setColor(PRIMARY_EMBED_COLOR)
                 .setDescription(
                     `**Term: [${term}](${url})** \n **Definition: ** ${meaning} \n  - [${contributor}](https://www.urbandictionary.com${authorUrl})`
                 )
                 .setTimestamp()
-                .setFooter({ text: 'KafkaBOT - Misc', iconURL: interaction.client.user.avatarURL() || Misc.BOT_FALLBACK_IMG });
+                .setFooter({ text: 'KafkaBOT - Misc', iconURL: interaction.client.user.avatarURL() || BOT_FALLBACK_IMG });
             await interaction.followUp({ embeds: [embed] });
             return;
         },
@@ -317,10 +183,10 @@ export default [
             const embed = new EmbedBuilder()
                 .setTitle(data.title.toLocaleUpperCase())
                 .setURL(data.postLink)
-                .setColor(Misc.PRIMARY_EMBED_COLOR)
+                .setColor(PRIMARY_EMBED_COLOR)
                 .setImage(data.url)
                 .setTimestamp()
-                .setFooter({ text: 'KafkaBOT - Misc', iconURL: interaction.client.user.avatarURL() || Misc.BOT_FALLBACK_IMG });
+                .setFooter({ text: 'KafkaBOT - Misc', iconURL: interaction.client.user.avatarURL() || BOT_FALLBACK_IMG });
 
             await interaction.followUp({ embeds: [embed] });
             return;
@@ -352,10 +218,10 @@ export default [
             }
 
             const embed = new EmbedBuilder()
-                .setColor(Misc.PRIMARY_EMBED_COLOR)
+                .setColor(PRIMARY_EMBED_COLOR)
                 .setAuthor({
                     name: interaction.user.username,
-                    iconURL: interaction.user.avatarURL() || Misc.BOT_FALLBACK_IMG,
+                    iconURL: interaction.user.avatarURL() || BOT_FALLBACK_IMG,
                 })
                 .setDescription(userMention(interaction.user.id))
                 .setThumbnail(interaction.user.avatarURL())

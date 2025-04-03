@@ -1,10 +1,10 @@
-import { Misc } from '@/helper/constant';
+import { BOT_FALLBACK_IMG, NEGATIVE_PROMPTS, PRIMARY_EMBED_COLOR } from '@helper/constant.helper';
 import { ChannelType, CommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import { Hercai } from 'hercai';
+import { AppDataSource } from '@helper/datasource.helper';
 import path from 'path';
 import fs from 'fs';
-import { AppDataSource } from '@/helper/datasource';
-import NSFWKeyword from '@/entity/nsfwKeyword';
+import NSFWKeyword from '@entity/nsfw-keyword.entity';
 
 export default [
     {
@@ -23,10 +23,10 @@ export default [
 
             const response = await herc.question({ model: 'v3', content: question.value as string });
             const embed = new EmbedBuilder()
-                .setColor(Misc.PRIMARY_EMBED_COLOR)
+                .setColor(PRIMARY_EMBED_COLOR)
                 .setDescription(`** ${interaction.user.displayName} asked **: ${response.content} \n ** KafkaBOT **: ${response.reply}`)
                 .setTimestamp()
-                .setFooter({ text: 'KafkaBOT - Chat with AI', iconURL: interaction.client.user.avatarURL() || Misc.BOT_FALLBACK_IMG });
+                .setFooter({ text: 'KafkaBOT - Chat with AI', iconURL: interaction.client.user.avatarURL() || BOT_FALLBACK_IMG });
 
             await interaction.followUp({ embeds: [embed] });
             return;
@@ -80,18 +80,18 @@ export default [
             const response = await herc.drawImage({
                 model: 'shonin',
                 prompt: value,
-                negative_prompt: Misc.NEGATIVE_PROMPTS.join(','),
+                negative_prompt: NEGATIVE_PROMPTS.join(','),
             });
 
             const embed = new EmbedBuilder()
-                .setColor(Misc.PRIMARY_EMBED_COLOR)
+                .setColor(PRIMARY_EMBED_COLOR)
                 .setDescription(
                     `** ${interaction.user.displayName}'s idea**: ${response.prompt} 
                     \n** KafkaBOT's response **: Here is your [${response.prompt}](${response.url})`
                 )
                 .setImage(response.url)
                 .setTimestamp()
-                .setFooter({ text: 'KafkaBOT - Chat with AI', iconURL: interaction.client.user.avatarURL() || Misc.BOT_FALLBACK_IMG });
+                .setFooter({ text: 'KafkaBOT - Chat with AI', iconURL: interaction.client.user.avatarURL() || BOT_FALLBACK_IMG });
 
             await interaction.followUp({ embeds: [embed] });
             return;

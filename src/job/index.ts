@@ -1,6 +1,6 @@
-import { BotClient } from '@/infrastructure/client';
-import HoyolabJob from './hoyolab';
-import WutheringWavesJob from './wutheringwaves';
+import { BotClient } from '@infrastructure/client.infrastructure';
+import HoyolabJob from './hoyolab.job';
+import WutheringWavesJob from './wuthering-waves.job';
 
 export default class Job {
     private _client: BotClient;

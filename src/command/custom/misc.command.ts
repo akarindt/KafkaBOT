@@ -1,70 +1,36 @@
-import Quote from '@/entity/quote';
-import { Misc } from '@/helper/constant';
-import { AppDataSource } from '@/helper/datasource';
-import { CustomOptions } from '@/infrastructure/client';
-import CloudinaryClient from '@/infrastructure/cloudinary';
+import Quote from '@entity/quote.entity';
+import { AppDataSource } from '@helper/datasource.helper';
+import { v2 } from 'cloudinary';
 import axios from 'axios';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, Message, MessageEditOptions, MessageReplyOptions } from 'discord.js';
 import {
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-    ComponentType,
-    EmbedBuilder,
-    Message,
-    MessageEditOptions,
-    MessageReplyOptions,
-} from 'discord.js';
-
-interface CurrencyResponse {
-    [key: string]:
-        | {
-              [key: string]: number;
-          }
-        | string;
-}
-
-const imageEmbed = (imageUrl: string) => {
-    return new EmbedBuilder().setImage(imageUrl);
-};
-
-const sendCurrencyExchangeInfo = async (message: Message, response: CurrencyResponse, from: string, to: string, amount: string) => {
-    const data = response;
-    const date = data.date as string;
-    const rate = Number((data[from] as { [key: string]: number })[to]);
-    const result = parseFloat(amount) * rate;
-
-    from = from.toUpperCase();
-    to = to.toUpperCase();
-
-    const locale = Intl.DateTimeFormat().resolvedOptions().locale;
-    const formatedFrom = new Intl.NumberFormat(locale, { style: 'currency', currency: from }).format(parseFloat(amount));
-    const formatedTo = new Intl.NumberFormat(locale, { style: 'currency', currency: to }).format(result);
-
-    const embed = new EmbedBuilder()
-        .setTitle(`Currency exchange: ${from} -> ${to}`)
-        .setColor(Misc.PRIMARY_EMBED_COLOR)
-        .setDescription(`From: ${from}\nTo: ${to}\nAmount: ${formatedFrom}`)
-        .addFields({
-            name: 'Result',
-            value: `${formatedTo}`,
-        })
-        .setFooter({ text: `KafkaBOT - Currency exchange - ${date}`, iconURL: message.client.user.avatarURL() || Misc.BOT_FALLBACK_IMG });
-
-    await message.reply({ embeds: [embed] });
-    return;
-};
+    BOT_IMAGE_FOLDER,
+    CLOUDINARY_IMAGE_CROP,
+    CLOUDINARY_IMAGE_FORMAT,
+    CLOUDINARY_IMAGE_QUALITY,
+    CLOUDINARY_IMAGE_WIDTH,
+    EXCHANGE_API,
+    EXCHANGE_API_FALLBACK,
+    IMAGE_LIMIT_SIZE,
+} from '@helper/constant.helper';
+import { CurrencyResponse, DiscordCommandCustomOptions } from '@/interface';
+import { ImageEmbed, SendCurrencyExchangeInfo } from '@helper/util.helper';
 
 export default [
     {
         name: '%',
         description: 'Save quote',
         parameters: ['identifier'],
-        execute: async (message: Message, options: CustomOptions) => {
+        execute: async (message: Message, options: DiscordCommandCustomOptions) => {
             const param = options.parameters.get('identifier');
             const content = options.content;
             const serverId = message.guildId;
             const quoteRepository = AppDataSource.getRepository(Quote);
-            const cloudinary = new CloudinaryClient();
+            const cloudinary = v2.config({
+                cloud_name: process.env.CLOUDINARY_NAME,
+                api_key: process.env.CLOUDINARY_API,
+                api_secret: process.env.CLOUDINARY_SECRET,
+            });
 
             if (!serverId) {
                 await message.reply('❌ You cannot use this command in DM');
@@ -84,15 +50,15 @@ export default [
                 }
 
                 attachments
-                    .filter((attachment) => attachment.contentType?.startsWith('image') && attachment.size <= Misc.IMAGE_LIMIT_SIZE)
+                    .filter((attachment) => attachment.contentType?.startsWith('image') && attachment.size <= IMAGE_LIMIT_SIZE)
                     .forEach(async (attachment) => {
                         const uploadResult = await cloudinary.uploader.upload(attachment.url, {
-                            folder: Misc.BOT_IMAGE_FOLDER,
+                            folder: BOT_IMAGE_FOLDER,
                             transformation: {
-                                quality: Misc.CLOUDINARY_IMAGE_QUALITY,
-                                fetch_format: Misc.CLOUDINARY_IMAGE_FORMAT,
-                                width: Misc.CLOUDINARY_IMAGE_WIDTH,
-                                crop: Misc.CLOUDINARY_IMAGE_CROP,
+                                quality: CLOUDINARY_IMAGE_QUALITY,
+                                fetch_format: CLOUDINARY_IMAGE_FORMAT,
+                                width: CLOUDINARY_IMAGE_WIDTH,
+                                crop: CLOUDINARY_IMAGE_CROP,
                             },
                         });
                         const quote = new Quote();
@@ -119,7 +85,7 @@ export default [
         name: '%%',
         description: 'Get quote',
         parameters: ['identifier'],
-        execute: async (message: Message, options: CustomOptions) => {
+        execute: async (message: Message, options: DiscordCommandCustomOptions) => {
             const param = options.parameters.get('identifier');
             const serverId = message.guildId;
 
@@ -153,7 +119,7 @@ export default [
             let msg: Message;
             const replyObject: MessageReplyOptions = quote.content.startsWith('http')
                 ? {
-                      embeds: [imageEmbed(quote.content)],
+                      embeds: [ImageEmbed(quote.content)],
                       components: quotes.length > 1 ? [button] : [],
                   }
                 : {
@@ -179,7 +145,7 @@ export default [
                 if (i.customId === 'random') {
                     const newReplyObject: MessageEditOptions = newQuote.content.startsWith('http')
                         ? {
-                              embeds: [imageEmbed(newQuote.content)],
+                              embeds: [ImageEmbed(newQuote.content)],
                               components: quotes.length > 1 ? [button] : [],
                           }
                         : {
@@ -210,7 +176,7 @@ export default [
         name: 'ce',
         description: 'Exchange currency',
         parameters: ['from', 'to', 'amount'],
-        execute: async (message: Message, options: CustomOptions) => {
+        execute: async (message: Message, options: DiscordCommandCustomOptions) => {
             let from = options.parameters.get('from');
             let to = options.parameters.get('to');
             let amount = options.parameters.get('amount');
@@ -224,15 +190,15 @@ export default [
             to = to.toLowerCase();
 
             axios
-                .get<CurrencyResponse>(`${Misc.EXCHANGE_API}/${from}.min.json`)
+                .get<CurrencyResponse>(`${EXCHANGE_API}/${from}.min.json`)
                 .then(async (response) => {
-                    await sendCurrencyExchangeInfo(message, response.data, from, to, amount);
+                    await SendCurrencyExchangeInfo(message, response.data, from, to, amount);
                 })
                 .catch(async (error) => {
                     axios
-                        .get<CurrencyResponse>(`${Misc.EXCHANGE_API_FALLBACK}/${from}.min.json`)
+                        .get<CurrencyResponse>(`${EXCHANGE_API_FALLBACK}/${from}.min.json`)
                         .then(async (response) => {
-                            await sendCurrencyExchangeInfo(message, response.data, from, to, amount);
+                            await SendCurrencyExchangeInfo(message, response.data, from, to, amount);
                         })
                         .catch(async (error) => {
                             await message.reply('❌ Something wrong happened');

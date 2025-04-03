@@ -20,31 +20,13 @@ services:
             timeout: 60s
             retries: 5
             start_period: 80s
-        restart: on-failure
+        restart: always
 
     kafkabotapp:
         container_name: KafkaBOT_APP
         build: .
-        environment:
-            DB_HOST: ${POSTGRES_HOST}
-            DB_PORT: ${POSTGRES_PORT}
-            DB_USER: ${POSTGRES_USER}
-            DB_PASSWORD: ${POSTGRES_PASSWORD}
-            DB_NAME: ${POSTGRES_DB}
-            CLIENT_TOKEN: ${CLIENT_TOKEN}
-            CLIENT_ID: ${CLIENT_ID}
-            CLIENT_SECRET: ${CLIENT_SECRET}
-            SAUCENAO_APIKEY: ${SAUCENAO_APIKEY}
-            CLOUDINARY_API: ${CLOUDINARY_API}
-            CLOUDINARY_SECRET: ${CLOUDINARY_SECRET}
-            CLOUDINARY_NAME: ${CLOUDINARY_NAME}
-            NODE_NO_WARNINGS: ${NODE_NO_WARNINGS}
-            COMMAND_PREFIX: ${COMMAND_PREFIX}
-            POSTGRES_USER: ${POSTGRES_USER}
-            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-            POSTGRES_DB: ${POSTGRES_DB}
-            POSTGRES_HOST: ${POSTGRES_HOST}
-            POSTGRES_PORT: ${POSTGRES_PORT}
+        env_file:
+            - .env
         ports:
             - '8000:8000'
         depends_on:
@@ -52,7 +34,7 @@ services:
                 condition: service_healthy
         networks:
             - kafkabot_network
-        restart: on-failure
+        restart: always
 
 networks:
     kafkabot_network:

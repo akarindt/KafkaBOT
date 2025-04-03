@@ -1,18 +1,13 @@
-import WuwaNotify from '@/entity/wuwaNotify';
-import WuwaSubscribe from '@/entity/wuwaSubscribe';
-import { Misc } from '@/helper/constant';
-import { AppDataSource } from '@/helper/datasource';
-import { BotClient } from '@/infrastructure/client';
+import WuwaNotify from '@entity/wuwa-notify.entity';
+import WuwaSubscribe from '@entity/wuwa-subscribe.entity';
+import { BOT_FALLBACK_IMG, MAX_TIME_OUT, PRIMARY_EMBED_COLOR } from '@helper/constant.helper';
+import { AppDataSource } from '@helper/datasource.helper';
+import { BotClient } from '@infrastructure/client.infrastructure';
 import { EmbedBuilder } from '@discordjs/builders';
 import puppeteer, { Browser, TimeoutError } from 'puppeteer';
 import { In } from 'typeorm';
-import schedule from 'node-schedule';
-
-interface WuwaCode {
-    code: string;
-    rewards: string;
-    date: string;
-}
+import cron from 'node-cron';
+import { WuwaCode } from '@interface/wuwa-code.interface';
 
 export default class WutheringWavesJob {
     private _client: BotClient;
@@ -31,7 +26,7 @@ export default class WutheringWavesJob {
     }
 
     public async StartCodeChecking() {
-        schedule.scheduleJob('*/45 * * * *', async () => {
+        cron.schedule('*/45 * * * *', async () => {
             const browser = await puppeteer.launch({
                 args: ['--disable-gpu', '--disable-setuid-sandbox', '--no-sandbox', '--no-zygote'],
             });
@@ -40,7 +35,7 @@ export default class WutheringWavesJob {
             await page
                 .goto('https://www.prydwen.gg/wuthering-waves/', {
                     waitUntil: 'domcontentloaded',
-                    timeout: Misc.MAX_TIME_OUT,
+                    timeout: MAX_TIME_OUT,
                 })
                 .catch(async (err) => {
                     if (err instanceof TimeoutError) {
@@ -93,7 +88,7 @@ export default class WutheringWavesJob {
 
             if (newCodes.length) {
                 const embed = new EmbedBuilder()
-                    .setColor(Misc.PRIMARY_EMBED_COLOR)
+                    .setColor(PRIMARY_EMBED_COLOR)
                     .setTitle('New Wuthering Waves codes available!')
                     .setAuthor({
                         name: `Wuthering Waves`,
@@ -109,7 +104,7 @@ export default class WutheringWavesJob {
                     )
                     .setFooter({
                         text: `KafkaBOT - Wuthering Waves Codes Notification`,
-                        iconURL: this._client.user?.avatarURL() || Misc.BOT_FALLBACK_IMG,
+                        iconURL: this._client.user?.avatarURL() || BOT_FALLBACK_IMG,
                     })
                     .setTimestamp();
 
