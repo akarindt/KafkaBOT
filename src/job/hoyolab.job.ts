@@ -1,20 +1,22 @@
-import Hoyoverse from '@/entity/hoyoverse';
-import { AppDataSource } from '@/helper/datasource';
-import { BotClient } from '@/infrastructure/client';
-import schedule from 'node-schedule';
-import {
-    HoyoverseAxiosResponse,
-    HoyoverseClient,
-    HoyoverseCodeItem,
-    HoyoverseConstantName,
-    UpdateHoyolabCookieResponse,
-} from '@/infrastructure/hoyoverse';
-import { Utils } from '@/helper/util';
+import { AppDataSource } from '@helper/datasource.helper';
+import { BotClient } from '@infrastructure/client.infrastructure';
 import axios from 'axios';
-import { Hoyoverse as HoyoConstant, Misc } from '@/helper/constant';
 import { EmbedBuilder } from 'discord.js';
-import HoyoverseCode from '@/entity/hoyoverseCode';
-import HoyoverseRedeem from '@/entity/hoyoverseRedeem';
+import HoyoverseCode from '@entity/hoyoverse-code.entity';
+import HoyoverseRedeem from '@entity/hoyoverse-redeem.entity';
+import { HoyoverseGameEnum } from '@enum/hoyoverse-game.enum';
+import {
+    BOT_FALLBACK_IMG,
+    HOYOVERSE_GAME_LIST,
+    HOYOVERSE_GENERAL_HEADERS,
+    HOYOVERSE_REDEMTION_LINKS,
+    PRIMARY_EMBED_COLOR,
+} from '@helper/constant.helper';
+import { HoyoverseAxiosResponse, HoyoverseCodeItem, UpdateHoyolabCookieResponse } from '@/interface';
+import cron from 'node-cron';
+import { HoyoverseClient } from '@infrastructure/hoyoverse.infrastructure';
+import Hoyoverse from '@entity/hoyoverse.entity';
+import { DateToInt, ParseCookie } from '@helper/util.helper';
 
 export default class HoyolabJob {
     private _client: BotClient;
@@ -23,9 +25,9 @@ export default class HoyolabJob {
         this._client = client;
     }
 
-    private async CheckCode(gameName: HoyoverseConstantName) {
+    private async CheckCode(gameName: HoyoverseGameEnum) {
         try {
-            const url = (HoyoConstant.HOYOVERSE_GAME_LIST[gameName].url.checkCodeWeb ?? []).pop();
+            const url = (HOYOVERSE_GAME_LIST[gameName].url.checkCodeWeb ?? []).pop();
             if (!url) return;
 
             const response = await axios.get<HoyoverseAxiosResponse>(url);
@@ -64,7 +66,7 @@ export default class HoyolabJob {
         }
     }
 
-    private async SendDiscord(methodName: string, client: BotClient, gameName: HoyoverseConstantName, data: Hoyoverse[]) {
+    private async SendDiscord(methodName: string, client: BotClient, gameName: HoyoverseGameEnum, data: Hoyoverse[]) {
         const game = new HoyoverseClient(gameName, data);
 
         try {
@@ -73,7 +75,7 @@ export default class HoyolabJob {
                     const checkinResults = await game.CheckAndExecute();
                     const SendCheckInPromises = checkinResults.map(async (result) => {
                         const embed = new EmbedBuilder()
-                            .setColor(Misc.PRIMARY_EMBED_COLOR)
+                            .setColor(PRIMARY_EMBED_COLOR)
                             .setTitle(`${result.assets.gameName} Daily Check-In`)
                             .setAuthor({
                                 name: `${result.account.uid} - ${result.account.nickname}`,
@@ -109,7 +111,7 @@ export default class HoyolabJob {
                             .setTimestamp()
                             .setFooter({
                                 text: `KafkaBOT - ${result.assets.gameName} Daily Check-In`,
-                                iconURL: client.user?.avatarURL() || Misc.BOT_FALLBACK_IMG,
+                                iconURL: client.user?.avatarURL() || BOT_FALLBACK_IMG,
                             });
                         await client.users.send(result.userDiscordId, { embeds: [embed] });
                     });
@@ -121,7 +123,7 @@ export default class HoyolabJob {
                     const redeemResults = await game.Redeem();
                     const SendRedeemPromises = redeemResults.map(async (result) => {
                         const embed = new EmbedBuilder()
-                            .setColor(Misc.PRIMARY_EMBED_COLOR)
+                            .setColor(PRIMARY_EMBED_COLOR)
                             .setTitle(`${result.assets.gameName} Code Redemption`)
                             .setAuthor({
                                 name: `${result.account.uid} - ${result.account.nickname}`,
@@ -159,7 +161,7 @@ export default class HoyolabJob {
                                         result.failed.length > 0
                                             ? result.failed
                                                   .map((fail) => {
-                                                      return `[${fail.code}](${HoyoConstant.HOYOVERSE_REDEMTION_LINKS[gameName]}?code=${fail.code})`;
+                                                      return `[${fail.code}](${HOYOVERSE_REDEMTION_LINKS[gameName]}?code=${fail.code})`;
                                                   })
                                                   .join('\n')
                                             : 'None',
@@ -168,7 +170,7 @@ export default class HoyolabJob {
                             .setTimestamp()
                             .setFooter({
                                 text: `KafkaBOT - ${result.assets.gameName} Code Redemption`,
-                                iconURL: client.user?.avatarURL() || Misc.BOT_FALLBACK_IMG,
+                                iconURL: client.user?.avatarURL() || BOT_FALLBACK_IMG,
                             });
 
                         const codes = [...result.success, ...result.failed];
@@ -178,7 +180,7 @@ export default class HoyolabJob {
                             entity.hoyoverseId = result.hoyoverseId;
                             entity.code = code.code;
                             entity.gameName = code.gameName;
-                            entity.redeemAt = Utils.dateToInt(new Date());
+                            entity.redeemAt = DateToInt(new Date());
                             entites.push(entity);
                         }
 
@@ -201,8 +203,8 @@ export default class HoyolabJob {
     public async StartHoyolabCheckInJob() {
         const hoyoverseRepository = AppDataSource.getRepository(Hoyoverse);
 
-        schedule.scheduleJob('0 */2 * * *', async () => {
-            const today = Utils.dateToInt(new Date());
+        cron.schedule('0 */2 * * *', async () => {
+            const today = DateToInt(new Date());
             const accounts = await hoyoverseRepository.find();
 
             if (!accounts.length) return;
@@ -211,7 +213,7 @@ export default class HoyolabJob {
                 const response = await axios.get('https://webapi-os.account.hoyoverse.com/Api/fetch_cookie_accountinfo', {
                     headers: {
                         Cookie: account.cookie,
-                        ...HoyoConstant.HOYOVERSE_HEADERS,
+                        ...HOYOVERSE_GENERAL_HEADERS,
                     },
                 });
 
@@ -227,7 +229,7 @@ export default class HoyolabJob {
                     continue;
                 }
 
-                const cookieData = Utils.parseCookie(account.cookie, {
+                const cookieData = ParseCookie(account.cookie, {
                     blacklist: ['cookie_token', 'account_id'],
                     whitelist: [],
                     separator: ';',
@@ -245,12 +247,12 @@ export default class HoyolabJob {
             console.log(`[INFO] Refresh token success!`);
         });
 
-        schedule.scheduleJob('0 0 16 * * *', async () => {
+        cron.schedule('0 0 16 * * *', async () => {
             const accounts = await hoyoverseRepository.find();
             await Promise.all([
-                await this.SendDiscord('CHECKIN', this._client, 'GENSHIN', accounts),
-                await this.SendDiscord('CHECKIN', this._client, 'STARRAIL', accounts),
-                await this.SendDiscord('CHECKIN', this._client, 'ZENLESS', accounts),
+                await this.SendDiscord('CHECKIN', this._client, HoyoverseGameEnum.GENSHIN, accounts),
+                await this.SendDiscord('CHECKIN', this._client, HoyoverseGameEnum.STARRAIL, accounts),
+                await this.SendDiscord('CHECKIN', this._client, HoyoverseGameEnum.ZENLESS, accounts),
             ]);
         });
 
@@ -258,17 +260,17 @@ export default class HoyolabJob {
     }
 
     public async StartCheckCodeJob() {
-        schedule.scheduleJob('*/15 * * * *', async () => {
-            await this.CheckCode('STARRAIL');
+        cron.schedule('*/15 * * * *', async () => {
+            await this.CheckCode(HoyoverseGameEnum.STARRAIL);
         });
         console.log(`[INFO] Started cron job: HOYOVERSE-AUTO-DAILY-CODE-CHECKING`);
     }
 
     public async StartHoyolabAutoRedeem() {
-        schedule.scheduleJob('*/30 * * * *', async () => {
+        cron.schedule('*/30 * * * *', async () => {
             const hoyoverseRepository = AppDataSource.getRepository(Hoyoverse);
             const accounts = await hoyoverseRepository.find();
-            await this.SendDiscord('REDEMTION', this._client, 'STARRAIL', accounts);
+            await this.SendDiscord('REDEMTION', this._client, HoyoverseGameEnum.STARRAIL, accounts);
         });
         console.log(`[INFO] Started cron job: HOYOVERSE-AUTO-REDEEM-CODE`);
     }

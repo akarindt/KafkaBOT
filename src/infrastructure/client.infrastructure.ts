@@ -3,30 +3,15 @@ import { CommandInteraction, Message } from 'discord.js';
 import { glob } from 'glob';
 import path from 'path';
 import url from 'url';
-import { Utils } from '@/helper/util';
+import { ImportFile } from '@helper/util.helper';
+import { database } from '@helper/datasource.helper';
+import { DiscordCommand, DiscordCustomCommand } from '@/interface';
+import { DiscordRestApiBody } from '@/type';
 import Job from '@/job';
-import { database } from '@/helper/datasource';
-
-export type CustomOptions = {
-    parameters: Collection<string, string | undefined>;
-    content: string | undefined;
-};
-
-export interface Command {
-    data: any;
-    execute(interaction: CommandInteraction): Promise<void>;
-}
-
-export interface CustomCommand {
-    name: string;
-    description: string;
-    parameters: string[];
-    execute(message: Message, options: CustomOptions): Promise<void> | void;
-}
 
 export class BotClient extends Client {
-    private readonly commands = new Collection<string, Command>();
-    private readonly customs = new Collection<string, CustomCommand>();
+    private readonly commands = new Collection<string, DiscordCommand>();
+    private readonly customs = new Collection<string, DiscordCustomCommand>();
     private readonly clientToken = process.env.CLIENT_TOKEN;
     private readonly clientId = process.env.CLIENT_ID;
     private readonly COMMAND_PREFIX = process.env.COMMAND_PREFIX;
@@ -52,17 +37,16 @@ export class BotClient extends Client {
             return;
         }
 
-        // Register slash/context/custom commands
+        // Register slash/context commands
         this.on('interactionCreate', async (interaction) => {
             if (interaction.isChatInputCommand() || interaction.isContextMenuCommand()) {
-                await this.assign(interaction);
+                await this.Assign(interaction);
             }
             return;
         });
 
-        this.on('messageCreate', async (message) => {
-            await this.assignCustom(message);
-        });
+        // Register custom commands
+        this.on('messageCreate', async (message) => await this.AssignCustom(message));
 
         this.once('ready', (client) => {
             if (!client) return;
@@ -77,33 +61,26 @@ export class BotClient extends Client {
             windowsPathsNoEscape: true,
         });
 
-        const body: any = [];
+        const body: DiscordRestApiBody[] = [];
 
         await Promise.all(
             files.map(async (filePath) => {
-                const imported = await Utils.importFile(url.pathToFileURL(filePath).href);
-                let command: any;
-
-                if ('default' in imported) {
-                    command = imported.default;
-                } else {
-                    command = imported;
-                }
+                const imported = await ImportFile(url.pathToFileURL(filePath).href);
+                const command: DiscordCommand[] | DiscordCommand | DiscordCustomCommand | DiscordCustomCommand[] =
+                    'default' in imported ? imported.default : imported;
 
                 if (Array.isArray(command)) {
-                    for (let item of command) {
-                        this.add(item, body, filePath);
-                    }
-                } else {
-                    this.add(command, body, filePath);
+                    command.forEach((item) => this.Add(item, body, filePath));
+                    return;
                 }
+
+                this.Add(command, body, filePath);
+                return;
             })
         );
 
-        const rest = new REST({ version: '10' }).setToken(this.clientToken!!);
-        await rest.put(Routes.applicationCommands(this.clientId!!), {
-            body: body,
-        });
+        const rest = new REST({ version: '10' }).setToken(this.clientToken!);
+        await rest.put(Routes.applicationCommands(this.clientId!), { body });
 
         console.log(`[INFO] Started refreshing ${this.commands.size} (/) commands.`);
         console.log(`[INFO] Started refreshing ${this.customs.size} custom (${process.env.COMMAND_PREFIX}) commands.`);
@@ -115,20 +92,26 @@ export class BotClient extends Client {
 
     public InitDB() {
         database.InitializeDB();
+        return;
     }
 
-    private add(command: any, body: any[], filePath: string) {
+    private Add(command: DiscordCommand | DiscordCustomCommand, body: DiscordRestApiBody[], filePath: string) {
         if ('data' in command && 'execute' in command) {
             this.commands.set(command.data.name, command);
             body.push(command.data.toJSON());
-        } else if ('name' in command && 'execute' in command) {
-            this.customs.set(command.name, command);
-        } else {
-            console.log(`[WARNING] The command at ${filePath} is missing required properties.`);
+            return;
         }
+
+        if ('name' in command && 'execute' in command) {
+            this.customs.set(command.name, command);
+            return;
+        }
+
+        console.log(`[WARNING] The command at ${filePath} is missing required properties.`);
+        return;
     }
 
-    private async assign(interaction: CommandInteraction) {
+    private async Assign(interaction: CommandInteraction) {
         if (!interaction.guild) {
             if (interaction.replied || interaction.deferred) {
                 await interaction.followUp('You cannot use slash commands in DM!');
@@ -140,6 +123,7 @@ export class BotClient extends Client {
 
         const client = interaction.client as BotClient;
         const command = client.commands.get(interaction.commandName);
+
         if (!command) {
             console.log(`[ERROR] No command matching ${interaction.commandName} was found.`);
             return;
@@ -149,7 +133,7 @@ export class BotClient extends Client {
             await command.execute(interaction);
             return;
         } catch (error) {
-            console.log(error);
+            console.log(`[ERROR] ${error}`);
             if (interaction.replied || interaction.deferred) {
                 await interaction.followUp('There was an error while executing this command!');
                 return;
@@ -159,13 +143,15 @@ export class BotClient extends Client {
         }
     }
 
-    private async assignCustom(message: Message) {
+    private async AssignCustom(message: Message) {
         if (!message.guild) return;
+
         let content: string | undefined = message.content;
+
         if (!content.startsWith(this.COMMAND_PREFIX!!)) return;
 
         // remove prefix from string
-        content = content.replace(new RegExp(this.COMMAND_PREFIX!!), '');
+        content = content.replace(new RegExp(this.COMMAND_PREFIX!), '');
 
         // get command name
         const commandName = content.split(' ').length ? content.split(' ')[0] : undefined;

@@ -1,5 +1,5 @@
-import WuwaSubscribe from '@/entity/wuwaSubscribe';
-import { AppDataSource } from '@/helper/datasource';
+import WuwaSubscribe from '@entity/wuwa-subscribe.entity';
+import { AppDataSource } from '@helper/datasource.helper';
 import { CommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export default [

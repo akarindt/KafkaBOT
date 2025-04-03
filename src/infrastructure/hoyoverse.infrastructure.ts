@@ -1,211 +1,37 @@
-import { Hoyoverse as HoyoConstant, Misc } from '@/helper/constant';
-import Hoyoverse from '@/entity/hoyoverse';
+import {
+    HOYOVERSE_GAME_HEADERS,
+    HOYOVERSE_GAME_LIST,
+    HOYOVERSE_GENERAL_HEADERS,
+    HOYOVERSE_RECORD_CARD_API,
+    HOYOVERSE_UPDATE_COOKIE_API,
+    USER_AGENT,
+} from '@helper/constant.helper';
+import Hoyoverse from '@entity/hoyoverse.entity';
 import axios from 'axios';
-import HoyoverseCode from '@/entity/hoyoverseCode';
-import { Utils } from '@/helper/util';
+import HoyoverseCode from '@entity/hoyoverse-code.entity';
+import { ParseCookie } from '@helper/util.helper';
 import { setTimeout } from 'timers/promises';
-import { AppDataSource } from '@/helper/datasource';
-import HoyoverseRedeem from '@/entity/hoyoverseRedeem';
+import { AppDataSource } from '@helper/datasource.helper';
+import HoyoverseRedeem from '@entity/hoyoverse-redeem.entity';
 import { In, Not } from 'typeorm';
-
-export type HoyoverseConstantName = 'GENSHIN' | 'HONKAI' | 'STARRAIL' | 'ZENLESS';
-
-export type HoyoverseAxiosResponse = {
-    active: {
-        code: string;
-        rewards: string[];
-    }[];
-    inactive: {
-        code: string;
-        rewards: string[];
-    }[];
-};
-
-export type HoyoverseSignInfo = {
-    total_sign_day: number;
-    today: string;
-    is_sign: boolean;
-    is_sub: boolean;
-    region: string;
-    sign_cnt_missed: number;
-    short_sign_day: number;
-};
-
-export type HoyoverseCheckIn = {
-    code: string;
-    risk_code: number;
-    gt: string;
-    challenge: string;
-    success: number;
-    is_risk: boolean;
-};
-
-export type HoyoverseInfoData = {
-    total_sign_day: number;
-    today: string;
-    is_sign: boolean;
-    is_sub: boolean;
-    region: string;
-    sign_cnt_missed: number;
-    short_sign_day: number;
-};
-
-export type HoyoverseAccountData = {
-    list: {
-        has_role: boolean;
-        game_id: number;
-        game_role_id: string;
-        nickname: string;
-        region: string;
-        level: number;
-        background_image: string;
-        is_public: boolean;
-        data: {
-            name: string;
-            type: number;
-            value: string;
-        }[];
-        region_name: string;
-        url: string;
-        data_switches: {
-            switch_id: number;
-            is_public: boolean;
-            switch_name: string;
-        }[];
-        h5_data_switches: any[];
-        background_color: string;
-        background_image_v2: string;
-        logo: string;
-        game_name: string;
-    }[];
-};
-
-export type HoyoverseResponse = {
-    retcode: number;
-    message: string;
-    data: HoyoverseCheckIn | HoyoverseInfoData | HoyoverseAccountData | HoyoverseAwardData | null;
-};
-
-export type HoyoverseAwardData = {
-    month: number;
-    awards: {
-        icon: string;
-        name: string;
-        cnt: number;
-    }[];
-    biz: string;
-    resign: boolean;
-    short_extra_reward: {
-        has_extra_award: boolean;
-        start_time: string;
-        end_time: string;
-        list: {
-            icon: string;
-            name: string;
-            cnt: number;
-            sign_date: number;
-            high_light: boolean;
-        }[];
-        start_timestamp: string;
-        end_timestamp: string;
-    };
-};
-
-export type HoyoverseGame = {
-    ACT_ID: string;
-    success: string;
-    signed: string;
-    gameId: number;
-    gameName: string;
-    assets: {
-        author: string;
-        gameName: string;
-        icon: string;
-    };
-    url: {
-        info: string;
-        home: string;
-        sign: string;
-        redem?: string;
-        checkCodeWeb?: string[];
-    };
-};
-
-export type ExecuteCheckIn = {
-    userDiscordId: string;
-    platform: string;
-    result: string;
-    assets: {
-        author: string;
-        gameName: string;
-        icon: string;
-    };
-    account: AccountDetails;
-};
-
-export type UpdateHoyolabCookieResponse = {
-    code: number;
-    data?: {
-        cookie_info: {
-            account_id: number;
-            account_name: string;
-            area_code: string;
-            cookie_token: string;
-            cur_time: number;
-            email: string;
-            mobile: string;
-        };
-        info: string;
-        msg: string;
-        sign: string;
-        status: number;
-    };
-};
-
-export type HoyoverseCodeItem = {
-    gameName: string;
-    code: string;
-    rewards: string[];
-    isActivate: boolean;
-    server: string;
-};
-
-export type HoyoverseCodeRedeem = {
-    success: HoyoverseCode[];
-    failed: HoyoverseCode[];
-    account: AccountDetails;
-    userDiscordId: string;
-    assets: {
-        author: string;
-        gameName: string;
-        icon: string;
-    };
-    hoyoverseId: number;
-};
-
-type AccountDetails = {
-    uid: string;
-    nickname: string;
-    rank: number;
-    region: string;
-    ingame_region: string;
-};
+import { HoyoverseGameEnum } from '@enum/hoyoverse-game.enum';
+import { ExecuteCheckIn, HoyoverseAccountData, HoyoverseAccountDetail, HoyoverseGame, HoyoverseGameItem, HoyoverseResponse } from '@/interface';
 
 export class HoyoverseClient {
-    private _name: HoyoverseConstantName;
-    private _game: HoyoverseGame;
+    private _name: HoyoverseGameEnum;
+    private _game: HoyoverseGameItem;
     private _data: Hoyoverse[];
     private _fullName: string;
     private _userAgent: string;
     private _updateApi: string;
 
-    constructor(name: HoyoverseConstantName, data: Hoyoverse[]) {
+    constructor(name: HoyoverseGameEnum, data: Hoyoverse[]) {
         this._name = name;
         this._data = data;
-        this._fullName = HoyoConstant.HOYOVERSE_GAME_LIST[this._name].gameName;
-        this._game = HoyoConstant.HOYOVERSE_GAME_LIST[this._name];
-        this._userAgent = Misc.USER_AGENT;
-        this._updateApi = HoyoConstant.HOYOVERSE_UPDATE_COOKIE_API;
+        this._fullName = HOYOVERSE_GAME_LIST[this._name].gameName;
+        this._game = HOYOVERSE_GAME_LIST['GENSHIN'];
+        this._userAgent = USER_AGENT;
+        this._updateApi = HOYOVERSE_UPDATE_COOKIE_API;
 
         if (!this._data.length) {
             console.log(`[WARNING] No ${this._fullName} accounts provided. Skipping...`);
@@ -259,9 +85,9 @@ export class HoyoverseClient {
         return results.filter((result) => result != null);
     }
 
-    async GetAccountDetails(cookie: string, ltuid: string): Promise<AccountDetails | null> {
+    async GetAccountDetails(cookie: string, ltuid: string): Promise<HoyoverseAccountDetail | null> {
         try {
-            const response = await axios.get(`${HoyoConstant.HOYOVERSE_RECORD_CARD_API}?uid=${ltuid}`, {
+            const response = await axios.get(`${HOYOVERSE_RECORD_CARD_API}?uid=${ltuid}`, {
                 headers: {
                     Cookie: cookie,
                     'User-Agent': this._userAgent,
@@ -303,8 +129,8 @@ export class HoyoverseClient {
                 {
                     headers: {
                         Cookie: cookie,
-                        ...HoyoConstant.HOYOVERSE_GAME_HEADERS[this._name],
-                        ...HoyoConstant.HOYOVERSE_HEADERS,
+                        ...HOYOVERSE_GAME_HEADERS[this._name],
+                        ...HOYOVERSE_GENERAL_HEADERS,
                     },
                 }
             );
@@ -365,7 +191,7 @@ export class HoyoverseClient {
 
                 for (const code of codeList) {
                     try {
-                        const cookieData = Utils.parseCookie(account.cookie, {
+                        const cookieData = ParseCookie(account.cookie, {
                             whitelist: ['cookie_token_v2', 'account_mid_v2', 'account_id_v2', 'cookie_token', 'account_id'],
                             blacklist: [],
                             separator: ';',

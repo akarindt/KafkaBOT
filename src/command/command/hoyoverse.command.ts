@@ -1,7 +1,7 @@
-import Hoyoverse from '@/entity/hoyoverse';
-import { Misc } from '@/helper/constant';
-import { AppDataSource } from '@/helper/datasource';
-import { Utils } from '@/helper/util';
+import Hoyoverse from '@entity/hoyoverse.entity';
+import { BOT_FALLBACK_IMG, PRIMARY_EMBED_COLOR } from '@helper/constant.helper';
+import { AppDataSource } from '@helper/datasource.helper';
+import { DateToInt } from '@helper/util.helper';
 import { CommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 
 export default [
@@ -26,7 +26,7 @@ export default [
                 const entity = new Hoyoverse();
                 entity.userDiscordId = userDiscordId;
                 entity.cookie = cookie;
-                entity.lastUpdated = Utils.dateToInt(new Date());
+                entity.lastUpdated = DateToInt(new Date());
                 await repository.insert(entity);
                 await interaction.followUp({ content: '✅ Assign successfully !', ephemeral: true });
                 return;
@@ -61,7 +61,7 @@ export default [
                 }
 
                 entity.cookie = cookie;
-                entity.lastUpdated = Utils.dateToInt(new Date());
+                entity.lastUpdated = DateToInt(new Date());
                 await repository.save(entity);
                 await interaction.followUp({ content: '✅ Update successfully !', ephemeral: true });
                 return;
@@ -89,11 +89,11 @@ export default [
 
             const embed = new EmbedBuilder()
                 .setTitle('Here is how to get your Hoyolab cookie')
-                .setColor(Misc.PRIMARY_EMBED_COLOR)
+                .setColor(PRIMARY_EMBED_COLOR)
                 .setDescription(message)
                 .setImage('https://res.cloudinary.com/dbivuiucl/image/upload/v1739938838/kafkaBOT/how_to_get_wml3jj.png')
                 .setTimestamp()
-                .setFooter({ text: 'KafkaBOT - How to get Hoyolab cookies', iconURL: interaction.client.user.avatarURL() || Misc.BOT_FALLBACK_IMG });
+                .setFooter({ text: 'KafkaBOT - How to get Hoyolab cookies', iconURL: interaction.client.user.avatarURL() || BOT_FALLBACK_IMG });
 
             await interaction.followUp({ embeds: [embed], ephemeral: true });
             return;
