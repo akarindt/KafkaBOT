@@ -25,7 +25,7 @@ export default class WutheringWavesJob {
         return;
     }
 
-    public async StartCodeChecking() {
+    public StartCodeChecking() {
         cron.schedule('*/45 * * * *', async () => {
             const browser = await puppeteer.launch({
                 args: ['--disable-gpu', '--disable-setuid-sandbox', '--no-sandbox', '--no-zygote'],
