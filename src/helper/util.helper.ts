@@ -1,13 +1,23 @@
 import { CommandItem, CurrencyResponse, ParseCookieOption, TfTMetaItem } from '@/interface';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CommandInteraction, ComponentType, EmbedBuilder, Message } from 'discord.js';
+import {
+    ActionRowBuilder,
+    APIEmbed,
+    ButtonBuilder,
+    ButtonStyle,
+    CommandInteraction,
+    ComponentType,
+    EmbedBuilder,
+    JSONEncodable,
+    Message,
+} from 'discord.js';
 import path from 'path';
 import { BOT_FALLBACK_IMG, ITEM_PER_PAGES, PRIMARY_EMBED_COLOR } from './constant.helper';
 
 export const GetUrlPath = (url: string): string => {
-    return url.replace(/^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/?\n]+)/, '');
+    return url.replace(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:?\n]+)/, '');
 };
 
-export const ButtonPagination = async (interaction: CommandInteraction, pages: any[], time = 30 * 1000) => {
+export const ButtonPagination = async (interaction: CommandInteraction, pages: (JSONEncodable<APIEmbed> | APIEmbed)[], time = 30 * 1000) => {
     if (!interaction || !pages || !pages.length) throw new Error('Invalid arguments');
     if (pages.length === 1) {
         await interaction.editReply({
@@ -155,7 +165,7 @@ export const TraceCaller = (n: number) => {
             break;
         }
     }
-    var b = s.indexOf('\n', a + 1);
+    let b = s.indexOf('\n', a + 1);
     if (b < 0) b = s.length;
     a = Math.max(s.lastIndexOf(' ', b), s.lastIndexOf('/', b));
     b = s.lastIndexOf(':', b);

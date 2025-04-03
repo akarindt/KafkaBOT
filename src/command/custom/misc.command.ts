@@ -116,7 +116,6 @@ export default [
             const button = new ActionRowBuilder<ButtonBuilder>().addComponents([random]);
 
             const quote = quotes[Math.floor(Math.random() * quotes.length)];
-            let msg: Message;
             const replyObject: MessageReplyOptions = quote.content.startsWith('http')
                 ? {
                       embeds: [ImageEmbed(quote.content)],
@@ -127,7 +126,7 @@ export default [
                       components: quotes.length > 1 ? [button] : [],
                   };
 
-            msg = await message.reply(replyObject);
+            const msg = await message.reply(replyObject);
 
             const mc = msg.createMessageComponentCollector({ componentType: ComponentType.Button, time: 30 * 1000 });
             let newQuote: Quote;
@@ -179,7 +178,7 @@ export default [
         execute: async (message: Message, options: DiscordCommandCustomOptions) => {
             let from = options.parameters.get('from');
             let to = options.parameters.get('to');
-            let amount = options.parameters.get('amount');
+            const amount = options.parameters.get('amount');
 
             if (!from || !to || !amount) {
                 await message.reply('❌ Invalid parameters');
@@ -194,13 +193,13 @@ export default [
                 .then(async (response) => {
                     await SendCurrencyExchangeInfo(message, response.data, from, to, amount);
                 })
-                .catch(async (error) => {
+                .catch(async () => {
                     axios
                         .get<CurrencyResponse>(`${EXCHANGE_API_FALLBACK}/${from}.min.json`)
                         .then(async (response) => {
                             await SendCurrencyExchangeInfo(message, response.data, from, to, amount);
                         })
-                        .catch(async (error) => {
+                        .catch(async () => {
                             await message.reply('❌ Something wrong happened');
                             return;
                         });

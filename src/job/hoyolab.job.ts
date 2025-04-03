@@ -34,10 +34,10 @@ export default class HoyolabJob {
             if (response.status !== 200) return;
 
             const data = response.data;
-            let codes: HoyoverseCodeItem[] = [];
+            const codes: HoyoverseCodeItem[] = [];
             const hoyoverseCodeRepository = AppDataSource.getRepository(HoyoverseCode);
 
-            for (let activeCode of data.active) {
+            for (const activeCode of data.active) {
                 codes.push({
                     gameName: gameName,
                     code: activeCode.code,
@@ -47,7 +47,7 @@ export default class HoyolabJob {
                 });
             }
 
-            for (let inactiveCode of data.inactive) {
+            for (const inactiveCode of data.inactive) {
                 codes.push({
                     gameName: gameName,
                     code: inactiveCode.code,
@@ -71,7 +71,7 @@ export default class HoyolabJob {
 
         try {
             switch (methodName) {
-                case 'CHECKIN':
+                case 'CHECKIN': {
                     const checkinResults = await game.CheckAndExecute();
                     const SendCheckInPromises = checkinResults.map(async (result) => {
                         const embed = new EmbedBuilder()
@@ -118,8 +118,9 @@ export default class HoyolabJob {
 
                     await Promise.all(SendCheckInPromises);
                     break;
+                }
 
-                case 'REDEMTION':
+                case 'REDEMTION': {
                     const redeemResults = await game.Redeem();
                     const SendRedeemPromises = redeemResults.map(async (result) => {
                         const embed = new EmbedBuilder()
@@ -191,6 +192,7 @@ export default class HoyolabJob {
                     });
                     await Promise.all(SendRedeemPromises);
                     break;
+                }
             }
             console.log(`[INFO] ${gameName} - ${methodName} success!`);
             return;
@@ -200,7 +202,7 @@ export default class HoyolabJob {
         }
     }
 
-    public async StartHoyolabCheckInJob() {
+    public StartHoyolabCheckInJob() {
         const hoyoverseRepository = AppDataSource.getRepository(Hoyoverse);
 
         cron.schedule('0 */2 * * *', async () => {
@@ -209,7 +211,7 @@ export default class HoyolabJob {
 
             if (!accounts.length) return;
 
-            for (let account of accounts) {
+            for (const account of accounts) {
                 const response = await axios.get('https://webapi-os.account.hoyoverse.com/Api/fetch_cookie_accountinfo', {
                     headers: {
                         Cookie: account.cookie,
@@ -223,7 +225,7 @@ export default class HoyolabJob {
                 }
 
                 const responseData = response.data as UpdateHoyolabCookieResponse;
-                const { data, ...rest } = responseData;
+                const { data } = responseData;
                 if (!data || data.status !== 1 || !data.cookie_info) {
                     await this._client.users.send(account.userDiscordId, `❌ Refresh token failed! at index: #${account.id}`);
                     continue;
@@ -259,14 +261,14 @@ export default class HoyolabJob {
         console.log(`[INFO] Started cron job: HOYOVERSE-AUTO-DAILY-CHECK-IN`);
     }
 
-    public async StartCheckCodeJob() {
+    public StartCheckCodeJob() {
         cron.schedule('*/15 * * * *', async () => {
             await this.CheckCode(HoyoverseGameEnum.STARRAIL);
         });
         console.log(`[INFO] Started cron job: HOYOVERSE-AUTO-DAILY-CODE-CHECKING`);
     }
 
-    public async StartHoyolabAutoRedeem() {
+    public StartHoyolabAutoRedeem() {
         cron.schedule('*/30 * * * *', async () => {
             const hoyoverseRepository = AppDataSource.getRepository(Hoyoverse);
             const accounts = await hoyoverseRepository.find();

@@ -12,12 +12,12 @@ export default class Job {
     public async Initialize() {
         // Hoyolab
         const HyJob = new HoyolabJob(this._client);
-        await HyJob.StartCheckCodeJob();
-        await HyJob.StartHoyolabCheckInJob();
-        await HyJob.StartHoyolabAutoRedeem();
+        HyJob.StartCheckCodeJob();
+        HyJob.StartHoyolabCheckInJob();
+        HyJob.StartHoyolabAutoRedeem();
         // End Hoyolab
 
         const WuwaJob = new WutheringWavesJob(this._client);
-        await WuwaJob.StartCodeChecking();
+        WuwaJob.StartCodeChecking();
     }
 }

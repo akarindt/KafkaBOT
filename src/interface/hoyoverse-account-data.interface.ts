@@ -20,7 +20,7 @@ export interface HoyoverseAccountData {
             is_public: boolean;
             switch_name: string;
         }[];
-        h5_data_switches: any[];
+        h5_data_switches: unknown[];
         background_color: string;
         background_image_v2: string;
         logo: string;

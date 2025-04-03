@@ -1,4 +1,4 @@
-import { HoyoverseGame, HoyoverseHeader, HoyoverseRedemptionUrl } from '@/interface';
+import { HoyoverseGame, HoyoverseHeader, HoyoverseRedemptionUrl } from '@/type';
 
 export const PRIMARY_EMBED_COLOR = 0xeb86c6;
 export const DEFAULT_SIMILARITY_POINT = 60;

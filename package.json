@@ -9,7 +9,8 @@
         "start:dev": "nodemon src/main.ts",
         "start:prod": "node build/main.js",
         "build": "tsc && tsc-alias",
-        "migration:run": "npm run typeorm migration:run -- -d ./src/helper/datasource.ts"
+        "migration:run": "npm run typeorm migration:run -- -d ./src/helper/datasource.ts",
+        "lint": "npx eslint ."
     },
     "keywords": [
         "discord",
@@ -18,13 +19,17 @@
     ],
     "author": "Akari",
     "devDependencies": {
+        "@eslint/js": "^9.23.0",
         "@tsconfig/recommended": "^1.0.8",
         "@types/node": "^22.13.17",
         "@types/node-cron": "^3.0.11",
+        "eslint": "^9.23.0",
+        "globals": "^16.0.0",
         "nodemon": "^3.1.9",
         "tsc-alias": "^1.8.13",
         "tsx": "^4.19.3",
-        "typescript": "^5.8.2"
+        "typescript": "^5.8.2",
+        "typescript-eslint": "^8.29.0"
     },
     "dependencies": {
         "axios": "^1.8.4",

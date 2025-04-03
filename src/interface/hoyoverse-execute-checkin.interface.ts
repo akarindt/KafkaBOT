@@ -1,6 +1,4 @@
-import { HoyoverseGameEnum } from '@enum/hoyoverse-game.enum';
 import { HoyoverseAccountDetail } from './hoyoverse-account-detail.interface';
-
 export interface ExecuteCheckIn {
     userDiscordId: string;
     platform: string;

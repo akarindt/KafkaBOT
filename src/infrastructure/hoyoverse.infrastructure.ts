@@ -15,7 +15,7 @@ import { AppDataSource } from '@helper/datasource.helper';
 import HoyoverseRedeem from '@entity/hoyoverse-redeem.entity';
 import { In, Not } from 'typeorm';
 import { HoyoverseGameEnum } from '@enum/hoyoverse-game.enum';
-import { ExecuteCheckIn, HoyoverseAccountData, HoyoverseAccountDetail, HoyoverseGame, HoyoverseGameItem, HoyoverseResponse } from '@/interface';
+import { ExecuteCheckIn, HoyoverseAccountData, HoyoverseAccountDetail, HoyoverseGameItem, HoyoverseResponse } from '@/interface';
 
 export class HoyoverseClient {
     private _name: HoyoverseGameEnum;
@@ -149,9 +149,9 @@ export class HoyoverseClient {
     }
 
     async Redeem() {
-        let url = this._game.url.redem;
-        let accounts = this._data;
-        let results = [];
+        const url = this._game.url.redem;
+        const accounts = this._data;
+        const results = [];
 
         if (!url) {
             console.log(`[ERROR] Redeem code - ${this._game.gameName} doesn't have redeem function`);

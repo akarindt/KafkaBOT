@@ -1,6 +1,6 @@
 import { BOT_FALLBACK_IMG, DEFAULT_SIMILARITY_POINT, PRIMARY_EMBED_COLOR } from '@helper/constant.helper';
 import { GetUrlPath } from '@helper/util.helper';
-import { ContextMenuCommandBuilder, ApplicationCommandType, CommandInteraction, EmbedBuilder, ContextMenuCommandType, Utils } from 'discord.js';
+import { ContextMenuCommandBuilder, ApplicationCommandType, CommandInteraction, EmbedBuilder, ContextMenuCommandType } from 'discord.js';
 import sagiri from 'sagiri';
 
 export default {

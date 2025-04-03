@@ -30,7 +30,7 @@ export default [
                 await repository.insert(entity);
                 await interaction.followUp({ content: '✅ Assign successfully !', ephemeral: true });
                 return;
-            } catch (error) {
+            } catch {
                 await interaction.followUp('❌ Something wrong happened');
                 return;
             }
@@ -65,7 +65,7 @@ export default [
                 await repository.save(entity);
                 await interaction.followUp({ content: '✅ Update successfully !', ephemeral: true });
                 return;
-            } catch (error) {
+            } catch {
                 await interaction.followUp('❌ Something wrong happened');
                 return;
             }

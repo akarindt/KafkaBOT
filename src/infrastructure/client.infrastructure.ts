@@ -53,7 +53,7 @@ export class BotClient extends Client {
             console.log(`[INFO] Ready! logged in as ${client.user.tag}`);
         });
 
-        this.login(this.clientToken!!);
+        this.login(this.clientToken!);
     }
 
     public async RegisterCommands() {
@@ -148,7 +148,7 @@ export class BotClient extends Client {
 
         let content: string | undefined = message.content;
 
-        if (!content.startsWith(this.COMMAND_PREFIX!!)) return;
+        if (!content.startsWith(this.COMMAND_PREFIX!)) return;
 
         // remove prefix from string
         content = content.replace(new RegExp(this.COMMAND_PREFIX!), '');
@@ -167,8 +167,8 @@ export class BotClient extends Client {
             return;
         }
 
-        const parameters = new Collection<string, any>(); // Initialize parameters collection
-        let contentArr = content.split(' '); // Copy array
+        const parameters = new Collection<string, string | undefined>(); // Initialize parameters collection
+        const contentArr = content.split(' '); // Copy array
 
         for (let i = 0; i < command.parameters.length; i++) {
             const paramValue = contentArr[i] || undefined; // Assign parameter's value based on index
@@ -183,7 +183,7 @@ export class BotClient extends Client {
         try {
             await command.execute(message, { parameters, content });
             return;
-        } catch (error) {
+        } catch {
             await message.reply('[ERROR] There was an error while executing this command!');
             return;
         }

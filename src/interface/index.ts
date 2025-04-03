@@ -1,5 +1,3 @@
-export * from './hoyoverse-game.interface';
-export * from './hoyoverse-header.interface';
 export * from './hoyoverse-link.interface';
 export * from './hoyoverse-account-data.interface';
 export * from './hoyoverse-account-detail.interface';
