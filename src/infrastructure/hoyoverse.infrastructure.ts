@@ -29,7 +29,7 @@ export class HoyoverseClient {
         this._name = name;
         this._data = data;
         this._fullName = HOYOVERSE_GAME_LIST[this._name].gameName;
-        this._game = HOYOVERSE_GAME_LIST['GENSHIN'];
+        this._game = HOYOVERSE_GAME_LIST[this._name];
         this._userAgent = USER_AGENT;
         this._updateApi = HOYOVERSE_UPDATE_COOKIE_API;
 
