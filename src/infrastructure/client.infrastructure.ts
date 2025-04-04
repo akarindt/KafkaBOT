@@ -8,6 +8,7 @@ import { database } from '@helper/datasource.helper';
 import { DiscordCommand, DiscordCustomCommand } from '@/interface';
 import { DiscordRestApiBody } from '@/type';
 import Job from '@/job';
+import { DiscordGeneralCommand } from '@/type/discord-general-command.type';
 
 export class BotClient extends Client {
     private readonly commands = new Collection<string, DiscordCommand>();
@@ -66,8 +67,7 @@ export class BotClient extends Client {
         await Promise.all(
             files.map(async (filePath) => {
                 const imported = await ImportFile(url.pathToFileURL(filePath).href);
-                const command: DiscordCommand[] | DiscordCommand | DiscordCustomCommand | DiscordCustomCommand[] =
-                    'default' in imported ? imported.default : imported;
+                const command: DiscordGeneralCommand = 'default' in imported ? imported.default : imported;
 
                 if (Array.isArray(command)) {
                     command.forEach((item) => this.Add(item, body, filePath));
@@ -87,7 +87,7 @@ export class BotClient extends Client {
     }
 
     public async RegisterCronJob() {
-        return await new Job(this).Initialize();
+        return new Job(this).Initialize();
     }
 
     public InitDB() {

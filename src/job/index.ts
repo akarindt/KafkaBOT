@@ -9,7 +9,7 @@ export default class Job {
         this._client = client;
     }
 
-    public async Initialize() {
+    public Initialize() {
         // Hoyolab
         const HyJob = new HoyolabJob(this._client);
         HyJob.StartCheckCodeJob();

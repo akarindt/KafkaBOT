@@ -1,4 +1,3 @@
-export * from './hoyoverse-link.interface';
 export * from './hoyoverse-account-data.interface';
 export * from './hoyoverse-account-detail.interface';
 export * from './hoyoverse-award-data.interface';

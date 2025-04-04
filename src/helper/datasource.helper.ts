@@ -1,6 +1,14 @@
 import { Database } from '@infrastructure/database.infrastructure';
-import path from 'path';
 import { DataSourceOptions } from 'typeorm';
+import HoyoverseCode from '@entity/hoyoverse-code.entity';
+import HoyoverseRedeem from '@entity/hoyoverse-redeem.entity';
+import Hoyoverse from '@entity/hoyoverse.entity';
+import NSFWKeyword from '@entity/nsfw-keyword.entity';
+import Quote from '@entity/quote.entity';
+import WuwaNotify from '@entity/wuwa-notify.entity';
+import WuwaSubscribe from '@entity/wuwa-subscribe.entity';
+
+import path from 'path';
 import dotenv from 'dotenv';
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
@@ -11,8 +19,8 @@ export const defaultConfig: DataSourceOptions = {
     port: parseInt(process.env.POSTGRES_PORT || ''),
     host: process.env.POSTGRES_HOST,
     database: process.env.POSTGRES_DB,
-    entities: [path.join(__dirname, '../entity/*{.ts, .js}')],
-    migrations: [path.join(__dirname, '../../migrations/*{.ts, .js}')],
+    entities: [HoyoverseCode, HoyoverseRedeem, Hoyoverse, NSFWKeyword, Quote, WuwaNotify, WuwaSubscribe],
+    migrations: [path.resolve(__dirname, '../../migrations/*{.ts, .js}')],
     migrationsTableName: 'TBL_MIGRATION',
     synchronize: false,
     logging: false,
