@@ -17,6 +17,7 @@ import cron from 'node-cron';
 import { HoyoverseClient } from '@infrastructure/hoyoverse.infrastructure';
 import Hoyoverse from '@entity/hoyoverse.entity';
 import { DateToInt, ParseCookie } from '@helper/util.helper';
+import { setTimeout } from 'timers/promises';
 
 export default class HoyolabJob {
     private _client: BotClient;
@@ -187,6 +188,7 @@ export default class HoyolabJob {
                 }
             }
             console.log(`[INFO] ${gameName} - ${methodName} success!`);
+            await setTimeout(7000);
             return;
         } catch (error) {
             console.log(`[ERROR] ${methodName} - An error occurred: ${error}`);
