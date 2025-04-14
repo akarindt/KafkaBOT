@@ -47,17 +47,9 @@ export default class HoyolabJob {
                 });
             }
 
-            for (const inactiveCode of data.inactive) {
-                codes.push({
-                    gameName: gameName,
-                    code: inactiveCode.code,
-                    rewards: inactiveCode.rewards,
-                    isActivate: false,
-                    server: 'All',
-                });
-            }
+            await hoyoverseCodeRepository.delete({ gameName: gameName });
+            await hoyoverseCodeRepository.insert(codes);
 
-            await hoyoverseCodeRepository.upsert(codes, ['code', 'gameName']);
             console.log(`[INFO] ${gameName} - code checking success!`);
             return;
         } catch (error) {
@@ -251,11 +243,9 @@ export default class HoyolabJob {
 
         cron.schedule('0 0 16 * * *', async () => {
             const accounts = await hoyoverseRepository.find();
-            await Promise.all([
-                await this.SendDiscord('CHECKIN', this._client, HoyoverseGameEnum.GENSHIN, accounts),
-                await this.SendDiscord('CHECKIN', this._client, HoyoverseGameEnum.STARRAIL, accounts),
-                await this.SendDiscord('CHECKIN', this._client, HoyoverseGameEnum.ZENLESS, accounts),
-            ]);
+            await this.SendDiscord('CHECKIN', this._client, HoyoverseGameEnum.GENSHIN, accounts);
+            await this.SendDiscord('CHECKIN', this._client, HoyoverseGameEnum.STARRAIL, accounts);
+            await this.SendDiscord('CHECKIN', this._client, HoyoverseGameEnum.ZENLESS, accounts);
         });
 
         console.log(`[INFO] Started cron job: HOYOVERSE-AUTO-DAILY-CHECK-IN`);
