@@ -253,15 +253,10 @@ export default class HoyolabJob {
         console.log(`[INFO] Started cron job: HOYOVERSE-AUTO-DAILY-CHECK-IN`);
     }
 
-    public StartCheckCodeJob() {
-        cron.schedule('*/15 * * * *', async () => {
-            await this.CheckCode(HoyoverseGameEnum.STARRAIL);
-        });
-        console.log(`[INFO] Started cron job: HOYOVERSE-AUTO-DAILY-CODE-CHECKING`);
-    }
-
     public StartHoyolabAutoRedeem() {
         cron.schedule('*/30 * * * *', async () => {
+            await this.CheckCode(HoyoverseGameEnum.STARRAIL);
+
             const hoyoverseRepository = AppDataSource.getRepository(Hoyoverse);
             const accounts = await hoyoverseRepository.find();
             await this.SendDiscord('REDEMTION', this._client, HoyoverseGameEnum.STARRAIL, accounts);

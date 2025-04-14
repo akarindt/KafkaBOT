@@ -12,7 +12,6 @@ export default class Job {
     public Initialize() {
         // Hoyolab
         const HyJob = new HoyolabJob(this._client);
-        HyJob.StartCheckCodeJob();
         HyJob.StartHoyolabCheckInJob();
         HyJob.StartHoyolabAutoRedeem();
         // End Hoyolab
